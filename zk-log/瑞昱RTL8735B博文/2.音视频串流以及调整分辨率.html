@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.音视频串流以及调整分辨率</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="_1">音视频串流及分辨率更改</h2>
+<p>使用综合demo时选择 mmf2_video_example_av_init();函数，该函数为音视频单通道串流（不带人脸识别）</p>
+<p>更改分辨率 代码片</p>
+<pre><code class="language-c">/*
+  VIDEO_VGA     
+    RTSP_WIDTH  640  
+    RTSP_HEIGHT 480  
+  VIDEO_HD  
+    RTSP_WIDTH  1280  
+    RTSP_HEIGHT 720 
+  VIDEO_FHD   
+    RTSP_WIDTH  1920    
+    RTSP_HEIGHT 1080 
+ */
+
+static const struct sensor_params_t sensor_params[] = {
+    {1920, 1080, 30}, //DUMMY
+    {1920, 1080, 30}, //SC2336
+    {1920, 1080, 30}, //GC2053
+    {2560, 1440, 15}, //GC4653
+    {1920, 1080, 30}, //F37
+    {1920, 1080, 30}, //IMX327
+    {1536, 1536, 30}, //F51
+    {1920, 1080, 30}, //PS5258
+    {2048, 1536, 20}, //SC301
+    {1920, 1080, 30}, //IMX307
+    {1920, 1080, 30}, //SC2333
+    {2560, 1440, 15}, //GC4023
+    {1952, 1944, 30}, //PS5420
+    {1536, 1536, 30}, //PS5270
+    {2592, 1944, 30}, //GC5035
+    {1920, 1080, 30}, //PS5268
+    {1920, 1080, 30}, //SC2310
+    {1952, 1944, 30}, //PS5420_HDR
+    {1536, 1536, 30}, //PS5270_HDR
+};
+
+ ---------------------------------------------------------------------------------------------------
+ atcmd_userctrl_init();     /*sensor capacity check &amp; video parameter setting*/       video_v1_params.resolution = VIDEO_VGA; 
+
+ // video_v1_params.width = sensor_params[USE_SENSOR].sensor_width;     
+ // video_v1_params.height = sensor_params[USE_SENSOR].sensor_height;   
+ video_v1_params.width = 640;  
+ video_v1_params.height = 480;  
+ video_v1_params.fps = sensor_params[USE_SENSOR].sensor_fps; 
+ video_v1_params.gop = sensor_params[USE_SENSOR].sensor_fps;    /*rtsp parameter setting*/    rtsp2_v1_params.u.v.fps = sensor_params[USE_SENSOR].sensor_fps;  
+ int voe_heap_size = video_voe_presetting(1, video_v1_params.width, video_v1_params.height, V1_BPS, 0,                      0, 0, 0, 0, 0,                      0, 0, 0, 0, 0,                      0, 0, 0); 
+</code></pre>
+<p>上述函数中，更改分辨率  应更改：</p>
+<p>video_v1_params.resolution = VIDEO_VGA;    其中 可选为 VIDEO_VGA, VIDEO_HD ,VIDEO_FHD ，对应的分辨率如上</p>
+<p>更改实际分辨率宽高</p>
+<p>video_v1_params.width = 640;   </p>
+<p>video_v1_params.height = 480;  </p>
+<p>注：摄像头定义的像素大小不能更改，否则会报错，如上我使用的  {1920, 1080, 30}, //F37      一开始更改这里，造成err</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">音视频串流及分辨率更改</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

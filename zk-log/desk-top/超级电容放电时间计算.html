@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>超级电容放电时间计算</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><img alt="image-20240704171925744" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240704171925744.png" /></p>
+<p><img alt="image-20240704172001231" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240704172001231.png" /></p>
+<p><img alt="image-20240704172016387" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240704172016387.png" /></p>
+<p>计算我们使用的</p>
+<p>电容参数：   </p>
+<ul>
+<li>
+<p>初始电压5.5V,</p>
+</li>
+<li>
+<p>最终电压2.5V  </p>
+</li>
+<li>电容值0.47F</li>
+<li>放电电流3mA  (1.5mA - 4mA之间变化)</li>
+</ul>
+<p>计算结果为：</p>
+<pre><code>(5.5V-2.5V)*0.47F/0.003A = 470s  (大约7分50S)
+</code></pre>
+<ul>
+<li>充满电实际测试结果约8分10秒</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul></ul>
+</div>
+
+</div>
+</body>
+</html>

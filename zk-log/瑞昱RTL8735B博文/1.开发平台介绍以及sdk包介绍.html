@@ -1,0 +1,796 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.开发平台介绍以及sdk包介绍</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="rtl8735bsdk">RTL8735B开发平台介绍以及SDK包使用</h1>
+<h2 id="realtek-rtl8735b">Realtek(瑞昱) RTL8735B芯片介绍</h2>
+<p>(Realtek RTL8735B也称为 AmebaPro-II)</p>
+<p>RTL8735B – Arm v8M @500MHz(Max.) </p>
+<p>– Integrated with 802.11 a/b/g/n Wi-Fi </p>
+<p>– Bluetooth Low Energy (BLE) 5.1 </p>
+<p>– Support Secure boot &amp; Crypto Engine </p>
+<p>– ISP Integrated </p>
+<p>– H.264/H.265 encoder up to 5MP or 1080p@45fps </p>
+<p>– Integrated Intelligent Engine @0.4 TOPS </p>
+<p>– Up to 128MB RAM(Max.) – Low Power design</p>
+<p>该芯片可作为 人脸识别的方案，0.4 TOPS 算力使得在运行yolo4时检测时间低至110ms</p>
+<p>参考链接：</p>
+<p>RTL8735B  对比 ESP32 :  https://www.youtube.com/watch?v=26Nslm-90TE</p>
+<p>RTL8735B  demo演示： https://space.bilibili.com/457777430/channel/seriesdetail?sid=3614093</p>
+<p>​                                           https://www.youtube.com/@amebaiot7033/videos</p>
+<h2 id="_1">开发平台</h2>
+<p><img alt="image-20241107152544459" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241107152544459.png" /></p>
+<p><img alt="get-start-2" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/P02.png" /></p>
+<table>
+<thead>
+<tr>
+<th>GPIO pin</th>
+<th>GPIO INT</th>
+<th>ADC</th>
+<th>PWM</th>
+<th>UART</th>
+<th>SPI</th>
+<th>I2C</th>
+<th>SWD</th>
+<th>LED</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>PF5</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td>SPI1_MISO</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td>PF6</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td>SPI1_SCLK</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>PF7</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td>SPI1_MOSI</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>PF8</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td>SPI1_SS</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>PF11</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td>PF12</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>PF13</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>PF14</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td>PF15</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td>PF2</td>
+<td>✓</td>
+<td>A2</td>
+<td></td>
+<td></td>
+<td></td>
+<td>I2C1_SDA</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>PF1</td>
+<td>✓</td>
+<td>A1</td>
+<td></td>
+<td></td>
+<td></td>
+<td>I2C1_SCL</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td>PF0</td>
+<td>✓</td>
+<td>A0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>PE4</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td>SPI_SS</td>
+<td>I2C_SDA</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>13</td>
+<td>PE3</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td>SPI_MOSI</td>
+<td>I2C_SCL</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td>PE2</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>SERIAL3_RX</td>
+<td>SPI_MISO</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>15</td>
+<td>PE1</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>SERIAL3_TX</td>
+<td>SPI_SCLK</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td>PD18</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>17</td>
+<td>PD17</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>18</td>
+<td>PD16</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>SERIAL2_RX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>PD15</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>SERIAL2_TX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>20</td>
+<td>PD14</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>PA2</td>
+<td>✓</td>
+<td>A6</td>
+<td></td>
+<td>SERIAL1_TX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>22</td>
+<td>PA3</td>
+<td>✓</td>
+<td>A7</td>
+<td></td>
+<td>SERIAL1_RX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>PF9</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>LED_BUILTIN / LEB_B (blue)</td>
+</tr>
+<tr>
+<td>24</td>
+<td>PE6</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>LED_G (green)</td>
+</tr>
+<tr>
+<td>25</td>
+<td>PF4</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>LOG_TX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>26</td>
+<td>PF3</td>
+<td>✓</td>
+<td>*A3</td>
+<td></td>
+<td>LOG_RX</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>27</td>
+<td>PA1</td>
+<td>✓</td>
+<td>A5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>I2C2_SDA</td>
+<td>SWD_CLK</td>
+<td></td>
+</tr>
+<tr>
+<td>28</td>
+<td>PA0</td>
+<td>✓</td>
+<td>A4</td>
+<td></td>
+<td></td>
+<td></td>
+<td>I2C2_SCL</td>
+<td>SWD_DATA</td>
+<td></td>
+</tr>
+<tr>
+<td>29</td>
+<td>PF10</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">教程示例以及论坛</h2>
+<p>影片教学与示范  YouTube 频道: • https://youtu.be/_rLiih5RkXY。
+• https://youtube.com/playlist?list=PLEQfNjOZQRyPnmXCuRqE1f5au2HT4E9CP。
+• https://youtu.be/-jQDpDFX2ao。
+• https://youtube.com/playlist?list=PLEQfNjOZQRyOxXFV7X_2fIcnd_J6VBmyM。
+BiliBili 频道: • https://space.bilibili.com/457777430。
+ 参考连结  Ameba Arduino SDK: https://www.amebaiot.com/ameba-arduino-summary/。
+FAQ: https://forum.amebaiot.com/t/welcome-to-ameba-faq/1748。
+论坛: https://forum.amebaiot.com/。
+Facebook 中文社群: https://www.facebook.com/groups/AmebaIoT。
+Facebook 英文社群: https://www.facebook.com/groups/amebaioten。</p>
+<h2 id="_3">软件平台</h2>
+<p>RTL8735B的平台开发有两种方式，一种是使用Arduino IDE, 一种是使用官方的SDK包使用gcc开发</p>
+<ul>
+<li>
+<p>Arduino IDE下提供了大量的demo,对于体验该芯片的功能来说不错，但对于开发者来说此环境不适用，比如我要添加其他传感器时，添加驱动就是一个很麻烦的事情。</p>
+</li>
+<li>
+<p>另一种是使用SDK开发，官方的sdk包中包含更多的demo以及有丰富的第三方组件可供学习使用，sdk包使用</p>
+</li>
+</ul>
+<p>​       gcc-arm-none-eabi + cmak  管理与编译工程，推荐在linux下安装该工具链开发</p>
+<h3 id="arduino">Arduino开发环境搭建</h3>
+<p>arduino开发环境搭建请参考：https://www.amebaiot.com/cn/amebapro2-amb82-mini-arduino-getting-started/   （其中在下载库的时候需要科学xx才可下载成功）</p>
+<h3 id="linux">Linux开发环境搭建</h3>
+<p>linux下开发：</p>
+<ul>
+<li>编译工具链下载</li>
+</ul>
+<p>ubuntu22下编译测试没有问题,  推荐使用ubuntu22</p>
+<pre><code>编译工具链下载
+sudo apt-get update
+apt  install cmake 
+sudo apt-get install gcc-arm-none-eabi  
+</code></pre>
+<ul>
+<li>sdk包下载与描述</li>
+</ul>
+<p>该sdk包为非公开，内部使用，第一次烧录时摄像头不通，小改了一下，贴的sdk包下载链接为更改之后的</p>
+<p>sdk包下载链接：             ，    淘宝购买官方的开发板可以直接使用该sdk包，若需更换摄像头需更改驱动</p>
+<h2 id="sdk">SDK包的软件结构</h2>
+<p>SDK 应用笔记可在该手册中找到：AN0700 AmebaPro2 Application Note</p>
+<p>在 AmebaPro2的 dk 中，它主要包含四个文件夹。“component”文件夹存储主要组件源，“project”文件夹包含项目生成文件、编译标志和一些示例。文件夹“ doc”和“ tool”提供了帮助您设置项目的文档和工具。</p>
+<p><img alt="image-20241108134048023" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108134048023.png" /></p>
+<p><img alt="image-20241108134126387" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108134126387.png" /></p>
+<p><img alt="image-20241108134149269" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108134149269.png" /></p>
+<p><img alt="image-20241108134214053" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108134214053.png" /></p>
+<h2 id="sdk_1">编译SDK包</h2>
+<p>该sdk包中提供了多个示例 以及一个综合示例,在编译前给该sdk包递归执行权限</p>
+<pre><code>chmod 775 -R sdk-ameba-v9.6b
+</code></pre>
+<h3 id="_4">编译综合示例</h3>
+<pre><code>编译时候确保在当前目录下：
+sdk-ameba-v9.6b/project/realtek_amebapro2_v0_example/GCC-RELEASE/build$
+
+生成编译文件
+cmake .. -G&quot;Unix Makefiles&quot; -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DVIDEO_EXAMPLE=ON
+
+这时候会在build目录下生成新的编译规则文件，回退到build目录给该目录下所有文件权限
+chmod 775 -R build
+
+build下编译
+cmake --build . --target flash_nn -j4
+</code></pre>
+<p>其中综合示例中有多个功能供我们使用，一次只能使用其中的一个函数</p>
+<pre><code>//------------------------------------------------------------------------------
+// video support examples
+//------------------------------------------------------------------------------
+static void example_mmf2_video_surport(void)
+{
+
+    // CH1 Video -&gt; H264/HEVC -&gt; RTSP
+    // mmf2_video_example_v1_init();
+
+    // CH2 Video -&gt; H264/HEVC -&gt; RTSP
+    //mmf2_video_example_v2_init();
+
+    // CH3 Video -&gt; JPEG -&gt; RTSP
+    //mmf2_video_example_v3_init();
+
+    // CH1 Video -&gt; H264/HEVC -&gt; RTSP + SNAPSHOT
+    //mmf2_video_example_v1_shapshot_init();
+
+    // 1 Video (H264/HEVC) -&gt; 2 RTSP (V1, V2)
+    //mmf2_video_example_simo_init();
+
+    // 1 Video (H264/HEVC) 1 Audio -&gt; RTSP
+    mmf2_video_example_av_init();  //音视频流
+
+    // 2 Video (H264/HEVC) 1 Audio -&gt; 2 RTSP (V1+A, V2+A)
+    //mmf2_video_example_av2_init();
+
+    // 1 Video (H264/HEVC) 1 Audio -&gt; 2 RTSP (V+A)
+    //mmf2_video_example_av21_init();
+
+    // 1 Video (H264/HEVC) 1 Audio -&gt; MP4 (SD card)
+    //mmf2_video_example_av_mp4_init();
+
+    // 1V1A RTSP MP4
+    // H264 -&gt; RTSP and mp4
+    // AUDIO -&gt; AAC  -&gt; RTSP and mp4
+    //mmf2_video_example_av_rtsp_mp4_init();
+
+    // Joint test
+    // H264 -&gt; RTSP (with AUDIO)
+    // H264 -&gt; RTSP (with AUDIO)
+    // AUDIO -&gt; AAC  -&gt; RTSP
+    // RTP   -&gt; AAD  -&gt; AUDIO
+    //mmf2_video_example_joint_test_init();
+
+    // Joint test RTSP MP4
+    // H264 -&gt; MP4 (V1)
+    // H264 -&gt; RTSP (V2)
+    // AUDIO -&gt; AAC  -&gt; RTSP and mp4
+    // RTP   -&gt; AAD  -&gt; AUDIO
+    // mmf2_video_example_joint_test_rtsp_mp4_init();
+
+    // H264 and 2way audio (G711, PCMU)
+    // H264 -&gt; RTSP (V1)
+    // AUDIO -&gt; G711E  -&gt; RTSP
+    // RTP   -&gt; G711D  -&gt; AUDIO
+    // ARRAY (PCMU) -&gt; G711D -&gt; AUDIO (doorbell)
+    //mmf2_video_example_2way_audio_pcmu_doorbell_init();
+
+    // H264 and 2way audio (G711, PCMU)
+    // H264 -&gt; RTSP (V1)
+    // AUDIO -&gt; G711E  -&gt; RTSP
+    // RTP   -&gt; G711D  -&gt; AUDIO
+    //mmf2_video_example_2way_audio_pcmu_init();
+
+    // ARRAY (H264) -&gt; RTSP (V)
+    //mmf2_video_example_array_rtsp_init();
+
+    // V1 parameter change
+    //mmf2_video_example_v1_param_change_init();
+
+    // V1 day night mode change
+    //mmf2_video_example_v1_day_night_change_init();
+
+    // V1 apply mask
+    //mmf2_video_example_v1_mask_init();
+
+    // V1 rate control example
+    //mmf2_video_example_v1_rate_control_init();
+
+    //HTTP File Server
+    //mmf2_video_example_av_mp4_httpfs_init();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; NN object detect (V4)
+    //mmf2_video_example_vipnn_rtsp_init();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; NN face detect (V4) -&gt; NN face recognition
+    //mmf2_video_example_face_rtsp_init();
+
+    // NN 3 models cascade example
+    //mmf2_video_example_fd_lm_mfn_sim_rtsp_init();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; NN object detect (V4)
+    // RGB  -&gt; NN face detect (V4) -&gt; NN face recognition
+    // AUDIO -&gt; NN audio classification
+    //mmf2_video_example_joint_test_all_nn_rtsp_init();
+
+    // MP4 -&gt; RTSP (V1)
+    //mmf2_video_example_demuxer_rtsp_init();
+
+    // ARRAY (H264, G711) -&gt; MP4
+    //mmf2_video_example_h264_pcmu_array_mp4_init();
+
+    // AUDIO -&gt; NN audio classification
+    //mmf2_video_example_audio_vipnn_init();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; motion detection (V4)
+    //mmf2_video_example_md_rtsp_init();
+
+    // MD dynamic record event
+    // H264 -&gt; MP4 (V1)
+    // H264 -&gt; RTSP (V2)
+    // RGB  -&gt; motion detection (V4)
+    // AUDIO -&gt; AAC  -&gt; RTSP and mp4
+    //mmf2_video_example_md_mp4_init();
+
+    //mmf2_video_example_bayercap_rtsp_init();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; motion detection (V4) -&gt; NN object detect
+    //mmf2_video_example_md_nn_rtsp_init();
+
+    // Joint test RTSP MP4 with fast camera start
+    //mmf2_video_example_joint_test_rtsp_mp4_init_fcs();
+
+    // H264 -&gt; RTSP (V1)
+    // RGB  -&gt; NN face detect (V4)
+    //mmf2_video_example_vipnn_facedet_init();
+
+    // EXTERNAL DATA -&gt; JPEG
+    //mmf2_video_example_jpeg_external_init();
+
+    // H264 -&gt; RTSP (V1)
+    // H264 -&gt; RTSP (V2, Sync mode)
+    // RGB  -&gt; NN face detect (V4)
+    //mmf2_video_example_vipnn_facedet_sync_init();
+
+    // CH1 Video -&gt; JPEG (SNAPSHOT, Sync mode)
+    //mmf2_video_example_vipnn_facedet_sync_snapshot_init();
+
+    // Joint test RTSP MP4 with NN
+    // H264 -&gt; MP4  (V1)
+    // H264 -&gt; RTSP (V2)
+    // RGB  -&gt; NN object detect (V4)
+    // RGB  -&gt; NN face detect (V4) -&gt; NN face recognition (optional)
+    // AUDIO -&gt; AAC  -&gt; RTSP and mp4
+    // AUDIO -&gt; NN audio classification
+    // RTP   -&gt; AAD  -&gt; AUDIO
+    //mmf2_video_example_joint_test_vipnn_rtsp_mp4_init();
+
+    video_init_done = 1;
+}
+</code></pre>
+<p>编译出的综合demo bin文件为     flash_ntz.nn.bin</p>
+<h3 id="_5">编译普通示例</h3>
+<p>在component---&gt;example 目录下，所有的子目录都是一个示例，有如下示例</p>
+<pre><code class="language-C">amazon_freertos
+├── audio_helix_aac
+├── audio_helix_mp3
+├── audio_loop
+├── audio_opus_encode
+├── bcast
+├── cJSON
+├── coap
+├── fatfs
+├── httpc
+├── http_client
+├── httpd
+├── http_download
+├── kvs_producer_mmf
+├── kvs_webrtc_mmf
+├── littlefs
+├── mcast
+├── media_fmp4
+├── media_framework
+├── media_mp4_demuxer
+├── media_uvcd
+├── media_video_to_storage
+├── mqtt
+├── nn_file_tester
+├── nonblock_connect
+├── ota_http
+├── qr_code_scanner
+├── sd_hotplug
+├── secure_boot
+├── secure_storage
+├── sntp_showtime
+├── socket_select
+├── socket_tcp_trx
+├── sqlite
+├── ssl_client
+├── ssl_download
+├── ssl_server
+├── std_file
+├── tcp_keepalive
+├── usb_cdc
+├── usb_cdc_snapshot
+├── usb_dfu_ota
+├── usb_example
+├── usb_mass_storage
+├── vl53l8cx
+
+</code></pre>
+<p>如果我要测试mqtt  则编译命令为</p>
+<pre><code class="language-c">cmake .. -G&quot;Unix Makefiles&quot; -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DEXAMPLE=mqtt
+cmake --build . --target flash -j4
+</code></pre>
+<p>编译出的bin文件名为  flash_ntz.bin</p>
+<h2 id="_6">软件烧录</h2>
+<p>上述编译步骤完成了，烧录时在windows下进行，将编译出的bin文件拷贝到 烧录工具（确保编译出的bin文件权限可读写，给了权限再下载到windows 进行烧录）</p>
+<p>拷贝bin文件到烧录工具 Pro2_PG_tool _v1.3.0  目录下</p>
+<p><img alt="image-20241108140803473" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108140803473.png" /></p>
+<p>使用以下命令进行烧录，注意区分编译的是综合demo还是示例demo  两者的bin文件不一致</p>
+<p>综合demo烧录如下，我这里用的git bash</p>
+<p>./uartfwburn.exe -p COM8 -f flash_ntz.nn.bin -b 2000000 -U     其中COM口需要与实际对应</p>
+<p><img alt="image-20241108140209180" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20241108140209180.png" /></p>
+<p>示例demo烧录命令一致，只是将bin文件替换下</p>
+<p>./uartfwburn.exe -p COM8 -f flash_ntz.bin -b 2000000 -U</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#rtl8735bsdk">RTL8735B开发平台介绍以及SDK包使用</a><ul>
+<li><a href="#realtek-rtl8735b">Realtek(瑞昱) RTL8735B芯片介绍</a></li>
+<li><a href="#_1">开发平台</a></li>
+<li><a href="#_2">教程示例以及论坛</a></li>
+<li><a href="#_3">软件平台</a><ul>
+<li><a href="#arduino">Arduino开发环境搭建</a></li>
+<li><a href="#linux">Linux开发环境搭建</a></li>
+</ul>
+</li>
+<li><a href="#sdk">SDK包的软件结构</a></li>
+<li><a href="#sdk_1">编译SDK包</a><ul>
+<li><a href="#_4">编译综合示例</a></li>
+<li><a href="#_5">编译普通示例</a></li>
+</ul>
+</li>
+<li><a href="#_6">软件烧录</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

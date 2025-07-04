@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>docker中使用命令行安装ubuntu</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>在 Docker 中安装 Ubuntu 实际上意味着从 Docker Hub 上拉取一个 Ubuntu 镜像并运行一个基于该镜像的容器。下面是如何做到这一点的步骤：</p>
+<h3 id="1-ubuntu">步骤 1: 拉取 Ubuntu 镜像</h3>
+<p>首先，你需要拉取一个 Ubuntu 镜像到你的系统。你可以选择特定的版本（如 <code>ubuntu:20.04</code>），或者如果你不指定版本，使用 <code>ubuntu:latest</code> 来拉取最新的官方 Ubuntu 镜像。打开你的终端或命令行界面，然后运行以下命令：</p>
+<pre><code>docker pull ubuntu:latest
+</code></pre>
+<p>这个命令会从 Docker Hub 拉取最新的 Ubuntu 镜像。如果你想要一个特定版本的 Ubuntu，只需将 <code>latest</code> 替换为你想要的版本号，例如 <code>20.04</code>。</p>
+<h3 id="2-ubuntu">步骤 2: 运行 Ubuntu 容器</h3>
+<p>拉取镜像后，你可以运行一个基于该镜像的容器。使用以下命令来运行一个交互式的容器，其中 <code>-it</code> 参数允许你交互式地使用容器内的 shell：</p>
+<pre><code>docker run -it --name ubuntu_container ubuntu:latest /bin/bash
+</code></pre>
+<p>这里的命令解析如下：</p>
+<ul>
+<li><code>docker run</code> 命令用于创建并启动一个新的容器。</li>
+<li><code>-it</code> 参数使容器在交互模式下运行，并分配一个伪终端。</li>
+<li><code>--name ubuntu_container</code> 给容器指定一个名字（<code>ubuntu_container</code>），这样你就可以轻松地引用它。</li>
+<li><code>ubuntu:latest</code> 指定使用哪个镜像来创建容器。这应该与你之前拉取的镜像标签匹配。</li>
+<li><code>/bin/bash</code> 指定启动容器时要运行的命令。在这个例子中，它会启动 bash shell，允许你直接在容器中输入命令。</li>
+</ul>
+<p>运行上述命令后，你将进入 Ubuntu 容器的 bash 环境中，可以在其中执行 Ubuntu 命令。当你完成操作并想退出容器时，只需输入 <code>exit</code> 命令或使用 <code>Ctrl+D</code> 快捷键。</p>
+<h3 id="_1">额外提示</h3>
+<ul>
+<li><strong>列出所有运行的容器</strong>：如果你想看到当前所有正在运行的容器，可以使用 <code>docker ps</code> 命令。</li>
+<li><strong>停止容器</strong>：要停止正在运行的容器，可以使用 <code>docker stop &lt;容器名或ID&gt;</code> 命令。</li>
+<li><strong>重新进入容器</strong>：如果你的容器已经运行，但你想再次进入其 bash 环境，可以使用 <code>docker exec -it &lt;容器名或ID&gt; /bin/bash</code> 命令。</li>
+</ul>
+<p>通过这些步骤，你就可以在 Docker 中轻松运行和管理 Ubuntu 容器了。</p>
+<h3 id="ubuntu">退出 Ubuntu 容器</h3>
+<p>如果你想退出容器的命令行界面，可以使用 <code>exit</code> 命令或按下 <code>Ctrl+D</code>。这会结束当前的 shell 会话，但容器本身会停止运行。要再次进入该容器的交互式命令行，可以使用：</p>
+<pre><code class="language-shell">docker start my_ubuntu_container
+docker attach my_ubuntu_container
+</code></pre>
+<p>我需要使用ssh工具来连接到我的ubuntu需要如何做</p>
+<p>要通过 SSH 连接到你在 Docker 容器中运行的 Ubuntu 系统，你需要执行几个步骤来设置环境。这些步骤包括在 Docker 容器中安装 SSH 服务、配置 SSH 服务、以及通过 Docker 端口映射来暴露 SSH 端口。下面是详细的步骤：</p>
+<h3 id="1-ssh-ubuntu">步骤 1: 创建一个带有 SSH 服务的 Ubuntu 容器</h3>
+<p>首先，你需要创建一个新的 Dockerfile 来构建一个包含 SSH 服务的 Ubuntu 容器镜像。</p>
+<ol>
+<li><strong>创建 Dockerfile</strong>：在一个空目录中创建一个文件命名为 <code>Dockerfile</code>，然后输入以下内容：</li>
+</ol>
+<pre><code># 使用官方 Ubuntu 基础镜像
+FROM ubuntu:latest
+
+# 安装 SSH 服务
+RUN apt-get update &amp;&amp; \
+    apt-get install -y openssh-server &amp;&amp; \
+    mkdir /var/run/sshd &amp;&amp; \
+    echo 'root:yourpassword' | chpasswd
+
+# 更改 SSH 配置以允许 root 登录
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# 容器启动时运行 SSH 服务
+CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]
+</code></pre>
+<ol>
+<li><strong>构建 Docker 镜像</strong>：在 Dockerfile 所在目录运行以下命令来构建你的镜像：</li>
+</ol>
+<pre><code>docker build -t ubuntu_ssh .
+</code></pre>
+<p>这会创建一个标签为 <code>ubuntu_ssh</code> 的新 Docker 镜像。</p>
+<h3 id="2-ssh-ubuntu">步骤 2: 运行带有 SSH 服务的 Ubuntu 容器</h3>
+<p>使用以下命令运行你刚刚创建的带有 SSH 服务的容器，并映射端口以便通过 SSH 连接：</p>
+<pre><code>docker run -d -p 2222:22 --name ubuntu_ssh_container ubuntu_ssh
+</code></pre>
+<p>这里 <code>-d</code> 参数使容器在后台运行，<code>-p 2222:22</code> 将容器的 22 端口（SSH 默认端口）映射到宿主机的 2222 端口。你可以选择使用其他宿主机端口，只需调整命令中的 <code>2222</code> 即可。</p>
+<h3 id="3-ssh">步骤 3: 通过 SSH 连接到容器</h3>
+<p>现在，你可以使用 SSH 客户端连接到运行 SSH 服务的 Docker 容器了：</p>
+<pre><code>ssh root@localhost -p 2222
+</code></pre>
+<p>当系统提示你输入密码时，使用你在 Dockerfile 中设置的密码（示例中为 <code>yourpassword</code>）。</p>
+<p>使用ssh工具连接一致  用户名root 密码yourpassword</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#1-ubuntu">步骤 1: 拉取 Ubuntu 镜像</a></li>
+<li><a href="#2-ubuntu">步骤 2: 运行 Ubuntu 容器</a></li>
+<li><a href="#_1">额外提示</a></li>
+<li><a href="#ubuntu">退出 Ubuntu 容器</a></li>
+<li><a href="#1-ssh-ubuntu">步骤 1: 创建一个带有 SSH 服务的 Ubuntu 容器</a></li>
+<li><a href="#2-ssh-ubuntu">步骤 2: 运行带有 SSH 服务的 Ubuntu 容器</a></li>
+<li><a href="#3-ssh">步骤 3: 通过 SSH 连接到容器</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

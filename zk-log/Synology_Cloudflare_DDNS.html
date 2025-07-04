@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Synology_Cloudflare_DDNS</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>一则短信猝不及防，tplink的自带免费域名的dns居然停了</p>
+<ul>
+<li>第一个想到的是使用openwrt软路由替换，作为主路由实现ddns与端口映射</li>
+</ul>
+<p>理解一下ddns的原理：</p>
+<p>动态域名的ip不固定，这时候需要将域名与ip绑定 通过域名访问，这一过程叫做dns</p>
+<p>TPLINK的 ddns 如何实现的：访问的域名只要能和实时变动的域名对应上，就ok了</p>
+<p>一般自己配置dns服务对应的ip是固定的，我们要做的是让dns服务器或服务商知道ip变了，要去更新一下，</p>
+<p>这时候需要有设备告诉dns服务器，ip发生了变化，你要更新一下</p>
+<p>我有一个群晖，在群晖上检测公网ip,当ip变了时告诉dns服务器或服务商</p>
+<p>github:https://github.com/joshuaavalon/SynologyCloudflareDDNS</p>
+<p>配置参考：https://diveng.xyz/article/configuring-cloudflare-dynamic-dns-on-synology-dsm/</p>
+<h1 id="synology-cloudflare-ddns-script">Synology Cloudflare DDNS Script 📜</h1>
+<p>The is a script to be used to add <a href="https://www.cloudflare.com/">Cloudflare</a> as a DDNS to <a href="https://www.synology.com/">Synology</a> NAS. The script used an updated API, Cloudflare API v4.</p>
+<h2 id="how-to-use">How to use</h2>
+<h3 id="access-synology-via-ssh">Access Synology via SSH</h3>
+<ol>
+<li>Login to your DSM</li>
+<li>Go to Control Panel &gt; Terminal &amp; SNMP &gt; Enable SSH service</li>
+<li>Use your client to access Synology via SSH.</li>
+<li>Use your Synology admin account to connect.</li>
+</ol>
+<h3 id="run-commands-in-synology">Run commands in Synology</h3>
+<ol>
+<li>Download <code>cloudflareddns.sh</code> from this repository to <code>/sbin/cloudflareddns.sh</code></li>
+</ol>
+<pre><code>wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflareddns.sh
+</code></pre>
+<p>It is not a must, you can put I whatever you want. If you put the script in other name or path, make sure you use the right path.</p>
+<ol>
+<li>Give others execute permission</li>
+</ol>
+<pre><code>chmod +x /sbin/cloudflareddns.sh
+</code></pre>
+<ol>
+<li>Add <code>cloudflareddns.sh</code> to Synology</li>
+</ol>
+<pre><code>cat &gt;&gt; /etc.defaults/ddns_provider.conf &lt;&lt; 'EOF'
+[Cloudflare]
+        modulepath=/sbin/cloudflareddns.sh
+        queryurl=https://www.cloudflare.com
+        website=https://www.cloudflare.com
+E*.
+</code></pre>
+<p><code>queryurl</code> does not matter because we are going to use our script but it is needed.</p>
+<h3 id="get-cloudflare-parameters">Get Cloudflare parameters</h3>
+<ol>
+<li>Go to your domain overview page and copy your zone ID.</li>
+<li>Go to your profile &gt; <strong>API Tokens</strong> &gt; <strong>Create Token</strong>. It should have the permissions of <code>Zone &gt; DNS &gt; Edit</code>. Copy the api token.</li>
+</ol>
+<h3 id="setup-ddns">Setup DDNS</h3>
+<ol>
+<li>Login to your DSM</li>
+<li>Go to Control Panel &gt; External Access &gt; DDNS &gt; Add</li>
+<li>Enter the following:</li>
+<li>Service provider: <code>Cloudflare</code></li>
+<li>Hostname: <code>www.example.com</code></li>
+<li>Username/Email: <code>&lt;Zone ID&gt;</code></li>
+<li>Password Key: <code>&lt;API Token&gt;</code></li>
+</ol>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#synology-cloudflare-ddns-script">Synology Cloudflare DDNS Script 📜</a><ul>
+<li><a href="#how-to-use">How to use</a><ul>
+<li><a href="#access-synology-via-ssh">Access Synology via SSH</a></li>
+<li><a href="#run-commands-in-synology">Run commands in Synology</a></li>
+<li><a href="#get-cloudflare-parameters">Get Cloudflare parameters</a></li>
+<li><a href="#setup-ddns">Setup DDNS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

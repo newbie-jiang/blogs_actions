@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <title>内容导航主页</title>
+  <style>
+    body { margin: 0; font-family: "Kaiti", "楷体", "Microsoft YaHei", "SimKai", "KaiTi", Helvetica, Arial, sans-serif; background: #eef0f7; }
+    .container { display: flex; height: 100vh; }
+    .sidebar { width: 300px; background: linear-gradient(180deg,#f9fafb 80%,#e9eefa); border-right: 1px solid #e1e4ed; box-shadow: 2px 0 8px 0 #ccd6e5; padding-top: 24px; overflow-y: auto; font-family: "Kaiti", "楷体", "Microsoft YaHei", "SimKai", "KaiTi", serif; }
+    .sidebar h1 { font-size: 1.5em; font-weight: 700; color: #1b3876; text-align: center; margin-bottom: 32px; letter-spacing: 1px; font-family: "Kaiti", "楷体", "Microsoft YaHei", "SimKai", "KaiTi", serif; }
+    .sidebar .dir-btn {
+        background: none; border: none; outline: none; cursor: pointer; font-size: 1.1em; font-weight: bold; color: #253768;
+        display: flex; align-items: center; width: 100%; padding: 8px 12px; margin-top: 10px; border-radius: 7px;
+        transition: background 0.2s;
+        font-family: "Kaiti", "楷体", "Microsoft YaHei", "SimKai", "KaiTi", serif;
+        justify-content: space-between;
+    }
+    .sidebar .dir-btn:hover { background: #dde8f7; }
+    .sidebar .dir-arrow { font-size: 1.0em; margin-right: 6px; transition: transform 0.2s; color: #7f8aa7;}
+    .sidebar .collapsed > .dir-arrow { transform: rotate(-90deg); }
+    .sidebar ul { list-style: none; padding-left: 28px; margin: 2px 0 10px 0; transition: max-height 0.3s; }
+    .sidebar li { margin: 4px 0; }
+    .sidebar a { color: #174e88; text-decoration: none; font-size: 1.0em; padding: 2px 4px; border-radius: 4px; display: inline-block; transition: all 0.15s; font-family: "Kaiti", "楷体", "Microsoft YaHei", "SimKai", "KaiTi", serif;}
+    .sidebar a:hover, .sidebar a.active { background: #cbe3fd; color: #22b94f; font-weight: bold;}
+    .sidebar .divider { border-top: 1px solid #ececec; margin: 16px 0; }
+    .main { flex: 1; min-width: 0; background: #fff; }
+    iframe { width: 100%; height: 100vh; border: none; background: #fff; }
+    @media (max-width: 700px) { .container { flex-direction: column; } .sidebar { width: 100vw; height: 250px; border-right: none; border-bottom: 1px solid #eee; } .main { height: calc(100vh - 250px); } }
+    ::-webkit-scrollbar { width: 8px; background: #e3e9f1; }
+    ::-webkit-scrollbar-thumb { background: #c1d4ee; border-radius: 5px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <nav class="sidebar">
+    <h1>行长内容导航 <span style="font-size:0.65em;color:#666;">（共59篇）</span></h1>
+<div class="dir-section ">
+<button class="dir-btn" onclick="toggleDir('dir_0', this)"><span class="dir-arrow">&#9654;</span>home <span style="color:#8496b5;font-size:0.9em;">(4)</span></button>
+<ul id="dir_0" >
+<li><a href="home/0.windows下安装tree.html" target="preview" onclick="setActive(this);return false;">0.windows下安装tree</a></li>
+<li><a href="home/1.zephyr配置安装-官方安装.html" target="preview" onclick="setActive(this);return false;">1.zephyr配置安装-官方安装</a></li>
+<li><a href="home/2.zephyr配置安装-使用安装好的包直接解压使用.html" target="preview" onclick="setActive(this);return false;">2.zephyr配置安装-使用安装好的包直接解压使用</a></li>
+<li><a href="home/3.zephyr目录结构.html" target="preview" onclick="setActive(this);return false;">3.zephyr目录结构</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_1', this)"><span class="dir-arrow">&#9654;</span>zk-log <span style="color:#8496b5;font-size:0.9em;">(28)</span></button>
+<ul id="dir_1" style="display:none;">
+<li><a href="zk-log/100x100 tof.html" target="preview" onclick="setActive(this);return false;">100x100 tof</a></li>
+<li><a href="zk-log/ameba-cmake分析.html" target="preview" onclick="setActive(this);return false;">ameba-cmake分析</a></li>
+<li><a href="zk-log/ble设备状态.html" target="preview" onclick="setActive(this);return false;">ble设备状态</a></li>
+<li><a href="zk-log/Synology_Cloudflare_DDNS.html" target="preview" onclick="setActive(this);return false;">Synology_Cloudflare_DDNS</a></li>
+<li><a href="zk-log/ThingsBoard部署-Linux.html" target="preview" onclick="setActive(this);return false;">ThingsBoard部署-Linux</a></li>
+<li><a href="zk-log/windows下安装tree.html" target="preview" onclick="setActive(this);return false;">windows下安装tree</a></li>
+<li><a href="zk-log/zephyr rtos有哪些文件参与了编译.html" target="preview" onclick="setActive(this);return false;">zephyr rtos有哪些文件参与了编译</a></li>
+<li><a href="zk-log/zephyr创建自己的board运行不起来.html" target="preview" onclick="setActive(this);return false;">zephyr创建自己的board运行不起来</a></li>
+<li><a href="zk-log/zephyr支持的arm芯片厂商.html" target="preview" onclick="setActive(this);return false;">zephyr支持的arm芯片厂商</a></li>
+<li><a href="zk-log/zephyr模拟器运行.html" target="preview" onclick="setActive(this);return false;">zephyr模拟器运行</a></li>
+<li><a href="zk-log/zephyr驱动框架.html" target="preview" onclick="setActive(this);return false;">zephyr驱动框架</a></li>
+<li><a href="zk-log/为什么会屈服于权威.html" target="preview" onclick="setActive(this);return false;">为什么会屈服于权威</a></li>
+<li><a href="zk-log/人脸活体检测模型.html" target="preview" onclick="setActive(this);return false;">人脸活体检测模型</a></li>
+<li><a href="zk-log/今日任务2025_5_24.html" target="preview" onclick="setActive(this);return false;">今日任务2025_5_24</a></li>
+<li><a href="zk-log/摄像头突破局域网限制.html" target="preview" onclick="setActive(this);return false;">摄像头突破局域网限制</a></li>
+<li><a href="zk-log/日志2024_05_08.html" target="preview" onclick="setActive(this);return false;">日志2024_05_08</a></li>
+<li><a href="zk-log/日志2024_11月_12月.html" target="preview" onclick="setActive(this);return false;">日志2024_11月_12月</a></li>
+<li><a href="zk-log/日志2024_12_30.html" target="preview" onclick="setActive(this);return false;">日志2024_12_30</a></li>
+<li><a href="zk-log/日志2024_4月_5月.html" target="preview" onclick="setActive(this);return false;">日志2024_4月_5月</a></li>
+<li><a href="zk-log/日志2025_1_2.html" target="preview" onclick="setActive(this);return false;">日志2025_1_2</a></li>
+<li><a href="zk-log/日志2025_1_3.html" target="preview" onclick="setActive(this);return false;">日志2025_1_3</a></li>
+<li><a href="zk-log/日志合集.html" target="preview" onclick="setActive(this);return false;">日志合集</a></li>
+<li><a href="zk-log/查找zephyr中最多的测试单元.html" target="preview" onclick="setActive(this);return false;">查找zephyr中最多的测试单元</a></li>
+<li><a href="zk-log/活体识别方案.html" target="preview" onclick="setActive(this);return false;">活体识别方案</a></li>
+<li><a href="zk-log/电池cr2450参数.html" target="preview" onclick="setActive(this);return false;">电池cr2450参数</a></li>
+<li><a href="zk-log/网络协议.html" target="preview" onclick="setActive(this);return false;">网络协议</a></li>
+<li><a href="zk-log/群晖docker安装gitlab.html" target="preview" onclick="setActive(this);return false;">群晖docker安装gitlab</a></li>
+<li><a href="zk-log/胰岛素泵app界面参考设置.html" target="preview" onclick="setActive(this);return false;">胰岛素泵app界面参考设置</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_2', this)"><span class="dir-arrow">&#9654;</span>zk-log/desk-top <span style="color:#8496b5;font-size:0.9em;">(17)</span></button>
+<ul id="dir_2" style="display:none;">
+<li><a href="zk-log/desk-top/docker中使用命令行安装ubuntu.html" target="preview" onclick="setActive(this);return false;">docker中使用命令行安装ubuntu</a></li>
+<li><a href="zk-log/desk-top/frps配置.html" target="preview" onclick="setActive(this);return false;">frps配置</a></li>
+<li><a href="zk-log/desk-top/ldo发热.html" target="preview" onclick="setActive(this);return false;">ldo发热</a></li>
+<li><a href="zk-log/desk-top/linux下部署Samba.html" target="preview" onclick="setActive(this);return false;">linux下部署Samba</a></li>
+<li><a href="zk-log/desk-top/scl sda信号测量.html" target="preview" onclick="setActive(this);return false;">scl sda信号测量</a></li>
+<li><a href="zk-log/desk-top/youtube视频下载工具.html" target="preview" onclick="setActive(this);return false;">youtube视频下载工具</a></li>
+<li><a href="zk-log/desk-top/低功耗测试说明书.html" target="preview" onclick="setActive(this);return false;">低功耗测试说明书</a></li>
+<li><a href="zk-log/desk-top/便携输注机器人功能说明.html" target="preview" onclick="setActive(this);return false;">便携输注机器人功能说明</a></li>
+<li><a href="zk-log/desk-top/按键唤醒.html" target="preview" onclick="setActive(this);return false;">按键唤醒</a></li>
+<li><a href="zk-log/desk-top/文件io.html" target="preview" onclick="setActive(this);return false;">文件io</a></li>
+<li><a href="zk-log/desk-top/标准io与系统io.html" target="preview" onclick="setActive(this);return false;">标准io与系统io</a></li>
+<li><a href="zk-log/desk-top/步进电机分析.html" target="preview" onclick="setActive(this);return false;">步进电机分析</a></li>
+<li><a href="zk-log/desk-top/活体人脸检测方案.html" target="preview" onclick="setActive(this);return false;">活体人脸检测方案</a></li>
+<li><a href="zk-log/desk-top/群晖cpu信息补丁.html" target="preview" onclick="setActive(this);return false;">群晖cpu信息补丁</a></li>
+<li><a href="zk-log/desk-top/群晖安装openwrt.html" target="preview" onclick="setActive(this);return false;">群晖安装openwrt</a></li>
+<li><a href="zk-log/desk-top/蓝牙.html" target="preview" onclick="setActive(this);return false;">蓝牙</a></li>
+<li><a href="zk-log/desk-top/超级电容放电时间计算.html" target="preview" onclick="setActive(this);return false;">超级电容放电时间计算</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_3', this)"><span class="dir-arrow">&#9654;</span>zk-log/desk-top/DOC <span style="color:#8496b5;font-size:0.9em;">(3)</span></button>
+<ul id="dir_3" style="display:none;">
+<li><a href="zk-log/desk-top/DOC/chatgpt消息发送不出去.html" target="preview" onclick="setActive(this);return false;">chatgpt消息发送不出去</a></li>
+<li><a href="zk-log/desk-top/DOC/动态库和静态库的引入.html" target="preview" onclick="setActive(this);return false;">动态库和静态库的引入</a></li>
+<li><a href="zk-log/desk-top/DOC/鲁班猫登录.html" target="preview" onclick="setActive(this);return false;">鲁班猫登录</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_4', this)"><span class="dir-arrow">&#9654;</span>zk-log/get_zephyr_sample <span style="color:#8496b5;font-size:0.9em;">(1)</span></button>
+<ul id="dir_4" style="display:none;">
+<li><a href="zk-log/get_zephyr_sample/readme.html" target="preview" onclick="setActive(this);return false;">readme</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_5', this)"><span class="dir-arrow">&#9654;</span>zk-log/zephyr编译文件分析build <span style="color:#8496b5;font-size:0.9em;">(1)</span></button>
+<ul id="dir_5" style="display:none;">
+<li><a href="zk-log/zephyr编译文件分析build/readme.html" target="preview" onclick="setActive(this);return false;">readme</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_6', this)"><span class="dir-arrow">&#9654;</span>zk-log/开源监控管理工具 <span style="color:#8496b5;font-size:0.9em;">(2)</span></button>
+<ul id="dir_6" style="display:none;">
+<li><a href="zk-log/开源监控管理工具/1.开源监控管理工具.html" target="preview" onclick="setActive(this);return false;">1.开源监控管理工具</a></li>
+<li><a href="zk-log/开源监控管理工具/2.Shinobi.html" target="preview" onclick="setActive(this);return false;">2.Shinobi</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+<div class="dir-section collapsed">
+<button class="dir-btn" onclick="toggleDir('dir_7', this)"><span class="dir-arrow">&#9654;</span>zk-log/瑞昱RTL8735B博文 <span style="color:#8496b5;font-size:0.9em;">(3)</span></button>
+<ul id="dir_7" style="display:none;">
+<li><a href="zk-log/瑞昱RTL8735B博文/1.开发平台介绍以及sdk包介绍.html" target="preview" onclick="setActive(this);return false;">1.开发平台介绍以及sdk包介绍</a></li>
+<li><a href="zk-log/瑞昱RTL8735B博文/2.了解sdk中的demo.html" target="preview" onclick="setActive(this);return false;">2.了解sdk中的demo</a></li>
+<li><a href="zk-log/瑞昱RTL8735B博文/2.音视频串流以及调整分辨率.html" target="preview" onclick="setActive(this);return false;">2.音视频串流以及调整分辨率</a></li>
+</ul>
+</div>
+<div class="divider"></div>
+  </nav>
+  <main class="main">
+    <iframe name="preview" src="home/0.windows下安装tree.html"></iframe>
+  </main>
+</div>
+<script>
+function setActive(link) {
+  document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+  link.classList.add("active");
+  document.querySelector("iframe").src = link.getAttribute("href");
+}
+function toggleDir(id, btn) {
+  var ul = document.getElementById(id);
+  if (ul.style.display === "none") {
+    ul.style.display = "";
+    btn.classList.remove("collapsed");
+  } else {
+    ul.style.display = "none";
+    btn.classList.add("collapsed");
+  }
+}
+window.onload = function() {
+  var first = document.querySelector(".sidebar a");
+  if(first) first.classList.add("active");
+};
+</script>
+</body></html>

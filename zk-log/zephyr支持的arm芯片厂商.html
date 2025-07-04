@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>zephyr支持的arm芯片厂商</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>zephyr\dts\arm</p>
+<p><img alt="image-20250408103804581" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20250408103804581.png" /></p>
+<pre><code class="language-c">$ tree -L 1
+.
+|-- acsip
+|-- adi
+|-- ambiq
+|-- antmicro
+|-- armv6-m.dtsi
+|-- armv7-a.dtsi
+|-- armv7-m.dtsi
+|-- armv7-r.dtsi
+|-- armv8-m.dtsi
+|-- armv8-r.dtsi
+|-- armv8.1-m.dtsi
+|-- aspeed
+|-- atmel
+|-- broadcom
+|-- cortex_r8_virt.dtsi
+|-- ene
+|-- gd
+|-- infineon
+|-- intel_socfpga_std
+|-- microchip
+|-- nordic
+|-- nuvoton
+|-- nxp
+|-- oct
+|-- olimex
+|-- quicklogic
+|-- rakwireless
+|-- raspberrypi
+|-- realtek
+|-- renesas
+|-- seeed_studio
+|-- silabs
+|-- st
+|-- ti
+|-- we
+-- xilinx 
+</code></pre>
+<h2 id="8">🇨🇳 国产芯片厂商（8个）</h2>
+<table>
+<thead>
+<tr>
+<th>文件夹/名字</th>
+<th>厂商名</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>gd</strong></td>
+<td>GigaDevice（兆易创新）</td>
+<td>以 GD32 MCU 系列为主，是 STM32 的国产替代品</td>
+</tr>
+<tr>
+<td><strong>nuvoton</strong></td>
+<td>新唐科技（Nuvoton）</td>
+<td>来自台湾的芯片公司，提供 M0、M4 系列</td>
+</tr>
+<tr>
+<td><strong>realtek</strong></td>
+<td>瑞昱（Realtek）</td>
+<td>WiFi/音频/嵌入式 SoC 供应商，如 RTL87xx</td>
+</tr>
+<tr>
+<td><strong>seeed_studio</strong></td>
+<td>Seeed Studio（矽递科技）</td>
+<td>虽然是平台商，但也有定制国产芯片模组</td>
+</tr>
+<tr>
+<td><strong>rakwireless</strong></td>
+<td>RAK 无线</td>
+<td>主要做 LoRa 无线模块，基于国产或国际芯片</td>
+</tr>
+<tr>
+<td><strong>we</strong></td>
+<td>芯旺微（WinnerMicro）</td>
+<td>WiFi MCU，已被阿里巴巴收购（如 W800/W801）</td>
+</tr>
+<tr>
+<td><strong>oct</strong></td>
+<td>开发平台 OCT</td>
+<td>很可能是国产定制芯片平台（不常见）</td>
+</tr>
+<tr>
+<td><strong>ene</strong></td>
+<td>欣颖电子（ENE）</td>
+<td>台湾厂商，做 EC（嵌入式控制器）芯片</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<hr />
+<h2 id="18">🌍 非国产/国际主流芯片厂商（18个）</h2>
+<table>
+<thead>
+<tr>
+<th>文件夹/名字</th>
+<th>厂商名</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>acsip</strong></td>
+<td>AcSiP</td>
+<td>无线模组厂商，基于 Nordic 等芯片</td>
+</tr>
+<tr>
+<td><strong>adi</strong></td>
+<td>Analog Devices</td>
+<td>模拟芯片和 MCU 方案（如 ADuCM 系列）</td>
+</tr>
+<tr>
+<td><strong>ambiq</strong></td>
+<td>Ambiq Micro</td>
+<td>超低功耗 ARM Cortex-M 系列，如 Apollo3</td>
+</tr>
+<tr>
+<td><strong>antmicro</strong></td>
+<td>Antmicro</td>
+<td>嵌入式平台公司，与 Zephyr 社区密切合作</td>
+</tr>
+<tr>
+<td><strong>armv6-m.dtsi</strong> ～ <strong>armv8.1-m.dtsi</strong></td>
+<td>Arm</td>
+<td>ARM 架构通用定义，不属于具体厂商</td>
+</tr>
+<tr>
+<td><strong>aspeed</strong></td>
+<td>ASPEED</td>
+<td>BMC 芯片供应商（服务器管理控制器）</td>
+</tr>
+<tr>
+<td><strong>atmel</strong></td>
+<td>Atmel（已被 Microchip 收购）</td>
+<td>经典 AVR/M0/M4 芯片</td>
+</tr>
+<tr>
+<td><strong>broadcom</strong></td>
+<td>Broadcom</td>
+<td>主要是网络芯片和 Raspberry Pi SoC</td>
+</tr>
+<tr>
+<td><strong>infineon</strong></td>
+<td>Infineon（英飞凌）</td>
+<td>汽车和工业级 MCU（收购了 Cypress）</td>
+</tr>
+<tr>
+<td><strong>intel_socfpga_std</strong></td>
+<td>Intel</td>
+<td>FPGA + ARM SoC（如 Cyclone V SoC）</td>
+</tr>
+<tr>
+<td><strong>microchip</strong></td>
+<td>Microchip</td>
+<td>AVR, PIC, SAM 系列</td>
+</tr>
+<tr>
+<td><strong>nordic</strong></td>
+<td>Nordic Semiconductor</td>
+<td>BLE 主打，nRF51/nRF52/nRF53/nRF91</td>
+</tr>
+<tr>
+<td><strong>nxp</strong></td>
+<td>NXP 恩智浦</td>
+<td>Cortex-M、i.MX RT、Kinetis 系列</td>
+</tr>
+<tr>
+<td><strong>olimex</strong></td>
+<td>Olimex</td>
+<td>板卡厂商，使用 Allwinner/NXP 等芯片</td>
+</tr>
+<tr>
+<td><strong>quicklogic</strong></td>
+<td>QuickLogic</td>
+<td>超低功耗 FPGA / MCU 方案</td>
+</tr>
+<tr>
+<td><strong>raspberrypi</strong></td>
+<td>Raspberry Pi</td>
+<td>BCM283x 系列芯片</td>
+</tr>
+<tr>
+<td><strong>renesas</strong></td>
+<td>瑞萨电子</td>
+<td>RX/RA 系列 MCU、汽车 SoC</td>
+</tr>
+<tr>
+<td><strong>silabs</strong></td>
+<td>Silicon Labs</td>
+<td>Zigbee/Thread/WiFi SoC，如 EFR32</td>
+</tr>
+<tr>
+<td><strong>st</strong></td>
+<td>STMicroelectronics</td>
+<td>STM32 系列（F0~H7）</td>
+</tr>
+<tr>
+<td><strong>ti</strong></td>
+<td>Texas Instruments</td>
+<td>MSP430, CC13xx/26xx, Sitara 系列</td>
+</tr>
+<tr>
+<td><strong>xilinx</strong></td>
+<td>Xilinx（已被 AMD 收购）</td>
+<td>Zynq SoC（ARM + FPGA）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_1">🧪 其他或虚拟平台（可能是平台代码而不是芯片）</h2>
+<table>
+<thead>
+<tr>
+<th>文件夹/名字</th>
+<th>含义</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>armv6-m.dtsi</strong> 等</td>
+<td>架构级设备树片段</td>
+<td>ARM 架构通用定义，用于 SoC 继承</td>
+</tr>
+<tr>
+<td><strong>cortex_r8_virt.dtsi</strong></td>
+<td>虚拟 Cortex-R8 平台</td>
+<td>通常是测试或模拟平台</td>
+</tr>
+<tr>
+<td><strong>antmicro</strong>、<strong>seeed_studio</strong>、<strong>rakwireless</strong></td>
+<td>可能是板卡平台集成商</td>
+<td>并不直接制造芯片</td>
+</tr>
+</tbody>
+</table>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#8">🇨🇳 国产芯片厂商（8个）</a></li>
+<li><a href="#18">🌍 非国产/国际主流芯片厂商（18个）</a></li>
+<li><a href="#_1">🧪 其他或虚拟平台（可能是平台代码而不是芯片）</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

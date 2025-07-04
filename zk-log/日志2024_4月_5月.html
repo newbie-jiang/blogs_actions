@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>日志2024_4月_5月</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="20240401">2024/04/01</h1>
+<p>【便携注射机器人项目】</p>
+<ul>
+<li>增加排气功能</li>
+</ul>
+<p>主界面时候可通过按键SW3（key --） 、SW4 (key ++) 选择排气功能，SW6（sure）可查看排气速度   SW2(start)可启动排气功能</p>
+<p><img alt="image-20240401175551779" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240401175551779.png" /></p>
+<p><img alt="image-20240401175632732" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240401175632732.png" /></p>
+<p><img alt="image-20240401175717737" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240401175717737.png" /></p>
+<ul>
+<li>增加抽药功能</li>
+</ul>
+<p>主界面时候按下 sw5(back) 抽药启动并显示相应ui，再按一次返回主界面并停止抽药</p>
+<p><img alt="image-20240401175847916" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240401175847916.png" /></p>
+<ul>
+<li>与傅工测试电机在针管内推进（实验未成功）</li>
+</ul>
+<p>根据受力分析，电机在针管内部由于受到阻力不仅有上下阻力，还有左右阻力，需改善产品结构或使用更大扭矩步进电机</p>
+<h1 id="20240402">2024/04/02</h1>
+<p>【便携注射机器人项目】</p>
+<ul>
+<li>做了四种字体界面demo向胡总展示 （楷体，黑体，宋体，华文中宋） 沟通确认UI界面使用 宋体 (该字体无版权)</li>
+<li>更改所有界面中文字体为 “宋体” 已完成并向胡总演示 通过</li>
+<li>增加英文字体，开机可选中 / 英文字体 ZH or EN  已完成绝大部分（明天上午可完成所有界面并测试通过）  </li>
+</ul>
+<p>后期中英文考虑增加功能（由于不确定flash的大小，后续flash剩余多则可将中英文都保存在flash并可通过用户设置）</p>
+<ul>
+<li>[x] 出厂第一次开机时可根据用户选中的中，英文  写入flash保存，后续开机不再弹出语言选项 </li>
+<li>[x] 按键设置中英文功能</li>
+</ul>
+<h1 id="20240403">2024/04/03</h1>
+<p>【便携注射机器人项目】</p>
+<ul>
+<li>完成注射机器人UI英语字体适配并测试无BUG</li>
+<li>编写注射机器人功能说明书，</li>
+<li>适配蓝牙控制指令,根据调整界面适配对应指令</li>
+</ul>
+<h1 id="20240408">2024/04/08</h1>
+<p>【便携注射机器人项目】</p>
+<ul>
+<li>
+<p>主界面增加设置选项，可通过按键进入设置菜单，已完成UI部分，配置参数写入falsh以及开机从falsh中获取数据还未完成，明日可完善该功能</p>
+</li>
+<li>
+<p>[x]  中英文语言设置</p>
+</li>
+<li>[x] 开机默认 <strong>输血速度，待入量</strong> 设置</li>
+<li>[x] 开机默认 <strong>输液速度，待入量</strong> 设置</li>
+<li>
+<p>[x] 开机默认 <strong>镇痛速度，待入量</strong> 设置</p>
+</li>
+<li>
+<p>规划falsh</p>
+</li>
+</ul>
+<p><img alt="image-20240408194202105" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240408194202105.png" /></p>
+<h1 id="20240409">2024/04/09</h1>
+<ul>
+<li>产线装机</li>
+</ul>
+<h1 id="20240410">2024/04/10</h1>
+<ul>
+<li>
+<p>[x] 完成出厂第一次开机时设置中、英文  后续开机不再弹出该页面</p>
+</li>
+<li>
+<p>[x] 完成设置界面的中英文切换 且断电不丢失（一套代码兼容中英文版本） </p>
+</li>
+<li>
+<p>[x] 完成设置界面的各模式参数预设（系统默认参数可调，用户不用每次调整速度以及液量到对应值）</p>
+</li>
+</ul>
+<p>系统参数占用情况</p>
+<ul>
+<li>500kB-504kB   前20个字节用于保存是否第一次上电标志位 之后40个字节用于保存系统参数（各模式 默认 速度 待入量）</li>
+<li>504kB-508kB   前十个字节 用于保存出厂是否设置过中英文标志位 </li>
+</ul>
+<h1 id="20240411">2024/04/11</h1>
+<ul>
+<li>[x] 上位机接收蓝牙数据较多死机问题，与富芮坤FAE胡工联系 【已解决】</li>
+<li>[x] 更新显示界面 参数由整数更改为小数，UI已更改大部分，串口协议需要更改尚未完成</li>
+</ul>
+<h2 id="_1">蓝牙发送数据较多卡死问题现象描述：</h2>
+<ul>
+<li>创建运行四个任务，蓝牙调试助手请求数据较少正常，过多会造成死机 ，重启， 蓝牙异常 现象</li>
+<li>屏蔽掉四个任务之后 请求数据过多正常    </li>
+</ul>
+<p>使用原厂demo板测试一致，与硬件电路无关</p>
+<p><img alt="image-20240411141436612" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240411141436612.png" /></p>
+<p><img alt="image-20240411141211712" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240411141211712.png" /></p>
+<h2 id="_2">问题排查：</h2>
+<p>文件中需要增加 特征2 的数据长度   原长度为20会导致数据阻塞，将缓冲区加大即可         但是屏蔽所有任务数据正常，很奇怪 </p>
+<p><img alt="image-20240411155939532" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240411155939532.png" /></p>
+<h1 id="20240412">2024/04/12</h1>
+<ul>
+<li>
+<p>[x] 更新显示界面 参数由整数更改为小数，速度，待入量 步进值0.1   UI已更改完成</p>
+</li>
+<li>
+<p>[x] 主从机发送接收数据需更改，更新UART协议已完成</p>
+</li>
+</ul>
+<h1 id="20240416">2024/04/16</h1>
+<h2 id="_3">低功耗测试</h2>
+<h2 id="-6v">---以下测试均在电压6V下进行</h2>
+<h2 id="_4">芯片工作电流说明</h2>
+<p>富芮坤蓝牙芯片</p>
+<p><img alt="image-20240416153404434" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240416153404434.png" /></p>
+<p>51芯片</p>
+<p><img alt="image-20240416154107362" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240416154107362.png" /></p>
+<p>整机功耗 测试1： 蓝牙芯片可进入低功耗模式，51一直非低功耗    连接屏幕(点亮)</p>
+<ul>
+<li>进入低功耗模式前   <strong>19.5mA</strong></li>
+<li>进入低功耗模式 <strong>11.9mA</strong></li>
+</ul>
+<p>整机功耗 测试2： 蓝牙芯片可进入低功耗模式，51一直非低功耗    不接屏幕</p>
+<ul>
+<li>进入低功耗模式前 <strong>13.7mA</strong></li>
+<li>进入低功耗模式 <strong>6mA</strong></li>
+</ul>
+<p>整机功耗 测试3： 蓝牙芯片可进入低功耗模式，51一直低功耗    连接屏幕(点亮)</p>
+<ul>
+<li>进入低功耗模式前   <strong>17.3mA</strong></li>
+<li>进入低功耗模式 <strong>9.6mA</strong></li>
+</ul>
+<p>整机功耗 测试3： 蓝牙芯片可进入低功耗模式，51一直低功耗    不接屏幕</p>
+<ul>
+<li>进入低功耗模式前   <strong>11.5mA</strong></li>
+<li>进入低功耗模式 <strong>3.8mA</strong></li>
+</ul>
+<h2 id="_5">结论</h2>
+<ul>
+<li>富芮坤蓝牙芯片工作电流约为 7.5mA  </li>
+<li>51 芯片工作电流约为 2.2mA</li>
+<li>屏幕工作电流约 6mA</li>
+<li>其他电流约为 3.7mA</li>
+</ul>
+<h2 id="_6">勘误</h2>
+<ul>
+<li>
+<p>上述中其他电流消耗异常，检查富芮坤蓝牙芯片工作电流并不准确，富芮坤芯片在配置了ADC的情况下系统进入低功耗电流会增加，实际测整机低功耗范围<strong>0.14mA--0.16mA</strong>   (蓝牙芯片进入低功耗（蓝牙未开启）  ，51芯片进入低功耗)   </p>
+</li>
+<li>
+<p>[ ] BUG   在开启低功耗时  使能蓝牙，出现异常错误，该错误在静态库中无法查看，明天和胡工讨论【未解决】</p>
+</li>
+<li>[ ] 唤醒后屏幕显示异常【未解决】</li>
+</ul>
+<p><img alt="image-20240416203229163" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240416203229163.png" /></p>
+<h1 id="20240417">2024/04/17</h1>
+<ul>
+<li>唤醒后屏幕显示异常【未解决】</li>
+</ul>
+<p>测试富芮坤demo板唤醒后屏幕显示正常，与我们的板软件逻辑一致</p>
+<p>硬件不同点</p>
+<ul>
+<li>demo板进入低功耗会复位LCD的RESET脚，会切断电源，</li>
+<li>我们的板由于硬件设计未连接RESET且LCD_EN脚由于连接电源无法关闭</li>
+</ul>
+<p>明日验证：通过跳线连接LCD的RESET脚，软件对LCD RESET脚复位验证 </p>
+<ul>
+<li>
+<p>进入低功耗无法关闭屏幕，会有6mA左右电流消耗 ，因为与电源相连，关闭则整个系统会断电</p>
+</li>
+<li>
+<p>唤醒后屏幕显示异常【已解决】</p>
+</li>
+</ul>
+<p>导致唤醒后屏幕显示异常原因，硬件设计上未连接LCD_RESER, 通过跳线连接LCD_RESER,软件验证已通过</p>
+<p><strong>下一版的电路需要增加LCD_RESET脚的连接</strong></p>
+<h1 id="20240506">2024/05/06</h1>
+<ul>
+<li>[x] 移植FATFS 文件系统 + 外部SPI flash  successful      格式化文件系统  挂载文件系统  读写文件  均验证通过</li>
+<li>外部falsh空间使用不完，可通过文件系统存储其他掉电不丢失内容，理论上可同时将外部falsh与内部flash划分出某部分作为文件系统(待验证)</li>
+<li>（Chip flash speed &gt; external flash speed）</li>
+<li>[ ] FATFS 文件系统 + 内部flash  暂未实现，需重写内部flash操作函数</li>
+</ul>
+<h1 id="20240507">2024/05/07</h1>
+<ul>
+<li>
+<p>FATFS 文件系统 + 内部flash  验证遇到问题  </p>
+</li>
+<li>
+<p>[x] 已经实现flash操作函数且进行读写验证成功(大小100k，读写每个扇区校验数据一致)</p>
+</li>
+</ul>
+<p><code>int8_t my_flash_write(uint8_t *pBuffer, uint32_t address, uint32_t size)
+  int8_t my_flash_read(uint8_t *pBuffer,uint32_t address,  uint32_t size)</code></p>
+<ul>
+<li>[ ] 已实现文件系统接口函数，但测试格式化文件系统失败：错误类型如下</li>
+</ul>
+<p><img alt="image-20240507182206604" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240507182206604.png" /></p>
+<p>查找相关文档解决方法</p>
+<ul>
+<li>增加堆栈（无效）</li>
+<li>增加TASK堆栈（无效）</li>
+<li>尝试静态内存分配、动态内存分配（无效）</li>
+<li>减少文件名长度（无效）</li>
+<li>更改编码类型（无效）</li>
+</ul>
+<h1 id="20240508">2024/05/08</h1>
+<p><strong>【VP10-PLUS】</strong></p>
+<ul>
+<li>
+<p>[x] 外部flash与内部flash同时挂载文件系统成功</p>
+</li>
+<li>
+<p>[x] 更改原系统配置参数地址</p>
+</li>
+<li>
+<p>[ ] 外置flash烧录较麻烦，准备移植zmodem协议，上位机拉取bin文件，通过该协议将数据发送至内部flash处理写入spi flash</p>
+</li>
+</ul>
+<p><strong>理想状态下烧录时间预估：</strong></p>
+<p>波特率115200   一帧数据10bit (起始位+数据位+停止位)    每秒发送11kB数据     <strong>1MB大小需要93 S</strong></p>
+<p>波特率921600  一帧数据10bit (起始位+数据位+停止位)     每秒发送90 kB数据    <strong>1MB大小需要11 S</strong></p>
+<h2 id="fatfsflashram">FATFS移植后内部flash与RAM占用情况</h2>
+<p><strong>总大小如下</strong></p>
+<ul>
+<li>1024KB      CHIP FLASH</li>
+<li>224KB       SRAM     </li>
+</ul>
+<p><img alt="" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240508102117508.png" /></p>
+<h2 id="flash">当前flash使用情况与剩余量如下</h2>
+<p>​         flash占用412.6KB        剩余600KB左右</p>
+<p>​          RAM占用122.4KB         剩余100kB左右</p>
+<p><img alt="image-20240508153614469" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240508153614469.png" /></p>
+<h2 id="_7">系统配置区域大小</h2>
+<p><img alt="image-20240508095324235" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240508095324235.png" /></p>
+<ul>
+<li>0x9DE2     FALSH占用39KB</li>
+</ul>
+<h2 id="falsh">当前内部falsh规划</h2>
+<p><img alt="image-20240508162200214" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240508162200214.png" /></p>
+<p><strong>err</strong></p>
+<ul>
+<li>从flash中读药物库列表分配内存失败!    需要增加堆栈大小</li>
+<li>挂载文件系统或格式化失败 err 17，需检查扇区大小，起始地址需要为起始块，扇区数量不能较少</li>
+</ul>
+<h1 id="20240513">2024/05/13</h1>
+<ul>
+<li>[x] USB 虚拟U盘挂载成功 读写验证通过（USB MSC）</li>
+</ul>
+<p>USB接口连接电脑可直接读写文件(使用内部flash)，log可直接导出</p>
+<p><img alt="image-20240513120257942" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/zhongke/image-20240513120257942.png" /></p>
+<h2 id="20240515">2024/05/15</h2>
+<ul>
+<li>[x] 重写电机转速算法已完成，由原来的转速0-999ml/h   更改为 转/小时   测试无误</li>
+<li>新板存在问题，相同程序驱动电机，力矩减小，且电流与上一版相比较小，电源电路未更改，还未分析其他硬件原理</li>
+<li>[x] 重写下位机串口接收协议已完成（未验证）</li>
+<li>上位机的串口协议还未更改，程序无法烧录至富芮坤芯片，测试两个ST link都不能下载程序，明天尝试串口下载程序</li>
+</ul>
+<h2 id="20240530">2024/05/30</h2>
+<p>问题排查</p>
+<p>当上位机通过UART发送数据给下位机，但下位机未能接收到数据时，可能涉及多个潜在问题。这些问题可能包括电压不匹配、物理连接问题、配置错误等。下面是一些需要检查的关键点：</p>
+<ol>
+<li><strong>电压匹配</strong>：</li>
+<li>确保上位机和下位机的电压水平是兼容的。如果一个设备使用3.3V，另一个使用5V，可能需要电平转换器来匹配信号电平。</li>
+<li><strong>物理连接</strong>：</li>
+<li>检查UART的连接线（通常是TX、RX和GND）是否正确连接。确保TX线连接到RX线，反之亦然。</li>
+<li>检查接线是否松动或有损坏。</li>
+<li><strong>串口配置</strong>：</li>
+<li>确保两个设备的波特率（bps）、数据位、停止位和奇偶校验配置一致。</li>
+<li>如果设备支持，可以查看是否有错误信号或状态指示帮助诊断问题。</li>
+<li><strong>软件和固件</strong>：</li>
+<li>检查上位机和下位机的软件或固件中是否有bug或配置错误。</li>
+<li>确保发送和接收的代码逻辑正确，无遗漏。</li>
+<li><strong>干扰和噪音</strong>：</li>
+<li>长距离的UART通信可能受到电磁干扰，尝试使用屏蔽线或缩短传输距离。</li>
+<li>检查系统周围是否有可能导致干扰的设备。</li>
+<li><strong>供电和接地问题</strong>：</li>
+<li>确保所有设备的供电稳定且无波动。</li>
+<li>检查地线是否正确连接，以防止地回路问题。</li>
+</ol>
+<p>通过逐步排查上述问题，通常可以定位到具体的故障点。如果问题仍然存在，可能需要使用逻辑分析仪等工具进一步诊断信号质量和完整性。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#20240401">2024/04/01</a></li>
+<li><a href="#20240402">2024/04/02</a></li>
+<li><a href="#20240403">2024/04/03</a></li>
+<li><a href="#20240408">2024/04/08</a></li>
+<li><a href="#20240409">2024/04/09</a></li>
+<li><a href="#20240410">2024/04/10</a></li>
+<li><a href="#20240411">2024/04/11</a><ul>
+<li><a href="#_1">蓝牙发送数据较多卡死问题现象描述：</a></li>
+<li><a href="#_2">问题排查：</a></li>
+</ul>
+</li>
+<li><a href="#20240412">2024/04/12</a></li>
+<li><a href="#20240416">2024/04/16</a><ul>
+<li><a href="#_3">低功耗测试</a></li>
+<li><a href="#-6v">---以下测试均在电压6V下进行</a></li>
+<li><a href="#_4">芯片工作电流说明</a></li>
+<li><a href="#_5">结论</a></li>
+<li><a href="#_6">勘误</a></li>
+</ul>
+</li>
+<li><a href="#20240417">2024/04/17</a></li>
+<li><a href="#20240506">2024/05/06</a></li>
+<li><a href="#20240507">2024/05/07</a></li>
+<li><a href="#20240508">2024/05/08</a><ul>
+<li><a href="#fatfsflashram">FATFS移植后内部flash与RAM占用情况</a></li>
+<li><a href="#flash">当前flash使用情况与剩余量如下</a></li>
+<li><a href="#_7">系统配置区域大小</a></li>
+<li><a href="#falsh">当前内部falsh规划</a></li>
+</ul>
+</li>
+<li><a href="#20240513">2024/05/13</a><ul>
+<li><a href="#20240515">2024/05/15</a></li>
+<li><a href="#20240530">2024/05/30</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

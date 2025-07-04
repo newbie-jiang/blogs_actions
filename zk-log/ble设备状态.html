@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>ble设备状态</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><strong>BLE设备的主要状态</strong></p>
+<ol>
+<li>
+<p><strong>待机状态（Standby State）</strong></p>
+</li>
+<li>
+<p>描述</p>
+</li>
+<li>BLE设备默认处于待机状态，所有无线通信模块都关闭以节省能耗。</li>
+<li>只有外部事件（如定时器、外部中断）或应用程序请求才能将设备从待机状态唤醒。</li>
+<li><strong>功耗</strong>：最低。</li>
+<li>
+<p><strong>使用场景</strong>：无操作时的默认状态。</p>
+</li>
+<li>
+<p><strong>广播状态（Advertising State）</strong></p>
+</li>
+<li>
+<p>描述</p>
+</li>
+<li>从机通过广播信道（37、38、39）发送广播包，向主机发出存在信号。</li>
+<li>广播包中可以包含设备的基本信息（如名称、服务UUID等）。</li>
+<li>类型</li>
+<li>可连接广播（Connectable Advertising）<ul>
+<li>主机可以扫描到广播并请求连接。</li>
+</ul>
+</li>
+<li>不可连接广播（Non-connectable Advertising）<ul>
+<li>仅用于发送广播信息，不接受连接请求。</li>
+</ul>
+</li>
+<li>定向广播（Directed Advertising）<ul>
+<li>广播仅针对特定的主机地址。</li>
+</ul>
+</li>
+<li>扫描响应广播（Scannable Advertising）<ul>
+<li>可被主机扫描，主机收到广播后可以请求额外信息（扫描响应数据）。</li>
+</ul>
+</li>
+<li><strong>功耗</strong>：广播间隔较短时功耗较高，间隔长时功耗较低。</li>
+<li>
+<p><strong>使用场景</strong>：设备待连接、周期性广播数据等。</p>
+</li>
+<li>
+<p><strong>扫描状态（Scanning State）</strong></p>
+</li>
+<li>
+<p>描述</p>
+</li>
+<li>主机设备在广播信道上扫描，从广播包中发现附近的BLE设备。</li>
+<li>如果扫描到目标设备，可以请求额外信息（扫描响应）。</li>
+<li>类型</li>
+<li>主动扫描（Active Scanning）<ul>
+<li>主机不仅接收广播包，还发送扫描请求，以获取扫描响应数据。</li>
+</ul>
+</li>
+<li>被动扫描（Passive Scanning）<ul>
+<li>主机仅接收广播包，不发送任何请求，功耗更低。</li>
+</ul>
+</li>
+<li><strong>功耗</strong>：取决于扫描间隔和扫描窗口的设置。</li>
+<li>
+<p><strong>使用场景</strong>：主机寻找目标设备。</p>
+</li>
+<li>
+<p><strong>连接状态（Connection State）</strong></p>
+</li>
+<li>
+<p>描述</p>
+</li>
+<li>主机与从机建立连接后，双方通过已建立的连接信道进行数据通信。</li>
+<li>进入此状态后，从机会停止广播，主机会停止扫描。</li>
+<li>特性</li>
+<li>数据传输使用加密和校验，连接更可靠。</li>
+<li>可以通过连接参数（如连接间隔、数据包大小）优化功耗。</li>
+<li>功耗</li>
+<li>功耗由通信频率（连接间隔）和数据传输量决定，间隔较长时功耗较低。</li>
+<li><strong>使用场景</strong>：文件传输、实时数据交互（如传感器数据）。</li>
+</ol>
+<p><strong>BLE工作状态切换图</strong></p>
+<p>以下是典型的状态切换路径：</p>
+<ol>
+<li>
+<p>从机（Slave Device）</p>
+</li>
+<li>
+<p><strong>待机</strong> → <strong>广播</strong> → （主机连接请求） → <strong>连接</strong> → （断开连接） → <strong>广播或待机</strong>。</p>
+</li>
+<li>
+<p>主机（Master Device）</p>
+</li>
+<li>
+<p><strong>待机</strong> → <strong>扫描</strong> → （发现设备） → <strong>连接请求</strong> → <strong>连接</strong> → （断开连接） → <strong>扫描或待机</strong>。</p>
+</li>
+</ol>
+<hr />
+<p><strong>BLE状态优化功耗的关键</strong></p>
+<ol>
+<li><strong>广播优化</strong>：</li>
+<li>增大广播间隔（如100ms到几秒）。</li>
+<li>选择不可连接广播以降低功耗。</li>
+<li><strong>扫描优化</strong>：</li>
+<li>使用被动扫描。</li>
+<li>增大扫描间隔并缩短扫描窗口。</li>
+<li><strong>连接优化</strong>：</li>
+<li>增大连接间隔（如100ms以上）。</li>
+<li>减少数据传输量。</li>
+<li><strong>待机优化</strong>：</li>
+<li>尽可能让设备保持待机状态，使用低功耗定时器唤醒。</li>
+</ol>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul></ul>
+</div>
+
+</div>
+</body>
+</html>

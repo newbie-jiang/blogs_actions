@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>群晖docker安装gitlab</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <pre><code>sudo -i
+sudo docker pull gitlab/gitlab-ce:latest
+
+docker run -d \
+  --hostname gitlab.your-domain.com \
+  -p 2080:80 \
+  -p 20443:443 \
+  -p 2022:22 \
+  --name gitlab \
+  --restart always \
+  -v /srv/gitlab/config:/etc/gitlab \
+  -v /srv/gitlab/logs:/var/log/gitlab \
+  -v /srv/gitlab/data:/var/opt/gitlab \
+  gitlab/gitlab-ce:latest
+
+
+
+</code></pre>
+<p>查看密码</p>
+<p>登录账户root</p>
+<pre><code>docker exec gitlab cat /etc/gitlab/initial_root_password
+</code></pre>
+<p>设置中文：</p>
+<ol>
+<li>登录 GitLab 后，右上角点击头像 → <strong>Settings</strong></li>
+<li>左侧选 <strong>Preferences</strong></li>
+<li>在 <strong>Language</strong> 下拉里选 <strong>简体中文 (Chinese)</strong></li>
+<li>滚动到页面底部，点击 <strong>Save changes</strong></li>
+</ol>
+<p>这样该用户的所有界面都会变成中文，且对每个用户都独立，别人不受影响。****</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul></ul>
+</div>
+
+</div>
+</body>
+</html>

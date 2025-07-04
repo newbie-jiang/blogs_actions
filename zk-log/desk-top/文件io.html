@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>文件io</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="ioio">文件IO与标准IO</h1>
+<h2 id="io">文件IO</h2>
+<ul>
+<li>文件io函数为 fopen   fclose   fread    fwrite</li>
+<li>文件IO调用直接与Linux内核交互，没有中间缓冲层</li>
+<li>由于每次文件IO操作都需要系统调用，这可能导致较高的开销，特别是在频繁的小量数据读写时</li>
+<li>适用于需要直接和内核交互、或需要精细控制文件行为的低级操作</li>
+</ul>
+<p>man 命令的使用          fopen 类似的属于库调用 man 3        open类似的属于系统调用 man 2</p>
+<pre><code>man 1 可执行程序或shell命令
+man 2 系统调用(内核提供的函数)
+man 3 库调用(程序库中的函数)
+man 4 特殊文件(通常在/dev中)
+man 5 文件格式和约定，如/etc/passwd
+man 6 游戏
+man 7 其他(包括宏包和约定)
+man 8 系统管理命令(通常只针对root用户)
+man 9 内核例程[非标准]
+</code></pre>
+<h3 id="fopen">fopen</h3>
+<h3 id="fclose">fclose</h3>
+<h3 id="fread">fread</h3>
+<h3 id="fwrite">fwrite</h3>
+<h2 id="io_1">标准IO</h2>
+<ul>
+<li>标准io函数为 open   close   read    write</li>
+<li>提供了一个缓冲层，用于减少实际的系统调用次数。这可以通过批量处理数据来提高性能。</li>
+<li>标准IO提供了一套高级的接口，使得文件操作更加简单和直观。例如，可以使用格式化的输入输出函数（如<code>printf</code>和<code>scanf</code>）。</li>
+<li>标准IO是C标准的一部分，因此在不同的操作系统和平台上具有很好的可移植性。</li>
+<li>虽然缓冲机制可以提高性能，但在某些实时性要求高的场景中，缓冲延迟可能是不可接受的。此外，标准IO的缓冲策略可能不适用于所有情况，有时需要手动调整。</li>
+</ul>
+<h3 id="open">open</h3>
+<h3 id="close">close</h3>
+<h3 id="read">read</h3>
+<h3 id="write">write</h3>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#ioio">文件IO与标准IO</a><ul>
+<li><a href="#io">文件IO</a><ul>
+<li><a href="#fopen">fopen</a></li>
+<li><a href="#fclose">fclose</a></li>
+<li><a href="#fread">fread</a></li>
+<li><a href="#fwrite">fwrite</a></li>
+</ul>
+</li>
+<li><a href="#io_1">标准IO</a><ul>
+<li><a href="#open">open</a></li>
+<li><a href="#close">close</a></li>
+<li><a href="#read">read</a></li>
+<li><a href="#write">write</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
