@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>解决github推送自定义域名失效</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>发现在更新时候，github pages的自定义域名会失效</p>
+<h2 id="_1">详细原因</h2>
+<ul>
+<li><strong>GitHub Pages 绑定自定义域名时，会在仓库的发布目录（比如 gh-pages 分支或 publish_dir 目录）下自动生成一个 <code>CNAME</code> 文件。</strong></li>
+<li>只要 <code>CNAME</code> 文件被删除、覆盖、没同步，或者你重新部署时没包含它，GitHub Pages 的自定义域名就会失效（变成空或者你的 .github.io 域名）。</li>
+<li>使用 Actions 自动部署时，<strong>如果你只部署 <code>blogs</code> 目录，而没有在 <code>blogs</code> 目录下包含 <code>CNAME</code> 文件</strong>，每次新构建后，GitHub Pages 都会把域名设回默认。</li>
+</ul>
+<h2 id="_2">解决办法</h2>
+<h3 id="1-cname-publish_dir-blogs">1. <strong>确保每次部署时都包含 <code>CNAME</code> 文件在 publish_dir 目录下（如 blogs/）</strong></h3>
+<ul>
+<li><strong>做法1：仓库根目录下有 <code>CNAME</code> 文件，自动被带入部署目录。</strong></li>
+<li><strong>做法2：在自动化脚本（如 2.process_html.py）里自动生成 <code>blogs/CNAME</code> 文件，内容就是你的域名，比如 <code>blogs.hedejiang.top</code>。</strong></li>
+<li><strong>做法3：在 Actions workflow 里专门加一步写入 CNAME 文件：</strong></li>
+</ul>
+<pre><code>- name: 写入 CNAME 文件
+  run: echo 'blogs.hedejiang.top' &gt; blogs/CNAME
+</code></pre>
+<p>完整yaml</p>
+<pre><code class="language-yaml">name: Build &amp; Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: |
+          pip install markdown
+
+      - name: 清理所有 html 文件
+        run: python delete_html_files.py
+
+      - name: 执行 Markdown 转 HTML
+        run: python 1.md_2_html.py
+
+      - name: 生成主页
+        run: python 2.process_html.py
+
+      - name: 写入 CNAME 文件
+        run: echo 'blogs.hedejiang.top' &gt; blogs/CNAME
+
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./blogs
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">详细原因</a></li>
+<li><a href="#_2">解决办法</a><ul>
+<li><a href="#1-cname-publish_dir-blogs">1. 确保每次部署时都包含 CNAME 文件在 publish_dir 目录下（如 blogs/）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
