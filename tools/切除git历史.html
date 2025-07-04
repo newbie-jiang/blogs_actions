@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>切除git历史</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="git">切除git历史</h1>
+<blockquote>
+<p><strong>要彻底删除“最早的几次提交”，只保留最近的某次提交及之后的内容，历史的第一步变成你选定的那次提交。</strong></p>
+</blockquote>
+<p>举例：</p>
+<pre><code>A -- B -- C -- D -- E (HEAD)
+</code></pre>
+<p>你想让仓库历史直接变成</p>
+<pre><code>       C -- D -- E (HEAD)
+</code></pre>
+<p>A、B 两次以及对应的所有文件彻底消失，<strong>让C变成新的“历史起点”</strong>。</p>
+<hr />
+<h2 id="git_1">这叫做<strong>切除 Git 历史（剪裁历史）</strong></h2>
+<p>需要用 <a href="https://git-scm.com/docs/git-filter-branch"><code>git filter-branch</code></a>、<a href="https://github.com/newren/git-filter-repo"><code>git filter-repo</code></a> 或 BFG Repo-Cleaner 等<strong>高级工具</strong>来“丢弃所有历史，只保留从某个提交开始的新仓库”。</p>
+<h2 id="filter-repo">最简单做法（推荐方式：新仓库+filter-repo）</h2>
+<h3 id="a-filter-repo">方案A：用 filter-repo 操作</h3>
+<h4 id="1-commit-c">1. 找到想要作为新起点的 commit（如 C）</h4>
+<pre><code>git log --oneline
+# 记下你想保留的第一个 commit 哈希，比如 0123456
+</code></pre>
+<h4 id="2-filter-repo">2. 使用 filter-repo 裁剪历史</h4>
+<blockquote>
+<p>如果没装 filter-repo，先：<code>pip install git-filter-repo</code></p>
+</blockquote>
+<pre><code>git filter-repo --force --refs 0123456..HEAD
+</code></pre>
+<blockquote>
+<p>这样就只保留从 0123456（<strong>不包括</strong>这个提交，如果要包括，加上 --include-refs）到当前的所有 commit，前面的历史全部删除。</p>
+</blockquote>
+<h4 id="3">3. 强制推送覆盖远程</h4>
+<pre><code>git push --force
+</code></pre>
+<hr />
+<h3 id="b">方案B：手动导出当前内容并新建仓库</h3>
+<ol>
+<li>新建一个空目录</li>
+<li>复制想保留的内容进去</li>
+<li>重新 git init，然后 add/commit/push</li>
+</ol>
+<h2 id="a">方案A具体命令举例</h2>
+<p>假如想让 <code>C</code>（假设哈希为 <code>abcdef1</code>）成为新历史的第一个提交：</p>
+<pre><code>pip install git-filter-repo  # 如未安装
+
+# 只保留C及之后的提交（假设C是abcdef1）
+git filter-repo --force --refs abcdef1..HEAD
+
+# 强推
+git push --force
+</code></pre>
+<p><strong>注意</strong>：这种操作会<strong>彻底改写整个仓库历史</strong>，远程协作者pull会冲突，需要大家配合。</p>
+<h2 id="b_1">方案B：只保留当前最新一次的代码</h2>
+<p>如果你只是想“历史只留一条提交”，可以：</p>
+<pre><code># 保存当前文件状态
+git checkout HEAD .
+
+# 清空所有历史，重新初始化
+rm -rf .git
+git init
+git remote add origin https://github.com/yourname/yourrepo.git
+git add .
+git commit -m &quot;新起点&quot;
+git push --force
+</code></pre>
+<p>这样历史就只剩你最新这一次。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#git">切除git历史</a><ul>
+<li><a href="#git_1">这叫做切除 Git 历史（剪裁历史）</a></li>
+<li><a href="#filter-repo">最简单做法（推荐方式：新仓库+filter-repo）</a><ul>
+<li><a href="#a-filter-repo">方案A：用 filter-repo 操作</a><ul>
+<li><a href="#1-commit-c">1. 找到想要作为新起点的 commit（如 C）</a></li>
+<li><a href="#2-filter-repo">2. 使用 filter-repo 裁剪历史</a></li>
+<li><a href="#3">3. 强制推送覆盖远程</a></li>
+</ul>
+</li>
+<li><a href="#b">方案B：手动导出当前内容并新建仓库</a></li>
+</ul>
+</li>
+<li><a href="#a">方案A具体命令举例</a></li>
+<li><a href="#b_1">方案B：只保留当前最新一次的代码</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
