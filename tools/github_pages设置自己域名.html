@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>github_pages设置自己域名</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="1-github">1. <strong>打开GitHub 仓库页面</strong></h2>
+<p>比如：<code>https://github.com/yourusername/yourrepo</code></p>
+<hr />
+<h2 id="2-settings-pages">2. <strong>进入 Settings → Pages 配置页</strong></h2>
+<ul>
+<li>进入仓库右上角 <code>Settings</code></li>
+<li>左侧菜单找到 <code>Pages</code>（有时在 "Code and automation" 下）</li>
+</ul>
+<hr />
+<h2 id="3-custom-domain">3. <strong>找到 “Custom domain” 或 “自定义域名” 设置框</strong></h2>
+<ul>
+<li>在 <code>GitHub Pages</code> 配置区，<strong>“Custom domain”</strong> 输入框中填入想绑定的域名，比如 <code>blog.yourdomain.com</code></li>
+<li>输入后点击 <code>Save</code></li>
+</ul>
+<h2 id="4-dns">4. <strong>在你的域名服务商后台配置 DNS 解析</strong></h2>
+<ul>
+<li>
+<p>如果是<strong>根域名（如 example.com）</strong>，一般需要添加一条 <code>A</code> 记录，指向 GitHub 的 IP（推荐使用 CNAME，除非 CNAME 只支持二级域名）。</p>
+</li>
+<li>
+<p><strong>二级域名（如 blog.example.com）</strong>，添加一条 CNAME 记录，指向你的 GitHub Pages 地址：</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>记录类型</th>
+<th>主机名（Name）</th>
+<th>值（Value/目标）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CNAME</td>
+<td>blog</td>
+<td>yourusername.github.io</td>
+</tr>
+</tbody>
+</table>
+<p>比如</p>
+<p>我在github设置为   blogs.hedejiang.top</p>
+<p>在cloudflare 设置如下</p>
+<p><img alt="image-20250704233733524" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250704233733524.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#1-github">1. 打开GitHub 仓库页面</a></li>
+<li><a href="#2-settings-pages">2. 进入 Settings → Pages 配置页</a></li>
+<li><a href="#3-custom-domain">3. 找到 “Custom domain” 或 “自定义域名” 设置框</a></li>
+<li><a href="#4-dns">4. 在你的域名服务商后台配置 DNS 解析</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
