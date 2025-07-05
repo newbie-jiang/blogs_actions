@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>4.deepseek_api使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="deepseek-api">deepseek api使用</h2>
+<p>api平台  https://platform.deepseek.com/usage</p>
+<p>接口文档参考https://api-docs.deepseek.com/zh-cn/</p>
+<p>充值并获取api keys，脚本测试</p>
+<ul>
+<li>此脚本可以<strong>总结 input.txt 内容并输出为 output.md</strong></li>
+</ul>
+<pre><code class="language-python">import sys
+sys.stdout.reconfigure(encoding='utf-8')
+from openai import OpenAI
+
+# 初始化客户端
+client = OpenAI(
+    api_key=&quot; &quot;,  # 此处需要填入api key
+    base_url=&quot;https://api.deepseek.com&quot;
+)
+
+def summarize_text(text):
+    response = client.chat.completions.create(
+        model=&quot;deepseek-chat&quot;,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;你是一个专业的文档总结助手，请用简洁、准确的语言总结用户的内容。&quot;},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;请总结以下内容：\n{text}&quot;}
+        ],
+        stream=False
+    )
+    return response.choices[0].message.content
+
+def main():
+    # 读取 input.txt 内容
+    with open(&quot;input.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as infile:
+        input_text = infile.read()
+
+    # 调用 API 总结
+    summary = summarize_text(input_text)
+
+    # 写入 output.txt
+    with open(&quot;output.md&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as outfile:
+        outfile.write(summary)
+
+    print(&quot;总结完成，已写入 output.md&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#deepseek-api">deepseek api使用</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

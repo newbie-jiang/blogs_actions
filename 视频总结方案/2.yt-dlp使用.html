@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.yt-dlp使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="ty-dlp">ty-dlp使用</h2>
+<p>官方链接https://github.com/yt-dlp/yt-dlp</p>
+<p>功能以及用法 https://github.com/yt-dlp/yt-dlp/blob/master/README.md</p>
+<p>windows下 下载ty-dlp.exe文件</p>
+<p>chrome上下载插件 Get cookies.txt LOCALLY  用于获取cookies.txt</p>
+<p><img alt="image-20250701104619046" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701104619046.png" /></p>
+<h2 id="general-options">通用选项（General Options）</h2>
+<pre><code> •  -h, --help
+显示帮助信息并退出 
+
+ •  --version
+显示版本号并退出  
+
+•  -U, --update
+将本程序升级到最新版本  
+
+•  --no-update
+不检查更新（默认）
+
+•  -i, --ignore-errors
+忽略下载和后处理错误，下载即使出错也会继续  
+
+•  --abort-on-error
+下载出错时终止后续任务（和 --ignore-errors 相反） 
+
+•  --list-extractors
+列出支持的网站解析器  
+
+•  --extractor-descriptions
+显示所有支持网站的描述信息 
+
+•  --flat-playlist
+只获取播放列表条目，不解析每个视频元数据
+</code></pre>
+<h2 id="network-options">网络选项（Network Options）</h2>
+<pre><code>--proxy URL
+设置代理（支持HTTP/HTTPS/SOCKS）
+
+--socket-timeout 秒数
+网络超时时间
+
+-4, --force-ipv4
+强制使用IPv4
+
+-6, --force-ipv6
+强制使用IPv6
+</code></pre>
+<h2 id="video-selection">视频选择（Video Selection）</h2>
+<pre><code>-I, --playlist-items 1,3,5-7
+下载指定序号的视频（支持范围）
+
+--min-filesize 50M
+只下载大于指定大小的文件
+
+--max-filesize 200M
+只下载小于指定大小的文件
+
+--date 20240628
+只下载指定日期发布的视频
+
+--match-filters &quot;like_count&gt;?100&quot;
+只下载满足条件的视频
+
+--no-playlist
+如果是单个视频与列表混合链接，只下载视频本身
+
+--yes-playlist
+强制下载整个播放列表
+</code></pre>
+<h2 id="download-options">下载相关（Download Options）</h2>
+<pre><code>-N, --concurrent-fragments 5
+多线程下载分片视频
+
+-r, --limit-rate 500K
+限制下载速度
+
+-R, --retries 10
+下载失败重试次数
+
+--skip-unavailable-fragments
+跳过不可用的视频分片
+
+--abort-on-unavailable-fragments
+分片无法下载时终止下载
+</code></pre>
+<h2 id="filesystem-options">文件系统相关（Filesystem Options）</h2>
+<pre><code>-a, --batch-file 文件
+从文件批量读取要下载的URL
+
+-P, --paths 路径
+设置下载文件的保存路径
+
+-o, --output 模板
+设置输出文件名模板
+
+-w, --no-overwrites
+不覆盖已有文件
+
+--cookies 文件
+指定cookies文件（支持chrome导出的cookies.txt）
+</code></pre>
+<h2 id="thumbnails-subtitles">缩略图与字幕（Thumbnails &amp; Subtitles）</h2>
+<pre><code>--write-thumbnail
+下载视频缩略图
+
+--write-subs
+下载字幕
+
+--write-auto-subs
+下载自动生成的字幕
+
+--sub-langs &quot;zh-CN,en&quot;
+指定要下载的字幕语言（可用all,正则）
+</code></pre>
+<h2 id="video-format-options">格式选择（Video Format Options）</h2>
+<pre><code>-f, --format
+指定要下载的视频格式（如 best、worst、mp4）
+
+-F, --list-formats
+列出所有可用格式
+
+-S, --format-sort
+对格式进行排序（如按清晰度、码率）
+
+--merge-output-format mp4
+合并输出为指定格式（mp4、mkv等）
+</code></pre>
+<h2 id="post-processing">后处理（Post-processing）</h2>
+<pre><code>-x, --extract-audio
+只提取音频（需ffmpeg）
+
+--audio-format mp3
+指定音频导出格式
+
+--audio-quality 0-10 或 128K
+音频导出比特率或质量
+
+--remux-video mp4
+无损封装到指定格式
+
+--embed-thumbnail
+将缩略图嵌入到音频/视频文件
+
+--embed-subs
+将字幕嵌入视频
+</code></pre>
+<h2 id="authentication">认证与登录（Authentication）</h2>
+<pre><code>-u, --username 用户名
+登录用户名
+
+-p, --password 密码
+登录密码
+
+--cookies-from-browser 浏览器名
+直接读取指定浏览器的cookies
+</code></pre>
+<h2 id="_1">其它常用参数</h2>
+<pre><code>-q, --quiet
+静默模式
+
+-v, --verbose
+显示详细调试信息
+
+-s, --simulate
+模拟操作（不实际下载）
+</code></pre>
+<h2 id="example">example</h2>
+<h3 id="1">1. <strong>下载单个视频到当前目录</strong></h3>
+<pre><code>yt-dlp https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p>下载默认最佳格式的视频和音频并合成为一个文件。</p>
+<hr />
+<h3 id="2-mp3">2. <strong>只下载音频并转换为mp3</strong></h3>
+<pre><code>yt-dlp -x --audio-format mp3 https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p><code>-x</code> 只提取音频，<code>--audio-format mp3</code> 转换为mp3格式（需ffmpeg）。</p>
+<hr />
+<h3 id="3">3. <strong>下载指定清晰度的视频</strong></h3>
+<pre><code>yt-dlp -f &quot;bestvideo[height&lt;=720]+bestaudio/best[height&lt;=720]&quot; https://www.bilibili.com/video/BVxxxxxx
+</code></pre>
+<p>下载不高于720p的最佳视频和音频，并自动合并。</p>
+<hr />
+<h3 id="4">4. <strong>下载带有中文字幕的视频及字幕</strong></h3>
+<pre><code>yt-dlp --write-subs --sub-langs zh-CN https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p><code>--write-subs</code> 下载字幕，<code>--sub-langs zh-CN</code> 指定中文字幕。</p>
+<hr />
+<h3 id="5">5. <strong>下载自动生成的中文字幕</strong></h3>
+<pre><code>yt-dlp --write-auto-subs --sub-langs zh-CN https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p><code>--write-auto-subs</code> 下载YouTube自动生成的字幕。</p>
+<hr />
+<h3 id="6-url">6. <strong>批量下载（从文件中读取URL）</strong></h3>
+<pre><code>yt-dlp -a urllist.txt
+</code></pre>
+<p><code>urllist.txt</code> 每行一个视频网址，自动批量下载。</p>
+<hr />
+<h3 id="7-youtube">7. <strong>下载YouTube播放列表所有视频</strong></h3>
+<pre><code>yt-dlp https://www.youtube.com/playlist?list=PLxxxxxx
+</code></pre>
+<p>自动下载整个播放列表的全部视频。</p>
+<hr />
+<h3 id="8-bcookies">8. <strong>下载B站高清视频，使用cookies</strong></h3>
+<pre><code>yt-dlp --cookies cookies.txt -f &quot;bestvideo+bestaudio/best&quot; https://www.bilibili.com/video/BVxxxxxx
+</code></pre>
+<p>使用登录cookies可下载大会员视频或高码率视频。</p>
+<hr />
+<h3 id="9">9. <strong>设置下载文件名模板（带标题、日期）</strong></h3>
+<pre><code>yt-dlp -o &quot;%(title)s-%(upload_date)s.%(ext)s&quot; https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p>文件名为“标题-上传日期.扩展名”</p>
+<hr />
+<h3 id="10-500kbs">10. <strong>限制下载速度为500KB/s</strong></h3>
+<pre><code>yt-dlp -r 500K https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<hr />
+<h3 id="11">11. <strong>跳过已下载过的视频（避免重复）</strong></h3>
+<pre><code>yt-dlp --download-archive archive.txt https://www.youtube.com/playlist?list=PLxxxxxx
+</code></pre>
+<p><code>archive.txt</code> 用于记录已下载过的视频ID。</p>
+<hr />
+<h3 id="12-258">12. <strong>只下载某个播放列表中的第2、5、8个视频</strong></h3>
+<pre><code>yt-dlp --playlist-items 2,5,8 https://www.youtube.com/playlist?list=PLxxxxxx
+</code></pre>
+<hr />
+<h3 id="13">13. <strong>带进度条显示下载进度</strong></h3>
+<pre><code>yt-dlp --progress https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<hr />
+<h3 id="14">14. <strong>模拟下载（不实际下载，只显示信息）</strong></h3>
+<pre><code>yt-dlp -s https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<hr />
+<h3 id="15">15. <strong>指定代理进行下载</strong></h3>
+<pre><code>yt-dlp --proxy socks5://127.0.0.1:1080 https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<hr />
+<h3 id="16-b">16. <strong>只下载视频的弹幕（B站）</strong></h3>
+<pre><code>yt-dlp --write-comments --skip-download https://www.bilibili.com/video/BVxxxxxx
+</code></pre>
+<hr />
+<h3 id="17">17. <strong>只下载缩略图，不下载视频本体</strong></h3>
+<pre><code>yt-dlp --write-thumbnail --skip-download https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<hr />
+<h3 id="18">18. <strong>下载后自动关机</strong></h3>
+<pre><code>yt-dlp https://www.youtube.com/watch?v=xxxxxxx &amp;&amp; shutdown -s -t 0
+</code></pre>
+<p>（Windows环境，Linux用 <code>poweroff</code>）</p>
+<hr />
+<h3 id="19-7">19. <strong>按上传日期下载最近7天发布的视频</strong></h3>
+<pre><code>yt-dlp --dateafter now-7days https://www.youtube.com/channel/UCxxxxxx
+</code></pre>
+<hr />
+<h3 id="20">20. <strong>下载后执行自定义命令（如播放/转存）</strong></h3>
+<pre><code>yt-dlp --exec &quot;vlc {}&quot; https://www.youtube.com/watch?v=xxxxxxx
+</code></pre>
+<p><code>{}</code> 会被替换为下载文件名。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#ty-dlp">ty-dlp使用</a></li>
+<li><a href="#general-options">通用选项（General Options）</a></li>
+<li><a href="#network-options">网络选项（Network Options）</a></li>
+<li><a href="#video-selection">视频选择（Video Selection）</a></li>
+<li><a href="#download-options">下载相关（Download Options）</a></li>
+<li><a href="#filesystem-options">文件系统相关（Filesystem Options）</a></li>
+<li><a href="#thumbnails-subtitles">缩略图与字幕（Thumbnails &amp; Subtitles）</a></li>
+<li><a href="#video-format-options">格式选择（Video Format Options）</a></li>
+<li><a href="#post-processing">后处理（Post-processing）</a></li>
+<li><a href="#authentication">认证与登录（Authentication）</a></li>
+<li><a href="#_1">其它常用参数</a></li>
+<li><a href="#example">example</a><ul>
+<li><a href="#1">1. 下载单个视频到当前目录</a></li>
+<li><a href="#2-mp3">2. 只下载音频并转换为mp3</a></li>
+<li><a href="#3">3. 下载指定清晰度的视频</a></li>
+<li><a href="#4">4. 下载带有中文字幕的视频及字幕</a></li>
+<li><a href="#5">5. 下载自动生成的中文字幕</a></li>
+<li><a href="#6-url">6. 批量下载（从文件中读取URL）</a></li>
+<li><a href="#7-youtube">7. 下载YouTube播放列表所有视频</a></li>
+<li><a href="#8-bcookies">8. 下载B站高清视频，使用cookies</a></li>
+<li><a href="#9">9. 设置下载文件名模板（带标题、日期）</a></li>
+<li><a href="#10-500kbs">10. 限制下载速度为500KB/s</a></li>
+<li><a href="#11">11. 跳过已下载过的视频（避免重复）</a></li>
+<li><a href="#12-258">12. 只下载某个播放列表中的第2、5、8个视频</a></li>
+<li><a href="#13">13. 带进度条显示下载进度</a></li>
+<li><a href="#14">14. 模拟下载（不实际下载，只显示信息）</a></li>
+<li><a href="#15">15. 指定代理进行下载</a></li>
+<li><a href="#16-b">16. 只下载视频的弹幕（B站）</a></li>
+<li><a href="#17">17. 只下载缩略图，不下载视频本体</a></li>
+<li><a href="#18">18. 下载后自动关机</a></li>
+<li><a href="#19-7">19. 按上传日期下载最近7天发布的视频</a></li>
+<li><a href="#20">20. 下载后执行自定义命令（如播放/转存）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
