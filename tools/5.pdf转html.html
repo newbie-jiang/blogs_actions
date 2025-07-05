@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>5.pdf转html</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>PDF转HTML</p>
+<p>https://github.com/pdf2htmlEX/pdf2htmlEX/releases/tag/v0.18.8.rc1</p>
+<p>在ubuntu下进行（我的环境ubuntu22）</p>
+<ul>
+<li>下载 pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-focal-x86_64.AppImage</li>
+<li>依赖</li>
+</ul>
+<pre><code>sudo apt update
+sudo apt install fuse
+sudo apt install libfuse2
+</code></pre>
+<p><img alt="image-20250705194001596" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250705194001596.png" /></p>
+<p>转换命令</p>
+<pre><code class="language-bash">./pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-focal-x86_64.AppImage test.pdf
+</code></pre>
+<p>实际测试下来效果不错，原始排版</p>
+<p><img alt="image-20250705194308681" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250705194308681.png" /></p>
+<p>批量转脚本</p>
+<pre><code class="language-python">import os
+import subprocess
+
+# 指定你要递归查找的目录，&quot;.&quot;表示当前目录
+search_dir = &quot;.&quot;
+
+# pdf2htmlEX 的 AppImage 路径
+pdf2htmlex_app = &quot;./pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-focal-x86_64.AppImage&quot;
+
+# 遍历目录下的所有文件，递归查找pdf
+for root, dirs, files in os.walk(search_dir):
+    for file in files:
+        if file.lower().endswith('.pdf'):
+            pdf_path = os.path.join(root, file)
+            html_name = os.path.splitext(file)[0] + &quot;.html&quot;
+            html_path = os.path.join(root, html_name)
+            if os.path.exists(html_path):
+                print(f&quot;已存在: {html_path}，跳过。&quot;)
+                continue
+            print(f&quot;正在转换: {pdf_path}&quot;)
+            try:
+                subprocess.run([pdf2htmlex_app, pdf_path, html_path], check=True)
+                print(f&quot;成功: {html_path}&quot;)
+            except subprocess.CalledProcessError:
+                print(f&quot;转换失败: {pdf_path}&quot;)
+
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul></ul>
+</div>
+
+</div>
+</body>
+</html>
