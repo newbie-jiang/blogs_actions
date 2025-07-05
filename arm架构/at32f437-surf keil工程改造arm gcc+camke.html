@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>at32f437-surf keil工程改造arm gcc+camke</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="at-surf-f437-arm-gcccmake">AT-SURF-F437 改造arm gcc工程+cmake</h2>
+<p><a href="https://github.com/newbie-jiang/at32-cmake">project download</a></p>
+<p><img alt="image-20250704101310347" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250704101310347.png" /></p>
+<p>官方有一个文件包给出的是一个makefile的demo 见此帖:<a href="https://bbs.21ic.com/icview-3223576-1-1.html">雅特力AT32 MCU在 VSCode环境上进行开发</a></p>
+<ul>
+<li>每一个系列有一个模板</li>
+</ul>
+<p><img alt="image-20250705115057709" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250705115057709.png" /></p>
+<p>我在AT-SURF-F437 的Firmware LIbary上进行了改造</p>
+<p><img alt="image-20250705115335688" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250705115335688.png" /></p>
+<p>过程</p>
+<ul>
+<li>参考一个demo的keil包含了哪些文件，cmake文件把demo的文件放进去就行，</li>
+<li>toolchain.cmake 单独写一个编译的工具依赖，</li>
+</ul>
+<p>编译命令</p>
+<pre><code>主目录下
+
+sudo cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
+sudo cmake --build build
+
+sudo rm -rf build
+</code></pre>
+<p>下载工具</p>
+<p>https://www.arterytek.com/cn/product/AT32F437.jsp#Resource</p>
+<p><img alt="image-20250703211503081" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250703211503081.png" /></p>
+<p>需要安装at-link</p>
+<p><img alt="image-20250703211535683" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250703211535683.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#at-surf-f437-arm-gcccmake">AT-SURF-F437 改造arm gcc工程+cmake</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
