@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>9.zephyr启动详解</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="zephyr">zephyr启动详解</h2>
+<h2 id="_1">怎么看如何启动的？</h2>
+<p>我的经验是，编译一个基础demo，然后看参与编译用到了哪些代码，分析这部分代码</p>
+<h2 id="demo">编译一个基础demo</h2>
+<pre><code>west build -p always -b nucleo_f103rb samples\basic\blinky
+</code></pre>
+<p><img alt="image-20250706171100412" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250706171100412.png" /></p>
+<h2 id="compile_commandsjson">分析compile_commands.json</h2>
+<p>build目录会有一个json文件，compile_commands.json  该文件中描述出了参与编译的文件</p>
+<p><img alt="image-20250603152404912" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250603152404912.png" /></p>
+<pre><code>{
+&quot;directory&quot;: xxxxxxxxxxxxxxxxxx
+&quot;command&quot;:xxxxxxxxxxxx
+&quot;file&quot;:xxxxxxxxxxxx
+&quot;output&quot;:xxxxxxxxxxxx
+}  
+</code></pre>
+<h2 id="_2">字段解释</h2>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>含义</th>
+<th>示例/说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"directory"</code></td>
+<td>编译命令运行时的工作目录（即 <code>gcc</code>/<code>clang</code> 等执行时的 <code>cwd</code>）</td>
+<td>比如：<code>"/home/you/project/build"</code></td>
+</tr>
+<tr>
+<td><code>"command"</code></td>
+<td>实际完整的编译命令行（含编译器路径、所有参数和文件名）</td>
+<td>比如：<code>"arm-none-eabi-gcc -I... -D... -c ../src/main.c -o main.o"</code></td>
+</tr>
+<tr>
+<td><code>"file"</code></td>
+<td>被编译的源代码文件路径（通常为相对或绝对路径）</td>
+<td>比如：<code>"../src/main.c"</code></td>
+</tr>
+<tr>
+<td><code>"output"</code></td>
+<td>此源文件编译后生成的目标文件路径</td>
+<td>比如：<code>"CMakeFiles/app.dir/src/main.c.obj"</code> 或 <code>"main.o"</code></td>
+</tr>
+</tbody>
+</table>
+<p>写一个脚本只获取  file 字段 来看实际参与编译的文件，当前的compile_commands.json文件太多了不好观察</p>
+<ul>
+<li>运行后会生成 <code>files.txt</code></li>
+</ul>
+<pre><code class="language-python">import json
+
+# 1. 读取 compile_commands.json
+with open('compile_commands.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+# 2. 获取所有文件
+files = [entry['file'] for entry in data]
+
+# 3. 找出所有 .s/.S 文件（大小写不敏感）
+s_files = [file for file in files if file.lower().endswith('.s')]
+
+# 4. 写入 files.txt
+with open('files.txt', 'w', encoding='utf-8') as f:
+    for file in files:
+        f.write(file + '\n')
+
+    # 空三行
+    f.write('\n' * 3)
+
+    # 写入所有的.s文件路径
+    for s_file in s_files:
+        f.write(s_file + '\n')
+
+</code></pre>
+<p><img alt="image-20250603153124180" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250603153124180.png" /></p>
+<p>查看files.txt</p>
+<ul>
+<li>依照目录来分析参与编译的文件这样就好分析的多了</li>
+</ul>
+<pre><code>G:\desktop\zephyrproject\zephyr\samples\basic\blinky\src\main.c
+G:\desktop\zephyrproject\zephyr\lib\heap\heap.c
+G:\desktop\zephyrproject\zephyr\lib\os\cbprintf_packaged.c
+G:\desktop\zephyrproject\zephyr\lib\os\printk.c
+G:\desktop\zephyrproject\zephyr\lib\os\sem.c
+G:\desktop\zephyrproject\zephyr\lib\os\thread_entry.c
+G:\desktop\zephyrproject\zephyr\lib\os\cbprintf_complete.c
+G:\desktop\zephyrproject\zephyr\lib\os\assert.c
+G:\desktop\zephyrproject\zephyr\lib\os\reboot.c
+G:\desktop\zephyrproject\zephyr\lib\utils\dec.c
+G:\desktop\zephyrproject\zephyr\lib\utils\hex.c
+G:\desktop\zephyrproject\zephyr\lib\utils\rb.c
+G:\desktop\zephyrproject\zephyr\lib\utils\timeutil.c
+G:\desktop\zephyrproject\zephyr\lib\utils\bitarray.c
+G:\desktop\zephyrproject\zephyr\lib\utils\ring_buffer.c
+G:\desktop\zephyrproject\zephyr\build\zephyr\misc\generated\configs.c
+G:\desktop\zephyrproject\zephyr\soc\st\stm32\common\stm32cube_hal.c
+G:\desktop\zephyrproject\zephyr\soc\st\stm32\common\soc_config.c
+G:\desktop\zephyrproject\zephyr\soc\st\stm32\stm32f1x\soc.c
+G:\desktop\zephyrproject\zephyr\subsys\tracing\tracing_none.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\offsets\offsets.c
+G:\desktop\zephyrproject\zephyr\misc\empty_file.c
+G:\desktop\zephyrproject\zephyr\misc\empty_file.c
+G:\desktop\zephyrproject\zephyr\build\zephyr\isr_tables.c
+G:\desktop\zephyrproject\zephyr\arch\common\sw_isr_common.c
+G:\desktop\zephyrproject\zephyr\arch\common\isr_tables.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\fatal.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\nmi.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\nmi_on_reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\tls.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\exc_exit.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\fault.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\fault_s.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\fpu.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\scb.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\thread_abort.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\vector_table.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\swap_helper.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\irq_manage.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\prep_c.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\thread.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\cpu_idle.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\irq_init.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\isr_wrapper.c
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\__aeabi_read_tp.S
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\assert.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\cbprintf.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\chk_fail.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\errno_wrap.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\exit.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\locks.c
+G:\desktop\zephyrproject\zephyr\lib\libc\picolibc\stdio.c
+G:\desktop\zephyrproject\zephyr\lib\libc\common\source\stdlib\abort.c
+G:\desktop\zephyrproject\zephyr\lib\libc\common\source\stdlib\malloc.c
+G:\desktop\zephyrproject\zephyr\misc\empty_file.c
+G:\desktop\zephyrproject\zephyr\drivers\interrupt_controller\intc_exti_stm32.c
+G:\desktop\zephyrproject\zephyr\drivers\clock_control\clock_stm32_ll_common.c
+G:\desktop\zephyrproject\zephyr\drivers\clock_control\clock_stm32f1.c
+G:\desktop\zephyrproject\zephyr\drivers\console\uart_console.c
+G:\desktop\zephyrproject\zephyr\drivers\gpio\gpio_stm32.c
+G:\desktop\zephyrproject\zephyr\drivers\pinctrl\common.c
+G:\desktop\zephyrproject\zephyr\drivers\pinctrl\pinctrl_stm32.c
+G:\desktop\zephyrproject\zephyr\drivers\reset\reset_stm32.c
+G:\desktop\zephyrproject\zephyr\drivers\serial\uart_stm32.c
+G:\desktop\zephyrproject\zephyr\drivers\timer\sys_clock_init.c
+G:\desktop\zephyrproject\zephyr\drivers\timer\cortex_m_systick.c
+G:\desktop\zephyrproject\modules\hal\stm32\stm32cube\stm32f1xx\soc\system_stm32f1xx.c
+G:\desktop\zephyrproject\modules\hal\stm32\stm32cube\stm32f1xx\drivers\src\stm32f1xx_hal.c
+G:\desktop\zephyrproject\modules\hal\stm32\stm32cube\stm32f1xx\drivers\src\stm32f1xx_hal_rcc.c
+G:\desktop\zephyrproject\modules\hal\stm32\stm32cube\stm32f1xx\drivers\src\stm32f1xx_hal_rcc_ex.c
+G:\desktop\zephyrproject\modules\hal\stm32\stm32cube\stm32f1xx\drivers\src\stm32f1xx_ll_utils.c
+G:\desktop\zephyrproject\zephyr\kernel\main_weak.c
+G:\desktop\zephyrproject\zephyr\kernel\banner.c
+G:\desktop\zephyrproject\zephyr\kernel\busy_wait.c
+G:\desktop\zephyrproject\zephyr\kernel\device.c
+G:\desktop\zephyrproject\zephyr\kernel\errno.c
+G:\desktop\zephyrproject\zephyr\kernel\fatal.c
+G:\desktop\zephyrproject\zephyr\kernel\init.c
+G:\desktop\zephyrproject\zephyr\kernel\init_static.c
+G:\desktop\zephyrproject\zephyr\kernel\kheap.c
+G:\desktop\zephyrproject\zephyr\kernel\mem_slab.c
+G:\desktop\zephyrproject\zephyr\kernel\float.c
+G:\desktop\zephyrproject\zephyr\kernel\version.c
+G:\desktop\zephyrproject\zephyr\kernel\idle.c
+G:\desktop\zephyrproject\zephyr\kernel\mailbox.c
+G:\desktop\zephyrproject\zephyr\kernel\msg_q.c
+G:\desktop\zephyrproject\zephyr\kernel\mutex.c
+G:\desktop\zephyrproject\zephyr\kernel\queue.c
+G:\desktop\zephyrproject\zephyr\kernel\sem.c
+G:\desktop\zephyrproject\zephyr\kernel\stack.c
+G:\desktop\zephyrproject\zephyr\kernel\system_work_q.c
+G:\desktop\zephyrproject\zephyr\kernel\work.c
+G:\desktop\zephyrproject\zephyr\kernel\condvar.c
+G:\desktop\zephyrproject\zephyr\kernel\thread.c
+G:\desktop\zephyrproject\zephyr\kernel\sched.c
+G:\desktop\zephyrproject\zephyr\kernel\pipe.c
+G:\desktop\zephyrproject\zephyr\kernel\timeslicing.c
+G:\desktop\zephyrproject\zephyr\kernel\xip.c
+G:\desktop\zephyrproject\zephyr\kernel\timeout.c
+G:\desktop\zephyrproject\zephyr\kernel\timer.c
+G:\desktop\zephyrproject\zephyr\kernel\mempool.c
+G:\desktop\zephyrproject\zephyr\kernel\dynamic_disabled.c
+
+
+
+G:\desktop\zephyrproject\zephyr\arch\arm\core\nmi_on_reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\fault_s.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\vector_table.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\swap_helper.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\__aeabi_read_tp.S
+
+</code></pre>
+<p>按照参与目录大致分析</p>
+<h3 id="1-art_pi_appsrc">1. <code>art_pi_app/src/</code></h3>
+<ul>
+<li><strong>应用程序代码</strong>（如 <code>main.c</code>）。</li>
+<li>通常是用户业务逻辑、入口、main loop 等。</li>
+</ul>
+<hr />
+<h3 id="2-zephyrlib">2. <code>zephyr/lib/</code></h3>
+<ul>
+<li><strong>通用库函数与操作系统基础功能</strong>。</li>
+<li>如 <code>heap.c</code>、<code>cbprintf_*</code>、<code>printk.c</code>、<code>assert.c</code> 等，涉及动态内存、打印、断言、信号量、线程入口等。</li>
+<li><code>utils/</code>：常用工具类（如 hex/dec/rb/bitarray/ring_buffer 等循环缓冲、数组处理工具）。</li>
+</ul>
+<hr />
+<h3 id="3-zephyrbuildzephyr-zephyrmisc">3. <code>zephyr/build/zephyr/</code> &amp; <code>zephyr/misc/</code></h3>
+<ul>
+<li><strong>自动生成文件、配置文件等辅助代码</strong>。</li>
+<li>如 <code>configs.c</code>、<code>isr_tables.c</code>、<code>empty_file.c</code> 等，可能为构建生成的初始化配置或中断表。</li>
+</ul>
+<hr />
+<h3 id="4-zephyrsocststm32">4. <code>zephyr/soc/st/stm32/</code></h3>
+<ul>
+<li><strong>目标 SoC（如 STM32）相关的适配和底层代码</strong>。</li>
+<li><code>common/</code>、<code>stm32h7x/</code>等：包含HAL适配、SoC配置、特定处理器功能（如 <code>soc_config.c</code>、<code>mpu_regions.c</code>）。</li>
+</ul>
+<hr />
+<h3 id="5-zephyrsubsys">5. <code>zephyr/subsys/</code></h3>
+<ul>
+<li><strong>Zephyr子系统代码</strong>。</li>
+<li>如 <code>mem_mgmt/</code>（内存管理）、<code>tracing/</code>（追踪日志/调试子系统等）。</li>
+</ul>
+<hr />
+<h3 id="6-zephyrarch">6. <code>zephyr/arch/</code></h3>
+<ul>
+<li><strong>架构相关代码</strong>（此处是 ARM 架构）。</li>
+<li><code>arm/core/</code>、<code>core/cortex_m/</code>、<code>core/mpu/</code> 等：涉及CPU异常、上下文切换、MPU、ISR、fault/中断/向量表、空闲、线程管理、架构适配等。</li>
+<li><code>.S</code> 文件为 ARM 汇编实现的底层启动或关键性能函数。</li>
+</ul>
+<hr />
+<h3 id="7-zephyrkernel">7. <code>zephyr/kernel/</code></h3>
+<ul>
+<li><strong>Zephyr内核核心代码</strong>。</li>
+<li>涉及任务调度（<code>sched.c</code>）、线程（<code>thread.c</code>）、信号量（<code>sem.c</code>）、队列、互斥锁、定时器、工作队列（<code>work.c</code>）、主入口（<code>main_weak.c</code>）、错误处理（<code>fatal.c</code>）、时钟（<code>timer.c</code>）、内存池、浮点支持等。</li>
+<li>这是RTOS最关键的部分。</li>
+</ul>
+<hr />
+<h3 id="8-zephyrdrivers">8. <code>zephyr/drivers/</code></h3>
+<ul>
+<li><strong>设备驱动层</strong>。</li>
+<li><code>interrupt_controller/</code>：中断控制器</li>
+<li><code>clock_control/</code>：时钟驱动</li>
+<li><code>console/</code>：串口/控制台</li>
+<li><code>gpio/</code>：通用IO</li>
+<li><code>pinctrl/</code>：引脚复用/配置</li>
+<li><code>reset/</code>：芯片复位</li>
+<li><code>serial/</code>：串口通信</li>
+<li><code>timer/</code>：定时器</li>
+</ul>
+<hr />
+<h3 id="9-moduleshalstm32stm32cube">9. <code>modules/hal/stm32/stm32cube/</code></h3>
+<ul>
+<li><strong>STM32官方HAL库</strong>（硬件抽象层，Zephyr通过它操作底层硬件）。</li>
+<li><code>drivers/src/</code>、<code>soc/</code>：与具体芯片型号和片上外设相关的底层实现，如时钟、外设驱动、系统启动等。</li>
+</ul>
+<hr />
+<h3 id="10-zephyrliblibc">10. <code>zephyr/lib/libc/</code></h3>
+<ul>
+<li><strong>C库实现（如 picolibc）</strong>。</li>
+<li>基础的标准C库功能实现，如assert、errno、exit、malloc、stdio等。</li>
+</ul>
+<hr />
+<h3 id="11">11. 其他</h3>
+<ul>
+<li>还有如 <code>zephyr/arch/common/</code>、<code>subsys/</code>、<code>kernel/</code>、<code>misc/</code>、<code>utils/</code>、<code>drivers/</code>，基本对应Zephyr各功能模块/系统组件。</li>
+<li>
+<p><code>empty_file.c</code> 一般为占位符，部分自动生成文件为配置或占位。</p>
+</li>
+<li>
+<p>所有.s/S 文件</p>
+</li>
+</ul>
+<pre><code>G:\desktop\zephyrproject\zephyr\arch\arm\core\nmi_on_reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\fault_s.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\reset.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\vector_table.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\swap_helper.S
+G:\desktop\zephyrproject\zephyr\arch\arm\core\cortex_m\__aeabi_read_tp.S
+</code></pre>
+<p>如上可以看到，都在zephyrproject\zephyr\arch\arm\core目录里</p>
+<p>在 Zephyr 的 ARM 架构中，设备上电后 CPU 会依据向量表中的复位向量开始执行代码。根据工程目录中的源码，启动流程大致如下：</p>
+<h3 id="_3">整体流程</h3>
+<ol>
+<li><strong>向量表加载</strong>：硬件读取 <code>vector_table.S</code> 中的复位向量，取到 <code>z_arm_reset</code> 的地址。</li>
+<li><strong>复位处理</strong>：<code>reset.S</code> 的 <code>z_arm_reset</code> 在上电或链式加载后执行，准备中断栈、寄存器等，然后跳到 C 层的 <code>z_prep_c()</code>。</li>
+<li><strong>早期异常</strong>：若在内核初始化前触发 NMI，则 <code>nmi_on_reset.S</code> 的 <code>z_SysNmiOnReset</code> 会进入等待循环，避免重启。</li>
+<li><strong>继续启动</strong>：<code>z_prep_c()</code>（在 <code>prep_c.c</code>）完成 BSS 清零、数据段复制等初始化，随后调用 <code>z_cstart()</code>。<br />
+<code>z_cstart()</code> 创建主线程并执行用户应用的 <code>main()</code>。</li>
+<li><strong>运行期间</strong>：若发生处理器异常（HardFault 等），<code>fault_s.S</code> 的相应入口保存现场并跳转到 <code>z_arm_fault</code> 进行诊断。<br />
+ 线程切换由 <code>swap_helper.S</code> 的 <code>z_arm_pendsv</code> 完成；系统调用和内核异常通过 <code>z_arm_svc</code> 入口处理。<br />
+  如需获得 TLS 地址，编译器调用 <code>__aeabi_read_tp.S</code> 实现的 <code>__aeabi_read_tp</code>。</li>
+</ol>
+<p>从而完成了自上电到进入 <code>main()</code> 前后整个汇编级流程的解释。</p>
+<ol>
+<li><strong>向量表</strong>
+   <code>arch/arm/core/cortex_m/vector_table.S</code> 定义了系统的中断/异常向量表，其中第二个表项指向 <code>z_arm_reset</code>。因此复位后 CPU 会跳转到 <code>z_arm_reset</code>。</li>
+<li><strong>复位处理</strong>
+   <code>z_arm_reset</code> 位于 <code>arch/arm/core/cortex_m/reset.S</code>。它完成堆栈指针设置、初始寄存器配置等工作，最后调用 <code>z_prep_c</code>。</li>
+<li><strong>准备 C 运行环境</strong>
+   <code>z_prep_c</code> 在 <code>arch/arm/core/cortex_m/prep_c.c</code> 中实现，负责重定位向量表、初始化 FPU、清零 BSS、复制数据段并初始化中断系统，随后调用 <code>z_cstart</code>。</li>
+<li><strong>内核初始化</strong>
+   <code>z_cstart</code> 位于 <code>kernel/init.c</code>，进行早期系统初始化（包括各种 init level 的钩子、设备初始化等），并在多线程配置下创建主线程，随后调用 <code>switch_to_main_thread</code>。</li>
+<li><strong>切换到主线程</strong>
+   <code>switch_to_main_thread</code>（同样在 <code>kernel/init.c</code>）完成首次上下文切换，开始执行背景线程 <code>bg_thread_main</code>。</li>
+<li><strong>背景线程完成初始化并调用应用 <code>main()</code></strong>
+   <code>bg_thread_main</code> 在执行完 POST_KERNEL、APPLICATION 等阶段的初始化后，最终调用用户定义的 <code>main()</code> 函数。</li>
+<li><strong>应用入口</strong>
+   示例工程的 <code>main()</code> 位于 <code>samples/basic/blinky/src/main.c</code>，此处实现 LED 闪烁逻辑</li>
+</ol>
+<p>综上，启动链路为：</p>
+<p><code>vector_table.S</code>（复位向量） ➜ <code>reset.S</code> (<code>z_arm_reset</code>) ➜ <code>prep_c.c</code> (<code>z_prep_c</code>) ➜ <code>kernel/init.c</code> (<code>z_cstart</code> ➜ <code>switch_to_main_thread</code> ➜ <code>bg_thread_main</code>) ➜ 示例工程的 <code>main()</code>。此流程在系统完成各阶段初始化后，正式转入应用层代码执行。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#zephyr">zephyr启动详解</a></li>
+<li><a href="#_1">怎么看如何启动的？</a></li>
+<li><a href="#demo">编译一个基础demo</a></li>
+<li><a href="#compile_commandsjson">分析compile_commands.json</a></li>
+<li><a href="#_2">字段解释</a><ul>
+<li><a href="#1-art_pi_appsrc">1. art_pi_app/src/</a></li>
+<li><a href="#2-zephyrlib">2. zephyr/lib/</a></li>
+<li><a href="#3-zephyrbuildzephyr-zephyrmisc">3. zephyr/build/zephyr/ &amp; zephyr/misc/</a></li>
+<li><a href="#4-zephyrsocststm32">4. zephyr/soc/st/stm32/</a></li>
+<li><a href="#5-zephyrsubsys">5. zephyr/subsys/</a></li>
+<li><a href="#6-zephyrarch">6. zephyr/arch/</a></li>
+<li><a href="#7-zephyrkernel">7. zephyr/kernel/</a></li>
+<li><a href="#8-zephyrdrivers">8. zephyr/drivers/</a></li>
+<li><a href="#9-moduleshalstm32stm32cube">9. modules/hal/stm32/stm32cube/</a></li>
+<li><a href="#10-zephyrliblibc">10. zephyr/lib/libc/</a></li>
+<li><a href="#11">11. 其他</a></li>
+<li><a href="#_3">整体流程</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
