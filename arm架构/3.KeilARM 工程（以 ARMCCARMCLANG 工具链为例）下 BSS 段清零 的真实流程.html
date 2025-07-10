@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>3.KeilARM 工程（以 ARMCCARMCLANG 工具链为例）下 BSS 段清零 的真实流程</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="keil-armccbss">KEIL ARMCC工具链下，bss段清零的真实流程</h1>
+<h2 id="1">1. 启动流程大致如下</h2>
+<ol>
+<li><strong>启动文件（startup_xxx.s / startup_xxx.sct）</strong></li>
+<li>通常只做最基础的堆栈初始化、向量表设置和异常默认处理。</li>
+<li>绝大部分 ARM 官方模板不会在汇编启动文件里主动写 BSS 清零的代码。</li>
+<li><strong>入口函数：Reset_Handler</strong></li>
+<li>调用 <code>SystemInit</code>（系统时钟、外设等初始化）</li>
+<li>之后通常会<strong>跳转到</strong> <code>__main</code></li>
+<li><strong>__main 的作用</strong></li>
+<li><code>__main</code> 并不是用户写的 main，而是由 ARM 的 C 运行库（RTL/newlib/ARM C Library）实现的一个隐藏函数。</li>
+<li>它主要负责 C 运行环境的初始化：<ul>
+<li>初始化堆栈</li>
+<li><strong>复制数据段（data）到 RAM</strong></li>
+<li><strong>清零 BSS 段</strong></li>
+<li>构建 C++ 全局对象（如用 C++ 时）</li>
+</ul>
+</li>
+<li>最终才跳转到你的 main。</li>
+</ol>
+<hr />
+<h2 id="2-bss">2. BSS 段清零的位置</h2>
+<ul>
+<li><strong>不是在 startup_xxx.s 里直接做的</strong>（当然你可以手写，但通常没必要）</li>
+<li>是在 <code>__main</code>（也叫 runtime entry, C runtime initialization）里自动完成的</li>
+<li><strong>依赖于你用的 C 运行库实现</strong></li>
+<li>ARMCC/ARMCLANG：用的通常是 ARM 提供的 run-time library（不是 newlib，是 ARM 自己的 libc）</li>
+<li>GCC：用的是 newlib 或 newlib-nano，BSS 清零代码在 <code>_start</code> 或 <code>__libc_init_array</code> 相关流程</li>
+</ul>
+<p>在 ARMCC/ARMCLANG 工具链下，Keil 工程会链接到 ARM 官方的 <code>__main</code>，而 <code>__main</code> 会调用一个叫 <code>__rt_entry</code> 的流程（见 map 文件），在这个流程里就会对 <code>.bss</code> 段进行清零。</p>
+<hr />
+<h2 id="3-__main">3. 你看到的 <code>__main</code> 与静态库</h2>
+<ul>
+<li><strong><code>__main</code> 是库里的</strong>，它的实现随编译器/库一起分发，不需要你自己写。</li>
+<li>具体 BSS 清零代码在库中，比如 ARMCC 可能在 <code>__scatterload</code> 或相关 C startup 文件中。</li>
+</ul>
+<hr />
+<h2 id="4">4. 证据/验证方法</h2>
+<ul>
+<li>你可以用 <code>arm-none-eabi-objdump -d your.elf</code> 或查看 map 文件，看 BSS 段是在哪段代码被操作的。</li>
+<li>你可以设置断点到 <code>__main</code>、<code>__rt_entry</code> 或 <code>SystemInit</code> 后一步步跟踪，也能看到 memset/loop 清零。</li>
+</ul>
+<hr />
+<h2 id="5">5. 总结一句话</h2>
+<blockquote>
+<p><strong>在 Keil (ARMCC/ARMCLANG) 工程下，BSS 段清零并不是在启动文件（startup.s）中手写完成的，而是在链接到的 C 运行库（ARM官方C runtime）中的 <code>__main</code> 入口函数实现的。</strong></p>
+</blockquote>
+<p>如果你想看 ARM 官方的实现，可以搜索 ARMCC 的 <code>__rt_entry</code>、<code>__scatterload</code>，或者 GCC 的 <code>crt0.S</code>、<code>crt0.o</code>。</p>
+<p>如果你还有 Keil 工程 map 文件，可以直接搜索 <code>__main</code> 和 <code>__rt_entry</code> 看跳转关系！</p>
+<p><strong>补充：</strong></p>
+<ul>
+<li>你可以通过「user code before main」这种机制插入代码，在 main 之前执行（Keil 支持）</li>
+<li>有些极简裸机项目才会把 data/bss 初始化也写到 startup 文件里</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#keil-armccbss">KEIL ARMCC工具链下，bss段清零的真实流程</a><ul>
+<li><a href="#1">1. 启动流程大致如下</a></li>
+<li><a href="#2-bss">2. BSS 段清零的位置</a></li>
+<li><a href="#3-__main">3. 你看到的 __main 与静态库</a></li>
+<li><a href="#4">4. 证据/验证方法</a></li>
+<li><a href="#5">5. 总结一句话</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
