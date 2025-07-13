@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>9.edge-tts测试</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="edge_tts">edge_tts测试</h2>
+<p>官方文档：https://github.com/rany2/edge-tts</p>
+<p>依赖库</p>
+<pre><code>pip install edge-tts sounddevice soundfile numpy
+</code></pre>
+<p>快速测试</p>
+<pre><code>edge-playback --text &quot;Hello, world!&quot;
+</code></pre>
+<p>查找中文音色，并读取文字自动播放</p>
+<pre><code class="language-python">import edge_tts
+import asyncio
+import time
+import io
+import sys
+import numpy as np
+import sounddevice as sd
+import soundfile as sf
+
+TEXT = &quot;你好，这是一段音色试听示例。支持多种声音风格，你可以选择喜欢的声音。&quot;
+
+async def list_zh_voices():
+    voices = await edge_tts.list_voices()
+    zh_voices = [v for v in voices if v[&quot;Locale&quot;].startswith(&quot;zh-&quot;)]
+    return zh_voices
+
+async def main():
+    voices = await list_zh_voices()
+    print(f&quot;共找到 {len(voices)} 个中文音色\n&quot;)
+    for idx, v in enumerate(voices):
+        name = v.get(&quot;ShortName&quot;)
+        gender = v.get(&quot;Gender&quot;, &quot;?&quot;)
+        display_name = v.get(&quot;DisplayName&quot;) or v.get(&quot;FriendlyName&quot;) or v.get(&quot;ShortName&quot;)
+        voice_type = v.get(&quot;VoiceType&quot;, &quot;?&quot;)
+        style_list = v.get(&quot;StyleList&quot;, [])
+        locale = v.get(&quot;Locale&quot;, &quot;?&quot;)
+        # 打印详细音色信息
+        print(f&quot;\n[{idx+1}/{len(voices)}] 试听人物: {display_name}&quot;)
+        print(f&quot;  - 技术名: {name}&quot;)
+        print(f&quot;  - 性别: {gender}&quot;)
+        print(f&quot;  - 类型: {voice_type}&quot;)
+        print(f&quot;  - 语言: {locale}&quot;)
+        print(f&quot;  - 风格: {', '.join(style_list) if style_list else '无'}&quot;)
+
+        try:
+            communicate = edge_tts.Communicate(TEXT, voice=name)
+            # 获取生成的音频流
+            audio_bytes = b''
+            async for chunk in communicate.stream():
+                if chunk[&quot;type&quot;] == &quot;audio&quot;:
+                    audio_bytes += chunk[&quot;data&quot;]
+
+            # 使用 soundfile 和 sounddevice 播放内存中的 wav
+            audio_buffer = io.BytesIO(audio_bytes)
+            data, samplerate = sf.read(audio_buffer, dtype='float32')
+            print(&quot;合成完毕，准备播放...&quot;)
+            sd.play(data, samplerate)
+            sd.wait()
+            print(&quot;播放完成。&quot;)
+        except Exception as e:
+            print(f&quot;音色 {name} 合成或播放失败: {e}&quot;)
+        time.sleep(1)  # 每段之间停1秒
+
+asyncio.run(main())
+
+</code></pre>
+<p><img alt="image-20250713193026471" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250713193026471.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#edge_tts">edge_tts测试</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
