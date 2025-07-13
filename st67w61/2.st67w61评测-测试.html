@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.st67w61评测-测试</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="x-nucleo-67w61-">x-nucleo-67w61 评测-测试</h1>
+<p>help指令列出了所有功能</p>
+<pre><code class="language-c">[16:51:20.634]收←◆help
+shell commands list:
+info_app             - info_app. Display application info
+quit                 - quit. Stop application execution
+echo                 - echo [ iteration ]
+fota_http            - fota_http &lt; server IP &gt; &lt; server port &gt; &lt; ST67 resource URI &gt; [ STM32 resource URI ] [ FOTA header resource URI ]. Run firmware update over HTTP
+ble_init             - ble_init [ 1: client mode; 2:server mode ]
+ble_adv_start        - ble_adv_start
+ble_adv_stop         - ble_adv_stop
+ble_start_scan       - ble_start_scan
+ble_stop_scan        - ble_stop_scan
+ble_connect          - ble_connect [ conn handle: 0 or 1 ] [ BD addr ]
+ble_disconnect       - ble_disconnect [ conn handle: 0 or 1 ]
+mqtt_configure       - mqtt_configure &lt; -s Scheme &gt; &lt; -i ClientId &gt; [ -u Username ] [ -pw Password ] [ -c Certificate ] [ -k PrivateKey ] [ -ca CACertificate ] [ -sni ]
+mqtt_connect         - mqtt_connect &lt; -h Host &gt; &lt; -p Port &gt;
+mqtt_disconnect      - mqtt_disconnect
+mqtt_subscribe       - mqtt_subscribe &lt; Topic &gt;
+mqtt_unsubscribe     - mqtt_unsubscribe &lt; Topic &gt;
+mqtt_publish         - mqtt_publish &lt; Topic &gt; &lt; Message &gt;
+ping                 - ping &lt;hostname&gt; [ -c count [1; max(uint16_t) - 1] ] [ -s size [1; 10000] ] [ -i interval [100; 3500] ]
+time                 - time &lt; timezone : UTC format : range [-12; 14] or HHmm format : with HH in range [-12; +14] and mm in range [00; 59] &gt;
+dnslookup            - dnslookup &lt;hostname&gt;
+info                 - info. Display ST67W6X module info
+reset                - reset &lt; 0: HAL_Reset; 1: NCP_Restore &gt;
+fs_write             - fs_write &lt; filename &gt;. Write file content from the Host to the NCP
+fs_read              - fs_read &lt; filename &gt;. Read file content
+fs_delete            - fs_delete &lt; filename &gt;. Delete file from the NCP file system
+fs_list              - fs_list. List all files in the file system
+powersave            - powersave [ 0: disable; 1: enable ]
+atcmd                - atcmd &lt; &quot;AT+CMD?&quot; &gt;. Execute AT command
+wifi_scan            - wifi_scan [ -p ] [ -s SSID ] [ -b BSSID ] [ -c channel [1; 13] ] [ -n max_count [1; 50] ]
+wifi_sta_connect     - wifi_sta_connect &lt; SSID &gt; [ Password ] [ -b BSSID ] [ -i interval [0; 7200] ] [ -n nb_attempts [0; 1000] ] [ -wps ] [ -wep ]
+wifi_sta_disconnect  - wifi_sta_disconnect [ -r ]
+wifi_sta_mode        - wifi_sta_mode [ mode ]
+wifi_auto_connect    - wifi_auto_connect
+wifi_hostname        - wifi_hostname [ hostname ]
+wifi_sta_ip          - wifi_sta_ip [ IP addr ] [ Gateway addr ] [ Netmask addr ]
+wifi_sta_dns         - wifi_sta_dns [ 0:default IPs; 1: manual IPs ] [ DNS1 addr ] [ DNS2 addr ] [ DNS3 addr ]
+wifi_sta_mac         - wifi_sta_mac
+wifi_sta_state       - wifi_sta_state
+wifi_country_code    - wifi_country_code [ 0:AP aligned country code; 1:User country code ] [ Country code [CN; JP; US; EU; 00] ]
+wifi_ap_start        - wifi_ap_start [ -s SSID ] [ -p Password ] [ -c channel [1; 13] ] [ -e security [0:Open; 2:WPA; 3:WPA2; 4:WPA3] ] [ -h hidden [0; 1] ]
+wifi_ap_stop         - wifi_ap_stop
+wifi_ap_mode         - wifi_ap_mode [ mode ]
+wifi_ap_list_sta     - wifi_ap_list_sta
+wifi_ap_disconnect_sta - wifi_ap_disconnect_sta &lt; MAC &gt;
+wifi_ap_ip           - wifi_ap_ip
+wifi_dhcp            - wifi_dhcp [ 0:DHCP disabled; 1:DHCP enabled ] [ 1:STA only; 2:AP only; 3:STA + AP ] [ lease_time [1; 2880] ]
+wifi_ap_mac          - wifi_ap_mac
+dtim                 - dtim &lt; value [0; 10] &gt;
+wifi_twt_setup       - wifi_twt_setup &lt; setup_type(0: request; 1: suggest; 2: demand) &gt; &lt; flow_type(0: announced; 1: unannounced) &gt; &lt; wake_int_exp &gt; &lt; min_wake_duration &gt; &lt; wake_int_ma
+[16:51:20.692]收←◆ntissa &gt;
+wifi_twt_set         - wifi_twt_set
+wifi_twt_teardown    - wifi_twt_teardown &lt; 0: announced; 1: unannounced &gt;; 2: all &gt;
+iperf                - iperf [ options ]. Iperf command line tool for network performance measurement. [ -h ] for help
+task_perf            - task_perf [ -s ]. Start or stop [ -s ] task performance measurement
+task_report          - task_report. Display task performance report
+echostart            - echostart &lt; port &gt;. WFA - Starts the UDP echo server on the specified port.
+echostop             - echostop. WFA - Stops the UDP echo server.
+help                 - help [ command ]. Display all available commands and the relative help message
+</code></pre>
+<p>参考链接</p>
+<p>https://wiki.st.com/stm32mcu/wiki/Connectivity:Wi-Fi_ST67W6X_CLI_Application</p>
+<p>https://github.com/STMicroelectronics/x-cube-st67w61/tree/main/Projects/NUCLEO-H7S3L8</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#x-nucleo-67w61-">x-nucleo-67w61 评测-测试</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
