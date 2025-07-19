@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>5.烧录uboot到sd卡</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="ubootsd">烧录uboot到sd卡</h2>
+<p>两种方式，使用nxp官方下载工具或者dd工具</p>
+<p><code>imxdownload</code> 是 NXP 提供的一个特定于 i.MX 处理器系列的烧录工具。这个工具是为了烧录 i.MX 处理器的 boot ROM 而设计的，通常用于烧录 U-Boot bootloader 到设备上。这个工具通常会与 i.MX 处理器的特定硬件接口一起使用，例如 USB 或 UART，来进行烧录。</p>
+<h3 id="imxdownload-dd"><code>imxdownload</code> 与 <code>dd</code> 的区别：</h3>
+<ol>
+<li><strong>特定性</strong>：</li>
+<li><code>imxdownload</code> 是针对 NXP 的 i.MX 系列处理器设计的，而 <code>dd</code> 是一个通用的 UNIX 工具，可用于任何 UNIX 系统上，用于复制和转换文件。</li>
+<li><strong>接口</strong>：</li>
+<li><code>imxdownload</code> 通常使用特定的硬件接口（例如 USB 或 UART）来烧录 i.MX 处理器，而 <code>dd</code> 则直接操作块设备，例如 SD 卡。</li>
+<li><strong>用途</strong>：</li>
+<li><code>imxdownload</code> 主要用于烧录 bootloader 到 i.MX 处理器的内部存储或外部存储中，而 <code>dd</code> 可以用于复制任何文件和设备内容，包括制作和恢复磁盘映像。</li>
+<li><strong>操作层级</strong>：</li>
+<li><code>imxdownload</code> 操作的是处理器级别，直接与处理器的 boot ROM 交互，而 <code>dd</code> 操作的是文件系统级别，与块设备交互。</li>
+</ol>
+<h3 id="_1">选择工具：</h3>
+<ul>
+<li>如果您正在使用 NXP 的 i.MX 系列处理器，并且需要通过特定的硬件接口烧录 bootloader，那么 <code>imxdownload</code> 可能是更合适的选择。</li>
+<li>如果您只是需要将 bootloader 烧录到一个块设备（例如 SD 卡）上，并且不需要特定的硬件接口，那么 <code>dd</code> 应该足够了。</li>
+</ul>
+<h3 id="_2">举例说明：</h3>
+<ol>
+<li><strong>使用特定硬件接口</strong>：</li>
+<li>如果您使用的是 i.MX 处理器，并且需要通过 USB 接口来烧录 bootloader 到处理器的内部存储中，那么您可能需要使用 <code>imxdownload</code> 这样的特定工具。</li>
+<li><strong>不需要特定硬件接口</strong>：</li>
+<li>如果您只是需要将 bootloader 烧录到一个 SD 卡上，这个 SD 卡可以直接通过计算机的 SD 卡读卡器访问，那么您可以使用 <code>dd</code> 命令，因为这种情况下不需要与特定的处理器或硬件接口进行直接通信。</li>
+</ol>
+<p>简而言之，如果您的烧录过程只涉及到标准的、通用的块设备接口，例如 SD 卡读卡器，那么 <code>dd</code> 命令应该是足够的。如果烧录过程需要与特定的处理器或硬件平台的特定接口进行通信，那么您可能需要使用特定于该硬件平台的烧录工具。</p>
+<h2 id="dd">dd工具烧录</h2>
+<p>我们使用dd工具来烧录吧，毕竟具有通用性</p>
+<p>要将U-Boot烧写到SD卡，您通常会使用<code>dd</code>命令。<code>dd</code>命令可以用于复制文件或设备内容，通常用于制作或复制磁盘映像。在这种情况下，您将使用<code>dd</code>命令将编译好的U-Boot二进制文件（通常是<code>u-boot.bin</code>或<code>u-boot.imx</code>）复制到SD卡。</p>
+<h3 id="_3">步骤：</h3>
+<ol>
+<li>
+<p><strong>找到U-Boot二进制文件</strong></p>
+</li>
+<li>
+<p>确定U-Boot二进制文件的位置。这通常是<code>u-boot.bin</code>或<code>u-boot.imx</code>。</p>
+</li>
+<li>
+<p><strong>卸载SD卡</strong></p>
+</li>
+<li>
+<p>在写入之前，确保SD卡是卸载的。</p>
+</li>
+</ol>
+<p><code>sudo umount /dev/sda1</code></p>
+<ol>
+<li>
+<p><strong>使用dd命令烧写U-Boot</strong></p>
+</li>
+<li>
+<p>使用<code>dd</code>命令将U-Boot烧写到SD卡。请替换<code>&lt;u-boot-file&gt;</code>为您的U-Boot二进制文件的路径。</p>
+</li>
+</ol>
+<p><code>sudo dd iflag=dsync oflag=dsync if=&lt;u-boot-file&gt; of=/dev/sda seek=2</code></p>
+<ul>
+<li>
+<p>这里，<code>if</code>是输入文件，<code>of</code>是输出文件（您的SD卡），<code>bs</code>是块大小，<code>seek</code>是跳过的块数。<code>seek=2</code>通常用于跳过SD卡的分区表。</p>
+</li>
+<li>
+<p><strong>同步</strong></p>
+</li>
+</ul>
+<p><code>iflag=dsync</code> 和 <code>oflag=dsync</code>，这两个选项会确保每次读取和写入都是同步的，这意味着每次读取或 写入操作都会等待物理 I/O 操作完成。这可以确保数据的完整性</p>
+<h3 id="_4">注意：</h3>
+<ul>
+<li>请小心使用<code>dd</code>命令，因为它会覆盖目标设备（在这种情况下是SD卡）的内容。确保<code>of</code>参数是正确的，以避免覆盖系统的其他部分。</li>
+<li>在执行<code>dd</code>命令之前，确保没有挂载SD卡的任何分区。</li>
+<li>请根据您的U-Boot版本和目标硬件，检查相关的文档以确定正确的<code>dd</code>命令参数，特别是<code>bs</code>和<code>seek</code>参数。</li>
+</ul>
+<p>了解以上内容以后，我的uboot 路径：/root/uboot</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929105840414.png"><img alt="image-20230929105840414" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929105840414.png" /></a></p>
+<p>查看挂在设备并卸载</p>
+<pre><code>lsblk
+sudo umount /dev/sda1
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110000451.png"><img alt="image-20230929110000451" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110000451.png" /></a></p>
+<p><strong>烧写U-Boot</strong></p>
+<p>注意：是sda,不是sda1分区</p>
+<p>我当前是在uboot目录下</p>
+<pre><code>sudo dd iflag=dsync oflag=dsync if=u-boot.imx of=/dev/sda seek=2
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110521672.png"><img alt="image-20230929110521672" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110521672.png" /></a></p>
+<p>0.07S，一个字--&gt;快, 不过看到这种一般是没烧写上去</p>
+<p>查看所有sd</p>
+<pre><code> ls /dev/sd*
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124421313.png"><img alt="image-20230929124421313" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124421313.png" /></a></p>
+<p>这里有一个虚拟的sdb ，删掉</p>
+<pre><code>sudo rm -rf /dev/sdb
+</code></pre>
+<p>再次查看</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124518698.png"><img alt="image-20230929124518698" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124518698.png" /></a></p>
+<p>再次烧写，烧写成功一般是这样</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929125820303.png"><img alt="image-20230929125820303" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929125820303.png" /></a></p>
+<p>硬件上 BOOT 设置从 SD 卡启动，使用 USB 线将 USB_TTL 和电脑连接，也就是将开发板的串口 1 连接到电脑上。打开MobaXterm，设置好串口参数并打开，最后复位开发板。在 MobaXterm 上出现“Hit any key to stop autoboot: ”倒计时的时候按下键盘上的回车键，默认是 3 秒倒计时，在 3 秒倒计时结束以后如果没有按下回车键的话 uboot 就会使用默认参数来启动 Linux 内核了。如果在 3 秒倒计时结束之前按下回车键，那么就会进入 uboot 的命令行模式，否则会引导进入linux内核可以理解为windows开机时的bios，开机狂按某个按键会进入bios，不按正常启动系统</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130009431.png"><img alt="image-20230929130009431" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130009431.png" /></a></p>
+<h2 id="nxpimxdownload">NXP官方工具imxdownload烧录</h2>
+<p>https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/tools/imxdownload</p>
+<p>将该工具放在uboot目录下，给予执行权限</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130624272.png"><img alt="image-20230929130624272" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130624272.png" /></a></p>
+<pre><code>chmod 777 imxdownload
+</code></pre>
+<p>烧写命令 //烧写到SD卡中</p>
+<pre><code>./imxdownload u-boot.bin /dev/sda 
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130742589.png"><img alt="image-20230929130742589" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130742589.png" /></a></p>
+<p>再次将SD插入开发板启动看一下没问题的（115200）</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130852681.png"><img alt="image-20230929130852681" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130852681.png" /></a></p>
+<h2 id="_5">总结：</h2>
+<p>烧写uboot到SD卡时候使用dd工具，具有通用性。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#ubootsd">烧录uboot到sd卡</a><ul>
+<li><a href="#imxdownload-dd">imxdownload 与 dd 的区别：</a></li>
+<li><a href="#_1">选择工具：</a></li>
+<li><a href="#_2">举例说明：</a></li>
+</ul>
+</li>
+<li><a href="#dd">dd工具烧录</a><ul>
+<li><a href="#_3">步骤：</a></li>
+<li><a href="#_4">注意：</a></li>
+</ul>
+</li>
+<li><a href="#nxpimxdownload">NXP官方工具imxdownload烧录</a></li>
+<li><a href="#_5">总结：</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

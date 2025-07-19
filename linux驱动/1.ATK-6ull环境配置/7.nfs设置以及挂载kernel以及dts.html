@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>7.nfs设置以及挂载kernel以及dts</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><strong>NFS 挂载原理</strong>
+ 开发板上运行的 Linux（比如嵌入式 ARM 平台）通常没有本地存储，或者是调试时不方便频繁更换镜像。这时常用的做法是：</p>
+<ul>
+<li><strong>内核（zImage、Image）</strong>和<strong>设备树（.dtb 文件）</strong>通过 TFTP 方式从 Ubuntu 主机下载到开发板内存，然后启动。</li>
+<li><strong>根文件系统</strong>通过 NFS 挂载，这样你在 Ubuntu 主机（开发机）上维护一个目录，开发板每次启动时都把这个目录作为根文件系统使用，方便开发、调试。</li>
+</ul>
+<p>需要在 Ubuntu 上<strong>共享一个文件夹</strong>，比如 <code>/nfsroot</code>，用来作为根文件系统。开发板通过网络挂载这个目录。</p>
+<p><strong>大致步骤</strong></p>
+<ul>
+<li>在 Ubuntu 上安装 NFS 服务：</li>
+</ul>
+<p><code>sudo apt update
+  sudo apt install nfs-kernel-server</code></p>
+<ul>
+<li>创建并配置共享目录（例如 <code>/nfsroot</code>）：</li>
+</ul>
+<p><code>sudo mkdir nfsroot</code></p>
+<p><code>我创建的目录  /home/hdj/nfsroot  ，创建后给权限chmod 775 -R nfsroot</code></p>
+<ul>
+<li>编辑 <code>/etc/exports</code> 文件，添加如下内容（我的开发板 IP 为 192.168.0.99）</li>
+</ul>
+<p><code>/home/hdj/nfsroot 192.168.0.99(rw,sync,no_root_squash,no_subtree_check)</code></p>
+<ul>
+<li>重新导出配置并重启 NFS 服务：</li>
+</ul>
+<p><code>sudo exportfs -ra
+  sudo systemctl restart nfs-kernel-server</code></p>
+<ul>
+<li>查看nfs状态</li>
+</ul>
+<pre><code>sudo systemctl status nfs-kernel-server
+</code></pre>
+<p><img alt="image-20250720015346696" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250720015346696.png" /></p>
+<ul>
+<li>将zImage 以及  imx6ull-alientek-emmc.dtb  文件放在nfsroot目录  </li>
+</ul>
+<p>使用 nfs 命令来将 zImage 下载到开发板 DRAM 的 0X80800000 地址处， imx6ull-alientek-emmc.dtb下载到83000000处</p>
+<p>下载zImage </p>
+<pre><code>nfs 80800000 192.168.0.38:/home/hdj/nfsroot/zImage
+</code></pre>
+<p>下载dtb</p>
+<pre><code>nfs 83000000 192.168.0.38:/home/hdj/nfsroot/imx6ull-alientek-emmc.dtb
+</code></pre>
+<p>启动内核</p>
+<pre><code>bootz 80800000 - 83000000
+</code></pre>
+<p><img alt="image-20250720022412627" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250720022412627.png" /></p>
+<h2 id="_1">挂载根文件系统</h2>
+<p><strong>U-Boot</strong> 下用于 NFS 网络启动的 bootargs 设置命令 ，这会在启动内核的时，自动运行该命令来挂载根文件系统</p>
+<pre><code>setenv bootargs console=ttymxc0,115200 root=/dev/nfs nfsroot=192.168.0.38:/home/hdj/nfsroot/rootfs,tcp ip=192.168.0.99:192.168.0.38:192.168.0.1:255.255.255.0::eth0:off
+
+saveenv
+</code></pre>
+<h3 id="1-setenv-bootargs">1. setenv bootargs ...</h3>
+<ul>
+<li><strong>作用</strong>：设置 U-Boot 环境变量 <code>bootargs</code>，其内容会传递给 Linux 内核作为启动参数（cmdline）。</li>
+</ul>
+<h3 id="2-consolettymxc0115200">2. console=ttymxc0,115200</h3>
+<ul>
+<li><strong>console=ttymxc0</strong>：指定内核启动日志和串口终端使用的串口设备为 <code>ttymxc0</code>（i.MX6ULL 芯片的第1个串口，一般是 UART1）。</li>
+<li><strong>115200</strong>：串口波特率为 115200bps。</li>
+</ul>
+<h3 id="3-rootdevnfs">3. root=/dev/nfs</h3>
+<ul>
+<li>告诉内核，<strong>根文件系统（rootfs）挂载方式为 NFS</strong>，而不是本地存储设备（如 eMMC/SD/flash）。</li>
+<li><code>/dev/nfs</code> 是 Linux 内核约定的伪设备名，表示通过 NFS 挂载根文件系统。</li>
+</ul>
+<h3 id="4-nfsroot192168038homehdjnfsrootrootfstcp">4. nfsroot=192.168.0.38:/home/hdj/nfsroot/rootfs,tcp</h3>
+<ul>
+<li><strong>nfsroot=服务器IP:目录路径,参数</strong></li>
+<li><code>192.168.0.38</code>：NFS 服务器的 IP 地址</li>
+<li><code>/home/hdj/nfsroot/rootfs</code>：NFS 服务器上要导出的根文件系统目录</li>
+<li><code>tcp</code>：指定 NFS 传输协议使用 TCP（而不是 UDP）</li>
+</ul>
+<h3 id="5-ip192168099192168038192168012552552550eth0off">5. ip=192.168.0.99:192.168.0.38:192.168.0.1:255.255.255.0::eth0:off</h3>
+<p><strong>格式为：</strong>
+ <code>ip=&lt;client-ip&gt;:&lt;server-ip&gt;:&lt;gateway-ip&gt;:&lt;netmask&gt;:&lt;hostname&gt;:&lt;device&gt;:&lt;autoconf&gt;</code></p>
+<ul>
+<li><code>192.168.0.99</code>：本机（开发板）的 IP 地址</li>
+<li><code>192.168.0.38</code>：NFS 服务器的 IP 地址</li>
+<li><code>192.168.0.1</code>：网关 IP 地址</li>
+<li><code>255.255.255.0</code>：子网掩码</li>
+<li><code>（空）</code>：主机名（hostname），这里省略不用</li>
+<li><code>eth0</code>：使用的网络设备（通常开发板第1个以太网口）</li>
+<li><code>off</code>：IP 地址不会自动获取（DHCP 关闭），完全用命令里的参数</li>
+</ul>
+<h3 id="_2">总结</h3>
+<p><strong>该命令的作用是：</strong></p>
+<ul>
+<li>设置开发板通过串口 ttymxc0 进行内核日志输出和交互</li>
+<li>内核启动时，根文件系统不在本地，而是从 192.168.0.38 这台 PC 的 <code>/home/hdj/nfsroot/rootfs</code> 路径，通过 NFS（TCP协议）远程挂载</li>
+<li>指定开发板的IP、网关、子网等全部参数，不需要DHCP</li>
+</ul>
+<p>在执行上述的三条命令即可启动内核并自动挂载根文件系统</p>
+<pre><code>nfs 80800000 192.168.0.38:/home/hdj/nfsroot/zImage
+nfs 83000000 192.168.0.38:/home/hdj/nfsroot/imx6ull-alientek-emmc.dtb
+bootz 80800000 - 83000000
+</code></pre>
+<p><img alt="image-20250720025823332" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250720025823332.png" /></p>
+<p>既然可以使用环境变量来自动挂载文件系统，那么应该也可以使用环境变量来运行这三条指令，我能想到。别人早就想到了</p>
+<p>U-Boot中提供了一个bootcmd命令，在 U-Boot 启动时会自动执行的环境变量。U-Boot 启动后会自动 <code>run bootcmd</code>。</p>
+<p><img alt="image-20250720032806466" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250720032806466.png" /></p>
+<pre><code>bootcmd=run findfdt;mmc dev ${mmcdev};mmc dev ${mmcdev}; if mmc rescan; then if run loadbootscript; then run bootscript; else if run loadimage; then run mmcboot; else run netboot; fi; fi; else run netboot; fi
+</code></pre>
+<h3 id="_3">分段解释：</h3>
+<ol>
+<li><strong>run findfdt</strong></li>
+<li>运行一个名为 <code>findfdt</code> 的环境变量（通常是自动判断和设置 <code>fdtfile</code> 设备树变量，适配不同硬件）。</li>
+<li><strong>mmc dev ${mmcdev}; mmc dev ${mmcdev};</strong></li>
+<li>选择并切换到 <code>${mmcdev}</code> 指定的 mmc 设备（比如 emmc 或 sd 卡）。这里连写两遍是有的 U-Boot 平台这样更保险。</li>
+<li><strong>if mmc rescan; then ... else ... fi</strong></li>
+<li>判断 mmc 设备是否可以被正确扫描（即卡/芯片插好可用）。</li>
+<li><strong>if run loadbootscript; then run bootscript; else ... fi</strong></li>
+<li>尝试运行名为 <code>loadbootscript</code> 的变量（比如从 FAT 分区加载 bootscript 文件到内存）。如果加载成功，执行 <code>bootscript</code>（通常是板级自定义的启动脚本）。</li>
+<li><strong>else if run loadimage; then run mmcboot; else run netboot; fi; fi</strong></li>
+<li>如果没有 bootscript，就尝试用 <code>loadimage</code>（通常指加载 zImage/uImage 内核），如果加载成功，执行 <code>mmcboot</code>（通常是启动内核+dtb+rootfs），否则就执行 <code>netboot</code>（通常是走 TFTP/NFS 网络启动）。</li>
+<li><strong>else run netboot; fi</strong></li>
+<li>如果 mmc rescan 失败，直接走网络启动。</li>
+</ol>
+<h3 id="_4"><strong>总结一句话：</strong></h3>
+<blockquote>
+<p><strong>优先从本地 mmc 启动，先找 bootscript，其次找内核镜像；都没有就走网络启动。</strong></p>
+</blockquote>
+<p>设置bootcmd 环境变量，让启动时自动从网络启动</p>
+<pre><code>setenv bootcmd 'nfs 80800000 192.168.0.38:/home/hdj/nfsroot/zImage; nfs 83000000 192.168.0.38:/home/hdj/nfsroot/imx6ull-alientek-emmc.dtb; bootz 80800000 - 83000000'
+
+saveenv
+</code></pre>
+<p><img alt="image-20250720033414629" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250720033414629.png" /></p>
+<p>完全断电，再开机，uboot启动后，应该会自动将内核，设备树，以及根文件系统挂载上</p>
+<p>至此驱动开发的环境就弄好了，可以非常方便的更新内核，设备树，文件系统，这就是uboot的优势，我觉得uboot的演变也是为了满足开发需求，一开始应该是一个基础的跳转，发现开发时要频繁的下载，慢慢的演变成现在的uboot</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">挂载根文件系统</a><ul>
+<li><a href="#1-setenv-bootargs">1. setenv bootargs ...</a></li>
+<li><a href="#2-consolettymxc0115200">2. console=ttymxc0,115200</a></li>
+<li><a href="#3-rootdevnfs">3. root=/dev/nfs</a></li>
+<li><a href="#4-nfsroot192168038homehdjnfsrootrootfstcp">4. nfsroot=192.168.0.38:/home/hdj/nfsroot/rootfs,tcp</a></li>
+<li><a href="#5-ip192168099192168038192168012552552550eth0off">5. ip=192.168.0.99:192.168.0.38:192.168.0.1:255.255.255.0::eth0:off</a></li>
+<li><a href="#_2">总结</a></li>
+<li><a href="#_3">分段解释：</a></li>
+<li><a href="#_4">总结一句话：</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
