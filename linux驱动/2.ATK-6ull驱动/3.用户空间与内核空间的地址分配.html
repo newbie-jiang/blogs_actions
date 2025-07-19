@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>3.用户空间与内核空间的地址分配</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="_1">一、基础理解</h2>
+<p><strong>现代操作系统（包括Linux）采用虚拟内存管理</strong>，为每个进程分配独立的虚拟地址空间。虚拟地址空间一般分为两部分：</p>
+<ul>
+<li><strong>用户空间（User Space）</strong>：进程可以访问的区域。</li>
+<li><strong>内核空间（Kernel Space）</strong>：只有操作系统内核能访问，用户程序不能直接访问。</li>
+</ul>
+<hr />
+<h2 id="32linux">二、32位Linux下的典型地址分配</h2>
+<p>在传统的<strong>32位Linux</strong>（如x86）系统中，虚拟地址空间为4GB（0x00000000 ~ 0xFFFFFFFF）：</p>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>地址范围</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户空间</td>
+<td>0x00000000 ~ 0xBFFFFFFF</td>
+<td>3GB（大部分应用程序可用）</td>
+</tr>
+<tr>
+<td>内核空间</td>
+<td>0xC0000000 ~ 0xFFFFFFFF</td>
+<td>1GB（操作系统内核及其模块、驱动等使用）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>这样设计的好处是：用户空间和内核空间<strong>完全隔离</strong>，用户程序不能随便访问内核地址，提升了安全性。</li>
+<li>当用户程序通过系统调用进入内核态时，内核会操作自己的空间，而不是用户的空间。</li>
+</ul>
+<blockquote>
+<p>注意：内核空间地址在每个进程的虚拟空间都可见，但普通应用不能访问，试图访问会导致“段错误”（segfault）。</p>
+</blockquote>
+<hr />
+<h2 id="64linux">三、64位Linux下的地址分配</h2>
+<ul>
+<li>64位系统虚拟地址非常大（理想值可达16EB），实际只用到一部分。</li>
+<li>用户空间和内核空间的分界线常常在高地址（如x86_64的0x00007FFFFFFFFFFF是用户空间最大地址）。</li>
+<li>例如（x86_64，常见情况）：</li>
+<li>用户空间：<code>0x0000000000000000</code> ~ <code>0x00007FFFFFFFFFFF</code> （128TB）</li>
+<li>内核空间：<code>0xFFFF800000000000</code> ~ <code>0xFFFFFFFFFFFFFFFF</code> 等（具体取决于内核配置）</li>
+<li>用户空间远大于32位，并且仍然严格隔离。</li>
+</ul>
+<hr />
+<h2 id="_2">四、常见的几种地址空间分布图</h2>
+<h3 id="32-linux">32位 Linux</h3>
+<pre><code>| 0xFFFFFFFF   |---------------------------|
+|              |      内核空间（1GB）       |
+| 0xC0000000   |---------------------------|
+|              |      用户空间（3GB）       |
+| 0x00000000   |---------------------------|
+</code></pre>
+<h3 id="64-linux">64位 Linux</h3>
+<pre><code>| 0xFFFFFFFFFFFFFFFF |----------------------|
+|                    |      内核空间        |
+| 0x00007FFFFFFFFFFF |----------------------|
+|                    |      用户空间        |
+| 0x0000000000000000 |----------------------|
+</code></pre>
+<ul>
+<li><strong>实际内核和用户空间的分割点可以通过内核配置参数更改。</strong></li>
+</ul>
+<hr />
+<h2 id="_3">五、特殊情况说明</h2>
+<ul>
+<li>有的服务器为了性能或兼容，会做不同的分配（比如2G/2G分割）。</li>
+<li>ARM、MIPS等嵌入式架构下的分配方式也可能不同，但原理一样，都是<strong>空间隔离</strong>。</li>
+</ul>
+<hr />
+<h2 id="_4">六、物理内存与虚拟内存</h2>
+<ul>
+<li>上述所有地址都是<strong>虚拟地址</strong>。</li>
+<li><strong>内核有权限将虚拟地址映射到物理地址</strong>；用户空间的映射只在本进程有效。</li>
+</ul>
+<hr />
+<h2 id="_5">七、总结一句话</h2>
+<blockquote>
+<p><strong>用户空间和内核空间分别占用虚拟内存的不同区域，通过严格的地址隔离保障系统安全和稳定。常见32位系统3G/1G分割，64位系统用户空间极大。</strong></p>
+</blockquote>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">一、基础理解</a></li>
+<li><a href="#32linux">二、32位Linux下的典型地址分配</a></li>
+<li><a href="#64linux">三、64位Linux下的地址分配</a></li>
+<li><a href="#_2">四、常见的几种地址空间分布图</a><ul>
+<li><a href="#32-linux">32位 Linux</a></li>
+<li><a href="#64-linux">64位 Linux</a></li>
+</ul>
+</li>
+<li><a href="#_3">五、特殊情况说明</a></li>
+<li><a href="#_4">六、物理内存与虚拟内存</a></li>
+<li><a href="#_5">七、总结一句话</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

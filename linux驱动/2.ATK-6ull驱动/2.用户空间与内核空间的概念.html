@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.用户空间与内核空间的概念</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>用户空间与内核空间概念</p>
+<h2 id="1-user-space">1. 什么是用户空间（User Space）？</h2>
+<ul>
+<li><strong>用户空间</strong>是普通应用程序（比如微信、QQ、浏览器、你写的C代码等）运行的区域。</li>
+<li>这里的程序<strong>没有直接操作硬件和内核资源的权限</strong>，只能通过“系统调用”（比如<code>read</code>、<code>write</code>、<code>open</code>等）向内核请求服务。</li>
+<li>每个进程有自己的独立用户空间，<strong>互相隔离，互不影响</strong>，这样可以防止程序之间相互破坏，提高系统安全性和稳定性。</li>
+</ul>
+<hr />
+<h2 id="2-kernel-space">2. 什么是内核空间（Kernel Space）？</h2>
+<ul>
+<li><strong>内核空间</strong>是操作系统内核自己运行的区域。</li>
+<li>这里有最高的权限，可以<strong>访问和控制所有硬件</strong>（比如内存、CPU、外设），也管理所有进程的资源。</li>
+<li>内核空间运行的代码主要包括：<strong>Linux内核本身、驱动程序、文件系统、网络协议栈</strong>等。</li>
+</ul>
+<hr />
+<h2 id="3">3. 为什么要区分用户空间和内核空间？</h2>
+<ul>
+<li><strong>安全</strong>：用户空间的程序不能随便修改系统和其他程序的数据，避免一个程序崩溃导致整个系统瘫痪。</li>
+<li><strong>稳定</strong>：即使应用程序崩溃，内核空间还能继续运行，不影响系统整体。</li>
+<li><strong>多任务和资源隔离</strong>：每个进程互相隔离，互不干扰。</li>
+</ul>
+<hr />
+<h2 id="4">4. 二者的关系和交互</h2>
+<ul>
+<li>应用程序要访问硬件（比如读写文件、访问网络、操作外设），必须通过<strong>系统调用</strong>（system call）切换到内核空间，由内核帮忙完成。</li>
+<li>这种切换叫做<strong>用户态（user mode）到内核态（kernel mode）</strong>的切换，完成后会再切回用户空间。</li>
+</ul>
+<h2 id="5">5. 举例</h2>
+<ul>
+<li>你打开微信（用户空间），想发图片，这时微信需要通过系统调用让内核帮你访问硬盘文件（切换到内核空间，读数据），然后再回到用户空间把图片发出去。</li>
+</ul>
+<hr />
+<h3 id="_1">总结一句话</h3>
+<blockquote>
+<p><strong>用户空间</strong>是普通程序员和应用运行的地方，<strong>内核空间</strong>是操作系统内核和驱动运行的地方。两者隔离，只有通过系统调用才能互相沟通。</p>
+</blockquote>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#1-user-space">1. 什么是用户空间（User Space）？</a></li>
+<li><a href="#2-kernel-space">2. 什么是内核空间（Kernel Space）？</a></li>
+<li><a href="#3">3. 为什么要区分用户空间和内核空间？</a></li>
+<li><a href="#4">4. 二者的关系和交互</a></li>
+<li><a href="#5">5. 举例</a><ul>
+<li><a href="#_1">总结一句话</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

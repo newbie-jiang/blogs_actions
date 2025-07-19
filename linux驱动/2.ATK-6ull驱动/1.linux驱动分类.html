@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.linux驱动分类</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>Linux驱动分类</p>
+<p>Linux 驱动按照不同的角度可以有多种分类方法。下面分别按照<strong>功能类型</strong>、<strong>总线类型</strong>、<strong>内核层次</strong>等维度来详细说明：</p>
+<hr />
+<h2 id="_1">一、按功能类型分类</h2>
+<p>这是最常见的分类方法，也就是根据外设或驱动服务的对象进行分类：</p>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>典型设备</th>
+<th>常见驱动示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符设备驱动</td>
+<td>串口、I2C、SPI、GPIO、LED、ADC等</td>
+<td><code>/dev/ttyS0</code>, <code>/dev/led0</code> 等</td>
+</tr>
+<tr>
+<td>块设备驱动</td>
+<td>硬盘、U盘、SD卡、eMMC等</td>
+<td><code>/dev/sda</code>, <code>/dev/mmcblk0</code> 等</td>
+</tr>
+<tr>
+<td>网络设备驱动</td>
+<td>网卡、WIFI、蓝牙、4G模块等</td>
+<td>eth0, wlan0, ppp0 等</td>
+</tr>
+<tr>
+<td>显示设备驱动</td>
+<td>LCD、HDMI、屏幕等</td>
+<td><code>/dev/fb0</code> (framebuffer)等</td>
+</tr>
+<tr>
+<td>输入设备驱动</td>
+<td>键盘、鼠标、触摸屏、按键、红外等</td>
+<td>event0, input0 等</td>
+</tr>
+<tr>
+<td>声卡驱动</td>
+<td>音频输入输出、麦克风、扬声器等</td>
+<td>ALSA, OSS 等</td>
+</tr>
+<tr>
+<td>相机/视频驱动</td>
+<td>摄像头、视频采集卡</td>
+<td><code>/dev/video0</code></td>
+</tr>
+<tr>
+<td>其他特种设备</td>
+<td>电源管理、传感器、加速度计等</td>
+<td>battery, sensor 等</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_2">二、按总线类型分类</h2>
+<p>Linux内核强调<strong>驱动和总线分离</strong>，每种外设通过某种总线连接到主机。驱动通常也按总线进行分类：</p>
+<ul>
+<li><strong>Platform 驱动</strong>：板级设备，典型于 SoC 外设（如 GPIO, UART, I2C 控制器等）</li>
+<li><strong>PCI/PCIe 驱动</strong>：PC 机上的显卡、声卡、网卡等</li>
+<li><strong>USB 驱动</strong>：U盘、USB鼠标、USB摄像头等</li>
+<li><strong>I2C/SPI 驱动</strong>：嵌入式设备上的各种传感器、EEPROM等</li>
+<li><strong>Virtio 驱动</strong>：虚拟化环境下的虚拟设备</li>
+<li><strong>其他专用总线</strong>：如CAN、LIN、SDIO等</li>
+</ul>
+<hr />
+<h2 id="_3">三、按内核层次结构分类</h2>
+<ul>
+<li><strong>内核态驱动</strong>：运行在内核空间，绝大多数硬件驱动（如platform/usb/网络/块设备等）</li>
+<li><strong>用户态驱动（用户空间驱动）</strong>：通过特定机制（如uio、fuse、libusb等）让用户空间直接控制硬件</li>
+</ul>
+<hr />
+<h2 id="_4">四、按实现方式/架构分类</h2>
+<ul>
+<li><strong>单一驱动</strong>：传统方式，驱动和设备直接耦合</li>
+<li><strong>分离式驱动</strong>（驱动-设备模型，Driver/Device）：现代内核推荐，驱动和设备信息分离，自动匹配（如platform_driver/platform_device）</li>
+<li><strong>总线-驱动-设备三元模型</strong>：Linux内核主流方式（bus、driver、device三大结构体）</li>
+</ul>
+<hr />
+<h2 id="vs">五、按功能层次（高级 vs 低级）</h2>
+<ul>
+<li><strong>低级驱动（底层驱动）</strong>：直接与硬件寄存器打交道</li>
+<li><strong>中间层驱动</strong>：为上层提供抽象接口（如VFS、ALSA中间件等）</li>
+<li><strong>高级驱动</strong>：直接服务于应用层（如某些字符设备、FUSE文件系统）</li>
+</ul>
+<hr />
+<h2 id="_5">总结</h2>
+<blockquote>
+<p><strong>常见分类方式：</strong></p>
+<ol>
+<li>字符设备驱动</li>
+<li>块设备驱动</li>
+<li>网络设备驱动</li>
+<li>平台/总线驱动（platform/pci/usb/i2c/spi等）</li>
+</ol>
+</blockquote>
+<p><strong>实际开发中常用的通用模型是：</strong></p>
+<ul>
+<li>总线（bus）- 设备（device）- 驱动（driver）三元组模型（bus_type, device, driver 结构体）</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">一、按功能类型分类</a></li>
+<li><a href="#_2">二、按总线类型分类</a></li>
+<li><a href="#_3">三、按内核层次结构分类</a></li>
+<li><a href="#_4">四、按实现方式/架构分类</a></li>
+<li><a href="#vs">五、按功能层次（高级 vs 低级）</a></li>
+<li><a href="#_5">总结</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

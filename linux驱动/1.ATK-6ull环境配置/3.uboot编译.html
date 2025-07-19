@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>3.uboot编译</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="linux-uboot">Linux驱动学习之---uboot编译</h2>
+<p>前言：为什么不自己构建uboot ？</p>
+<ul>
+<li>太浪费时间了，虽然可以学习很多知识，但工作中实际去构建应该是比较少的，原厂会提供demo,在这个基础上去更改</li>
+<li>想快速搭建好环境学习linux驱动，学习uboot会浮躁，打击学习积极性，把uboot放在后面学习比较好</li>
+</ul>
+<h2 id="bootloader">bootloader简介</h2>
+<p>Linux 系统要启动就必须需要一个 bootloader 程序，也就说芯片上电以后先运行一段</p>
+<p>bootloader 程序。这段bootloader程序会先初始化DDR等外设，然后将Linux内核从flash(NAND，</p>
+<p>NOR FLASH，SD，MMC 等)拷贝到 DDR 中，最后启动 Linux 内核。当然了，bootloader 的实</p>
+<p>际工作要复杂的多，但是它最主要的工作就是启动 Linux 内核，bootloader 和 Linux 内核的关系</p>
+<p>就跟 PC 上的 BIOS 和 Windows 的关系一样，bootloader 就相当于 BIOS。</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929001850801.png"><img alt="image-20230929001850801" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929001850801.png" /></a></p>
+<p>bootloader分为很多种，常用的应该是uboot了</p>
+<p><strong>U-Boot</strong> <strong>初次编译</strong></p>
+<p>首先在 Ubuntu 中安装 ncurses 库，否则编译会报错，</p>
+<p>在 U-Boot（一个常用的引导加载程序）的编译过程中，<code>ncurses</code> 库可能会被用到，特别是当您配置 U-Boot 时（例如运行 <code>make menuconfig</code> 命令）。<code>menuconfig</code> 会提供一个基于文本的菜单，让您可以选择和配置 U-Boot 的各种选项，而这正是通过 <code>ncurses</code> 库实现的。</p>
+<p>安装命令如下：</p>
+<pre><code>sudo apt-get install libncurses5-dev
+</code></pre>
+<p>将uboot源码拷贝到目录下，我的目录 ：/root/uboot</p>
+<p>这里我使用正点原子提供好的，因为已经做好了内存外存的适配</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929002353667.png"><img alt="image-20230929002353667" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929002353667.png" /></a></p>
+<p>解压</p>
+<pre><code>tar -vxjf uboot-imx-2016.03-2.1.0-g0ae7e33-v1.7.tar.bz2
+</code></pre>
+<p>解压完成之后删除压缩包</p>
+<pre><code>rm -rf uboot-imx-2016.03-2.1.0-g0ae7e33-v1.7.tar.bz2
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929002658168.png"><img alt="image-20230929002658168" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929002658168.png" /></a></p>
+<p>安装交叉编译工具链，为了保证不出现各种奇葩的错误，还是用正点原子提供的吧，同时贴出直接安装步骤</p>
+<p>创建文件夹，将交叉编译工具放在该目录</p>
+<p>https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/tools/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz</p>
+<pre><code>sudo mkdir /usr/local/arm
+</code></pre>
+<p>并解压</p>
+<pre><code>sudo tar -vxf gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929010309584.png"><img alt="image-20230929010309584" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929010309584.png" /></a></p>
+<p>修改环境变量，使用 vim 打开/etc/profile 文件，命令如下：</p>
+<pre><code>sudo vim /etc/profile
+</code></pre>
+<p>打开/etc/profile 以后，在最后面输入如下所示内容：</p>
+<pre><code>export PATH=$PATH:/usr/local/arm/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/bin
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929010716649.png"><img alt="image-20230929010716649" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929010716649.png" /></a></p>
+<p>修改好以后就保存退出，重启 Ubuntu 系统</p>
+<pre><code>sudo reboot
+</code></pre>
+<p>安装相关库</p>
+<pre><code>sudo apt-get install lsb-core lib32stdc++6
+</code></pre>
+<p>交叉编译工具验证</p>
+<pre><code>arm-linux-gnueabihf-gcc -v
+</code></pre>
+<p>或者</p>
+<p>直接包管理器安装交叉编译工具链</p>
+<p>通常工具链的二进制文件会被安装到系统的标准路径中，例如 <code>/usr/bin</code>，这意味着通常不需要修改 <code>PATH</code> 环境变量，因为这些路径通常已经包含在 <code>PATH</code> 中。（这个我没有装，没有验证，理论应该是这样的）</p>
+<pre><code>sudo apt-get install gcc-arm-linux-gnueabihf
+</code></pre>
+<p>开始编译</p>
+<pre><code>make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- mx6ull_14x14_ddr512_emmc_defconfig
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j12
+</code></pre>
+<p>当 <code>V</code> 设置为 <code>1</code> 时，<code>make</code> 会显示更多的输出，这对于调试编译问题很有帮助。</p>
+<p><code>-j12</code> 是一个选项，用于指定 <code>make</code> 应该同时运行多少个任务。<code>12</code> 表示 <code>make</code> 可以同时运行最多 12 个任务。这可以加快编译速度，特别是在多核心的计算机上。</p>
+<p>如果您不指定 <code>-j</code> 后面的数字，<code>make</code> 将会尽可能地运行无限多的任务，这可能会导致系统资源的耗尽。通常，为了避免过度使用系统资源，建议总是为 <code>-j</code> 选项指定一个合适的数字</p>
+<p>执行最后一步时编译错误</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929004332724.png"><img alt="image-20230929004332724" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929004332724.png" /></a></p>
+<p><code>arm-linux-gnueabihf-gcc</code> 不识别 <code>-march=armv5</code> 作为一个有效的目标架构。错误信息也列出了所有有效的 <code>-march</code> 目标参数，<code>armv5</code> 不在其中，但有 <code>armv5t</code>、<code>armv5te</code> 和 <code>armv5tej</code>。</p>
+<p>更改makefile</p>
+<pre><code>cd ./arch/armpwd
+vim Makefile
+</code></pre>
+<p>将最后的armv5 更改为armv5te</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929095236135.png"><img alt="image-20230929095236135" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929095236135.png" /></a></p>
+<ol>
+<li>保存文件并退出编辑器。</li>
+<li>清理并重新编译项目：</li>
+</ol>
+<pre><code>make clean
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j12
+</code></pre>
+<p>编译完成</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929095443809.png"><img alt="image-20230929095443809" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929095443809.png" /></a></p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929103518594.png"><img alt="image-20230929103518594" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929103518594.png" /></a></p>
+<p>编译完成以后uboot源码多了一些文件，其中u-boot.bin就是编译出来的uboot二进制文件。uboot是个裸机程序，因此需要在其前面加上头部(IVT、DCD等数据)才能在I.MX6U上执行，图中的u-boot.imx文件就是添加头部以后的u-boot.bin，u-boot.imx就是我们最终要烧写到开发板EMMC中的uboot 镜像文件。</p>
+<h2 id="uboot">烧写uboot启动</h2>
+<h3 id="sd">挂载SD卡</h3>
+<p>在ubuntu上插入sd卡</p>
+<p><code>lsblk</code> 命令会列出所有可用的块设备，以及它们的挂载点（如果已挂载的话）。</p>
+<pre><code>lsblk
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929101205135.png"><img alt="image-20230929101205135" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929101205135.png" /></a></p>
+<p>以上是我的SD卡，有一个分区（<code>sda1</code>）。然而，这个分区没有挂载点列出，这意味着它当前没有被挂，我们需要挂载sd卡</p>
+<h3 id="_1">常见的挂载点：</h3>
+<ol>
+<li><strong>/mnt：</strong> 这个目录通常用作临时挂载点，例如手动挂载的设备。</li>
+<li><strong>/media：</strong> 大多数现代Linux发行版会使用这个目录作为自动挂载的可移动设备的挂载点，例如USB驱动器、CD-ROM驱动器、SD卡等。</li>
+<li><strong>/home：</strong> 用户的个人目录通常会挂载在这里，尤其是在<code>/home</code>目录位于不同的分区或磁盘时。</li>
+<li><strong>/boot：</strong> 在某些系统中，引导分区会被挂载到这个目录。</li>
+</ol>
+<p>创建挂载点</p>
+<pre><code>sudo mkdir /media/sdcard
+</code></pre>
+<p>将sd卡设备挂载上去</p>
+<pre><code>sudo mount /dev/sda1 /media/sdcard
+</code></pre>
+<p>再次查看是否挂载，可以看到已经有挂载点了</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929101709108.png"><img alt="image-20230929101709108" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929101709108.png" /></a></p>
+<h2 id="sd_1">格式化SD卡</h2>
+<p>这张卡已经格式化过了，不过了解下linux下SD卡的格式化还是有必要的</p>
+<h3 id="sd_2">确定SD卡的设备路径</h3>
+<p>我的SD卡的设备路径是 <code>/dev/sda</code>。请再次确认这一点，以避免误操作其他设备。使用 <code>lsblk</code></p>
+<h3 id="sd_3">卸载SD卡</h3>
+<p>如果SD卡已经挂载，需要先卸载它。您可以使用 <code>umount</code> 命令来卸载所有与SD卡相关的分区。例如：</p>
+<pre><code>sudo umount /dev/sda1
+</code></pre>
+<p>格式化SD卡</p>
+<p>使用 <code>mkfs</code> 命令来格式化SD卡。<code>mkfs.vfat</code> 命令用于创建一个FAT文件系统，这通常是FAT32文件系统。</p>
+<pre><code>sudo mkfs.vfat /dev/sda1
+</code></pre>
+<p>挂载SD卡</p>
+<p>这里还是挂载到刚才的目录下</p>
+<pre><code>sudo mount /dev/sda1 /media/sdcard
+</code></pre>
+<h2 id="ubootsd">烧录uboot到sd卡</h2>
+<p>两种方式，使用nxp官方下载工具或者dd工具</p>
+<p><code>imxdownload</code> 是 NXP 提供的一个特定于 i.MX 处理器系列的烧录工具。这个工具是为了烧录 i.MX 处理器的 boot ROM 而设计的，通常用于烧录 U-Boot bootloader 到设备上。这个工具通常会与 i.MX 处理器的特定硬件接口一起使用，例如 USB 或 UART，来进行烧录。</p>
+<h3 id="imxdownload-dd"><code>imxdownload</code> 与 <code>dd</code> 的区别：</h3>
+<ol>
+<li><strong>特定性</strong>：</li>
+<li><code>imxdownload</code> 是针对 NXP 的 i.MX 系列处理器设计的，而 <code>dd</code> 是一个通用的 UNIX 工具，可用于任何 UNIX 系统上，用于复制和转换文件。</li>
+<li><strong>接口</strong>：</li>
+<li><code>imxdownload</code> 通常使用特定的硬件接口（例如 USB 或 UART）来烧录 i.MX 处理器，而 <code>dd</code> 则直接操作块设备，例如 SD 卡。</li>
+<li><strong>用途</strong>：</li>
+<li><code>imxdownload</code> 主要用于烧录 bootloader 到 i.MX 处理器的内部存储或外部存储中，而 <code>dd</code> 可以用于复制任何文件和设备内容，包括制作和恢复磁盘映像。</li>
+<li><strong>操作层级</strong>：</li>
+<li><code>imxdownload</code> 操作的是处理器级别，直接与处理器的 boot ROM 交互，而 <code>dd</code> 操作的是文件系统级别，与块设备交互。</li>
+</ol>
+<h3 id="_2">选择工具：</h3>
+<ul>
+<li>如果您正在使用 NXP 的 i.MX 系列处理器，并且需要通过特定的硬件接口烧录 bootloader，那么 <code>imxdownload</code> 可能是更合适的选择。</li>
+<li>如果您只是需要将 bootloader 烧录到一个块设备（例如 SD 卡）上，并且不需要特定的硬件接口，那么 <code>dd</code> 应该足够了。</li>
+</ul>
+<h3 id="_3">举例说明：</h3>
+<ol>
+<li><strong>使用特定硬件接口</strong>：</li>
+<li>如果您使用的是 i.MX 处理器，并且需要通过 USB 接口来烧录 bootloader 到处理器的内部存储中，那么您可能需要使用 <code>imxdownload</code> 这样的特定工具。</li>
+<li><strong>不需要特定硬件接口</strong>：</li>
+<li>如果您只是需要将 bootloader 烧录到一个 SD 卡上，这个 SD 卡可以直接通过计算机的 SD 卡读卡器访问，那么您可以使用 <code>dd</code> 命令，因为这种情况下不需要与特定的处理器或硬件接口进行直接通信。</li>
+</ol>
+<p>简而言之，如果您的烧录过程只涉及到标准的、通用的块设备接口，例如 SD 卡读卡器，那么 <code>dd</code> 命令应该是足够的。如果烧录过程需要与特定的处理器或硬件平台的特定接口进行通信，那么您可能需要使用特定于该硬件平台的烧录工具。</p>
+<h2 id="dd">dd工具烧录</h2>
+<p>我们使用dd工具来烧录吧，毕竟具有通用性</p>
+<p>要将U-Boot烧写到SD卡，您通常会使用<code>dd</code>命令。<code>dd</code>命令可以用于复制文件或设备内容，通常用于制作或复制磁盘映像。在这种情况下，您将使用<code>dd</code>命令将编译好的U-Boot二进制文件（通常是<code>u-boot.bin</code>或<code>u-boot.imx</code>）复制到SD卡。</p>
+<h3 id="_4">步骤：</h3>
+<ol>
+<li>
+<p><strong>找到U-Boot二进制文件</strong></p>
+</li>
+<li>
+<p>确定U-Boot二进制文件的位置。这通常是<code>u-boot.bin</code>或<code>u-boot.imx</code>。</p>
+</li>
+<li>
+<p><strong>卸载SD卡</strong></p>
+</li>
+<li>
+<p>在写入之前，确保SD卡是卸载的。</p>
+</li>
+</ol>
+<p><code>sudo umount /dev/sda1</code></p>
+<ol>
+<li>
+<p><strong>使用dd命令烧写U-Boot</strong></p>
+</li>
+<li>
+<p>使用<code>dd</code>命令将U-Boot烧写到SD卡。请替换<code>&lt;u-boot-file&gt;</code>为您的U-Boot二进制文件的路径。</p>
+</li>
+</ol>
+<p><code>sudo dd iflag=dsync oflag=dsync if=&lt;u-boot-file&gt; of=/dev/sda seek=2</code></p>
+<ul>
+<li>
+<p>这里，<code>if</code>是输入文件，<code>of</code>是输出文件（您的SD卡），<code>bs</code>是块大小，<code>seek</code>是跳过的块数。<code>seek=2</code>通常用于跳过SD卡的分区表。</p>
+</li>
+<li>
+<p><strong>同步</strong></p>
+</li>
+</ul>
+<p><code>iflag=dsync</code> 和 <code>oflag=dsync</code>，这两个选项会确保每次读取和写入都是同步的，这意味着每次读取或 写入操作都会等待物理 I/O 操作完成。这可以确保数据的完整性</p>
+<h3 id="_5">注意：</h3>
+<ul>
+<li>请小心使用<code>dd</code>命令，因为它会覆盖目标设备（在这种情况下是SD卡）的内容。确保<code>of</code>参数是正确的，以避免覆盖系统的其他部分。</li>
+<li>在执行<code>dd</code>命令之前，确保没有挂载SD卡的任何分区。</li>
+<li>请根据您的U-Boot版本和目标硬件，检查相关的文档以确定正确的<code>dd</code>命令参数，特别是<code>bs</code>和<code>seek</code>参数。</li>
+</ul>
+<p>了解以上内容以后，我的uboot 路径：/root/uboot</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929105840414.png"><img alt="image-20230929105840414" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929105840414.png" /></a></p>
+<p>查看挂在设备并卸载</p>
+<pre><code>lsblk
+sudo umount /dev/sda1
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110000451.png"><img alt="image-20230929110000451" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110000451.png" /></a></p>
+<p><strong>烧写U-Boot</strong></p>
+<p>注意：是sda,不是sda1分区</p>
+<p>我当前是在uboot目录下</p>
+<pre><code>sudo dd iflag=dsync oflag=dsync if=u-boot.imx of=/dev/sda seek=2
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110521672.png"><img alt="image-20230929110521672" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929110521672.png" /></a></p>
+<p>0.07S，一个字--&gt;快, 不过看到这种一般是没烧写上去</p>
+<p>查看所有sd</p>
+<pre><code> ls /dev/sd*
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124421313.png"><img alt="image-20230929124421313" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124421313.png" /></a></p>
+<p>这里有一个虚拟的sdb ，删掉</p>
+<pre><code>sudo rm -rf /dev/sdb
+</code></pre>
+<p>再次查看</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124518698.png"><img alt="image-20230929124518698" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929124518698.png" /></a></p>
+<p>再次烧写，烧写成功一般是这样</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929125820303.png"><img alt="image-20230929125820303" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929125820303.png" /></a></p>
+<p>BOOT 设置从 SD 卡启</p>
+<p>动，使用 USB 线将 USB_TTL 和电脑连接，也就是将开发板的串口 1 连接到电脑上。打开</p>
+<p>MobaXterm，设置好串口参数并打开，最后复位开发板。在 MobaXterm 上出现“Hit any key to</p>
+<p>stop autoboot: ”倒计时的时候按下键盘上的回车键，默认是 3 秒倒计时，在 3 秒倒计时结束以</p>
+<p>后如果没有按下回车键的话 uboot 就会使用默认参数来启动 Linux 内核了。如果在 3 秒倒计时</p>
+<p>结束之前按下回车键，那么就会进入 uboot 的命令行模式，否则会引导进入linux内核</p>
+<p>可以理解为windows开机时的bios，开机狂按某个按键会进入bios，不按正常启动系统</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130009431.png"><img alt="image-20230929130009431" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130009431.png" /></a></p>
+<h2 id="nxpimxdownload">NXP官方工具imxdownload烧录</h2>
+<p>https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/tools/imxdownload</p>
+<p>将该工具放在uboot目录下，给予执行权限</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130624272.png"><img alt="image-20230929130624272" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130624272.png" /></a></p>
+<pre><code>chmod 777 imxdownload
+</code></pre>
+<p>烧写命令 //烧写到SD卡中</p>
+<pre><code>./imxdownload u-boot.bin /dev/sda 
+</code></pre>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130742589.png"><img alt="image-20230929130742589" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130742589.png" /></a></p>
+<p>再次将SD插入开发板启动看一下没问题的（115200）</p>
+<p><a href="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130852681.png"><img alt="image-20230929130852681" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20230929130852681.png" /></a></p>
+<h2 id="_6">总结：</h2>
+<p>编译uboot 依赖于交叉编译工具链以及一些必须库，烧写uboot到SD卡时候使用dd工具，具有通用性。</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#linux-uboot">Linux驱动学习之---uboot编译</a></li>
+<li><a href="#bootloader">bootloader简介</a></li>
+<li><a href="#uboot">烧写uboot启动</a><ul>
+<li><a href="#sd">挂载SD卡</a></li>
+<li><a href="#_1">常见的挂载点：</a></li>
+</ul>
+</li>
+<li><a href="#sd_1">格式化SD卡</a><ul>
+<li><a href="#sd_2">确定SD卡的设备路径</a></li>
+<li><a href="#sd_3">卸载SD卡</a></li>
+</ul>
+</li>
+<li><a href="#ubootsd">烧录uboot到sd卡</a><ul>
+<li><a href="#imxdownload-dd">imxdownload 与 dd 的区别：</a></li>
+<li><a href="#_2">选择工具：</a></li>
+<li><a href="#_3">举例说明：</a></li>
+</ul>
+</li>
+<li><a href="#dd">dd工具烧录</a><ul>
+<li><a href="#_4">步骤：</a></li>
+<li><a href="#_5">注意：</a></li>
+</ul>
+</li>
+<li><a href="#nxpimxdownload">NXP官方工具imxdownload烧录</a></li>
+<li><a href="#_6">总结：</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
