@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.LVGL开发工具</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="lvglsquareline-studio">LVGL开发工具SquareLine Studio</h1>
+<p>下载地址：https://squareline.io/downloads</p>
+<p>下载最新版本的不登录账号只有30天试用，之后需要付费，注册账号可以免费使用</p>
+<ul>
+<li>下载最新版本，截止2024/09/22 最新版本为1.4.2</li>
+</ul>
+<p><img alt="image-20240922123515588" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922123515588.png" /></p>
+<ul>
+<li>安装后注册一个账号，信息填写选学生或个人开发者，注册邮箱验证</li>
+</ul>
+<p><img alt="image-20240922120416013" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922120416013.png" /></p>
+<h2 id="demo">创建一个demo示例并移植</h2>
+<ul>
+<li>此处选择LVGL9.1版本</li>
+<li>选择VScode工程</li>
+<li>颜色深度选择16bit(RGB565)</li>
+</ul>
+<p><img alt="image-20240922125049697" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922125049697.png" /></p>
+<ul>
+<li>创建之后为此界面   </li>
+</ul>
+<p><img alt="image-20240922125419412" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922125419412.png" /></p>
+<p>移植到stm32</p>
+<p>https://blog.csdn.net/qq_43706223/article/details/133989746</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#lvglsquareline-studio">LVGL开发工具SquareLine Studio</a><ul>
+<li><a href="#demo">创建一个demo示例并移植</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.快速移植lvgl</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="keillvgl">keil快速移植LVGL</h1>
+<p>https://github.com/newbie-jiang/lvgl9.2_keil</p>
+<h2 id="1">1.了解如何实现</h2>
+<p>keil中传统移植lvgl的方式为  </p>
+<ul>
+<li>在工程中创建文件夹</li>
+<li>依次添加文件</li>
+<li>包含头文件</li>
+</ul>
+<p><img alt="image-20240922161243654" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922161243654.png" /></p>
+<p>以上的这些步骤执行的结果实际上都保存在工程文件中，遵循XML语法</p>
+<p><img alt="image-20240922161404890" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922161404890.png" /></p>
+<ul>
+<li>在工程中创建文件夹与添加文件 步骤实现如下</li>
+</ul>
+<p><img alt="image-20240922161640345" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922161640345.png" /></p>
+<ul>
+<li>在工程中包含头文件路径实现如下</li>
+</ul>
+<p><img alt="image-20240922161906365" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922161906365.png" /></p>
+<p>上述的这些语法很有规律，看着并不难，</p>
+<h2 id="2xml">2.直接使用配置好的xml语法</h2>
+<ul>
+<li>快速移植是直接使用已经移植好工程中的lvgl部分xml代码</li>
+</ul>
+<p>前提条件：</p>
+<ul>
+<li>demo工程（keil工程）中首先测试自己的屏幕可以正常显示，并且颜色正常，</li>
+<li>下载裁剪好的源码以及xml文件</li>
+</ul>
+<h2 id="1lvgl-uvprojx">移植步骤1：将lvgl放在 *.uvprojx的上一层目录</h2>
+<p>lvgl文件里面是裁剪好的源码</p>
+<p>比如：</p>
+<p><img alt="image-20240922164019903" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922164019903.png" /></p>
+<p><img alt="image-20240922164051832" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922164051832.png" /></p>
+<h2 id="2lvglxml">移植步骤2：添加到lvgl文件夹与文件部分xml到工程中</h2>
+<p><img alt="image-20240922162914732" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922162914732.png" /></p>
+<p><img alt="image-20240922163251780" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922163251780.png" /></p>
+<p>将文件夹与文件的代码放在结尾处   </Groups>上方（搜索一下就出来了）</p>
+<p><img alt="image-20240922164649622" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922164649622.png" /></p>
+<p>执行完这个步骤keil工程中的文件与文件夹就出来了</p>
+<h2 id="2lvglxml_1">移植步骤2：将lvgl的头文件添加到xml工程中</h2>
+<p><img alt="image-20240922163321970" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922163321970.png" /></p>
+<p>搜索一下<IncludePath> 添加到后面就可以了</p>
+<p><img alt="image-20240922165025084" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240922165025084.png" /></p>
+<p>编译无报错实现对应的接口就可以了</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#keillvgl">keil快速移植LVGL</a><ul>
+<li><a href="#1">1.了解如何实现</a></li>
+<li><a href="#2xml">2.直接使用配置好的xml语法</a></li>
+<li><a href="#1lvgl-uvprojx">移植步骤1：将lvgl放在 *.uvprojx的上一层目录</a></li>
+<li><a href="#2lvglxml">移植步骤2：添加到lvgl文件夹与文件部分xml到工程中</a></li>
+<li><a href="#2lvglxml_1">移植步骤2：将lvgl的头文件添加到xml工程中</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

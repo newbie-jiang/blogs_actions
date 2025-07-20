@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>ST云实验室电机测试</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="st">ST云实验室电机评测</h2>
+<p>链接地址：https://livebench.tenxerlabs.com/app/motor_control_foc_sdk</p>
+<p>基于STM32G4、STDRIVE101、STL90N10F7的永磁同步电机的磁场定向控制评估套件 概述</p>
+<p><img alt="image-20250701191710579" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701191710579.png" /></p>
+<p>可以看到此云平台实际上是一套自动化流程，当登录用户点击PLUG IN 时，控制所有设备上电</p>
+<ul>
+<li>点击连接后，设备上电，需要等待一会儿 设备启动完成，日志查看是否启动完成</li>
+</ul>
+<p><img alt="image-20250701200104863" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200104863.png" /></p>
+<p><img alt="image-20250701200203789" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200203789.png" /></p>
+<p>界面展示</p>
+<ul>
+<li>进程日志</li>
+<li>示波器</li>
+<li>cli</li>
+<li>视频直播</li>
+<li>热图</li>
+<li>相电流(被测电机)</li>
+<li>电源</li>
+</ul>
+<p><img alt="image-20250701200315835" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200315835.png" /></p>
+<p><img alt="image-20250701200402310" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200402310.png" /></p>
+<ul>
+<li>点击connect 连接上位机进行控制</li>
+</ul>
+<p><img alt="image-20250701200457379" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200457379.png" /></p>
+<ul>
+<li>成功连接上了，如下</li>
+</ul>
+<p><img alt="image-20250701200537455" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200537455.png" /></p>
+<ul>
+<li>设置目标转速启动电机</li>
+</ul>
+<p><img alt="image-20250701200736454" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200736454.png" /></p>
+<p><img alt="image-20250701200849376" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701200849376.png" /></p>
+<p>测量电机的电流</p>
+<p><img alt="image-20250701201242695" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701201242695.png" /></p>
+<p><img alt="image-20250701201339945" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701201339945.png" /></p>
+<ul>
+<li>跑一会儿应该可以看到热图变化，有几个发热点，（光标放在哪儿可测量哪儿的温度）</li>
+<li>现在温度不是很高，转速才1500，最大转速可以4500，提高转速看看温度</li>
+</ul>
+<p><img alt="image-20250701201525019" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701201525019.png" /></p>
+<p>简介</p>
+<p>欢迎评估基于STM32G4、STDRIVE101、STL90N10F7的永磁同步电机的磁场定向控制套件。</p>
+<p>本实验旨在通过矢量控制（FOC）控制永磁同步电机（PMSM），并评估STM32电机控制软件开发套件（MCSDK）。</p>
+<p>本评估套件构建的基于STM32G4, STDRIVE101, STL90N10F7的永磁同步电机FOC控制平台，将两个完全一样的永磁同步电机耦合起来，一个作为加载电机，一个作为被测电机。其中，被测电机使用B-G473E-ZEST1S+STEVAL-LVLP01进行控制，加载电机使用EVALKIT-ROBOT-1套件。用户可以通过Motor Pilot(MCSDK v6.3.0的一部分)控制被测电机的启停和期望速度；通过CLI命令界面控制加载电机的启停和加载大小。这个过程中的电流、电压、热数据以及两个电机的状态都可以通过右侧的显示栏进行监控。</p>
+<p>使用指南</p>
+<p>1.Motor Pilot GUI 连接 - 点击“Connect”以建立硬件连接，并确认驱动板的连接状态。</p>
+<p>2.启动电机 - 确认电机状态，并设置目标速度（最高4000 RPM），点击“Start”以启动电机，并监控实时参数。</p>
+<p>3.图形数据 - 点击顶部图标 --&gt; 右键添加相电流（I_A和I_B），并使用“snapshots” 截图保存数据。</p>
+<p>4.调整负载电机的负载</p>
+<p>更多有关电机控制界面的信息，请参考ST Motor Pilot GUI 用户指南。</p>
+<p>https://tenxer-sw-download.s3.us-east-1.amazonaws.com/CE+Projects/STMicroelectronics+Designs/C-0154/Motor_Pilot_GUI_QUG.pdf</p>
+<p>该文档提供了使用意法半导体电机先导GUI软件配置和控制PMSM FOC评估套件的快速演示，它提供了如何将GUI连接到硬件，配置电机速度，扭矩，电压和电流参数的逐步说明。
+该指南有助于启动电机，如何使用GUI的功能在图形上绘图。</p>
+<p>如下：</p>
+<p><img alt="image-20250701192051573" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192051573.png" /><img alt="image-20250701192103771" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192103771.png" /><img alt="image-20250701192122157" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192122157.png" /><img alt="image-20250701192144120" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192144120.png" /><img alt="image-20250701192216504" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192216504.png" /><img alt="image-20250701192227675" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250701192227675.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#st">ST云实验室电机评测</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

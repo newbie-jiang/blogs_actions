@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>4.code blocks模拟器运行lvgl</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="lvgl9">韦东山LVGL9学习文档</h1>
+<h2 id="_1">环境安装配置</h2>
+<h3 id="_2">资料下载：</h3>
+<p>仓库：</p>
+<pre><code>git clone https://gitee.com/weidongshan/lvgl_100ask_course_v9.git
+</code></pre>
+<p>更新：</p>
+<pre><code>git pull origin master
+</code></pre>
+<h3 id="codeblocks">安装code::Blocks</h3>
+<p><img alt="image-20240818114808825" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818114808825.png" /></p>
+<h3 id="lvgl9_1">更新编译工具链以支持LVGL9特性</h3>
+<ul>
+<li>安装目录下删除原编译工具链</li>
+</ul>
+<p><img alt="image-20240818121403537" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818121403537.png" /></p>
+<ul>
+<li>替换工具链</li>
+</ul>
+<p><img alt="image-20240818124416966" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818124416966.png" /></p>
+<ul>
+<li>编译找不到工具链解决 setting --&gt; compiler setting</li>
+</ul>
+<p><img alt="image-20240818125324363" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818125324363.png" /></p>
+<h3 id="_3">解决编译报错</h3>
+<p><img alt="image-20240818125814736" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818125814736.png" /></p>
+<p>setting --&gt; compiler setting</p>
+<p><img alt="image-20240818130042765" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818130042765.png" /></p>
+<p>将此处设置为如下</p>
+<p><img alt="image-20240818130206002" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818130206002.png" /></p>
+<h2 id="lvglcodeblocks">获取LVGL源码并添加到code::Blocks运行</h2>
+<h3 id="lvglcodeblocks_1">下载LVGL的code::Blocks支持包</h3>
+<p>前言：百问网做了一个code::Blocks运行LVGL包，下载该源码之后导入对应lvgl对应的版本源码，直接打开code::Blocks即可运行</p>
+<p>code::Blocks包下载：https://github.com/lvgl/lv_port_win_codeblocks</p>
+<p>这里的版本对应着支持lvgl的版本，需要版本一致</p>
+<p><img alt="image-20240818140532877" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818140532877.png" /></p>
+<p>下载9.1版本的code::Blocks支持包</p>
+<p><img alt="image-20240818140700968" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818140700968.png" /></p>
+<h3 id="91lvgl">下载9.1版本的lvgl源码</h3>
+<p>doc : https://github.com/lvgl/lvgl/blob/master/docs/README_zh.rst</p>
+<p>获取源码</p>
+<pre><code> https://github.com/lvgl/lvgl.git
+</code></pre>
+<p>注：直接clone之后需要切换到分支</p>
+<p><img alt="image-20240818133058115" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818133058115.png" /></p>
+<p>选取特定版本</p>
+<p><img alt="image-20240818134317529" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818134317529.png" /></p>
+<p><img alt="image-20240818134342480" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818134342480.png" /></p>
+<h3 id="lvglcodeblocks_2">将lvgl源码导入code::Blocks支持包</h3>
+<p>下载好了支持包以及lvgl源码如下</p>
+<p><img alt="image-20240818141746843" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818141746843.png" /></p>
+<ul>
+<li>目前支持包的lvgl库为空</li>
+</ul>
+<p><img alt="image-20240818141905148" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818141905148.png" /></p>
+<p>将lvgl的源码导入进来</p>
+<p><img alt="image-20240818141950422" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818141950422.png" /></p>
+<p><img alt="image-20240818142027398" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818142027398.png" /></p>
+<p>打开项目</p>
+<p><img alt="image-20240818142119612" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818142119612.png" /></p>
+<p>重新构建编译并运行（若有报错获找不到编译器，参考环境安装配置小节）</p>
+<p><img alt="image-20240818142540719" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818142540719.png" /></p>
+<p><img alt="image-20240818142450935" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20240818142450935.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#lvgl9">韦东山LVGL9学习文档</a><ul>
+<li><a href="#_1">环境安装配置</a><ul>
+<li><a href="#_2">资料下载：</a></li>
+<li><a href="#codeblocks">安装code::Blocks</a></li>
+<li><a href="#lvgl9_1">更新编译工具链以支持LVGL9特性</a></li>
+<li><a href="#_3">解决编译报错</a></li>
+</ul>
+</li>
+<li><a href="#lvglcodeblocks">获取LVGL源码并添加到code::Blocks运行</a><ul>
+<li><a href="#lvglcodeblocks_1">下载LVGL的code::Blocks支持包</a></li>
+<li><a href="#91lvgl">下载9.1版本的lvgl源码</a></li>
+<li><a href="#lvglcodeblocks_2">将lvgl源码导入code::Blocks支持包</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
