@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.什么是YUV</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="1-yuv">1. 什么是 YUV？</h2>
+<p><strong>YUV</strong> 是一种常见的<strong>颜色编码方式</strong>，主要用于视频采集、存储、传输和处理。</p>
+<ul>
+<li><strong>Y</strong>：亮度（Luminance），表示黑白（灰度）信息</li>
+<li><strong>U/V</strong>：色度（Chrominance），表示色彩信息</li>
+<li>U：蓝色色度（Blue minus Luma，Cb）</li>
+<li>V：红色色度（Red minus Luma，Cr）</li>
+</ul>
+<blockquote>
+<p><strong>YUV = 亮度(Y) + 色度(U/V)</strong></p>
+</blockquote>
+<hr />
+<h2 id="2-yuv">2. YUV 为什么会出现？</h2>
+<p><strong>本质原因：</strong></p>
+<ul>
+<li><strong>人眼对亮度更敏感，对色彩不敏感。</strong></li>
+<li><strong>带宽和存储有限，如何压缩数据、减少数据量，而又不损失太多画质？</strong></li>
+</ul>
+<p><strong>历史原因和优势：</strong></p>
+<ol>
+<li><strong>视频信号压缩（最初用于模拟电视）</strong></li>
+<li>只要保存完整的亮度(Y)，色度(U/V)可以降低精度或抽样。</li>
+<li>色度信息用更低分辨率存储/传输，大幅降低数据量，但视觉损失不明显。</li>
+<li><strong>高效编码和兼容性</strong></li>
+<li>可以直接与黑白电视兼容（只要Y通道），节约了早期设备升级的成本。</li>
+<li><strong>数字视频和图像处理的主流格式</strong></li>
+<li>如 H.264、JPEG、MPEG、V4L2 等各种标准，底层都是用 YUV 做中间处理或最终编码。</li>
+</ol>
+<hr />
+<h2 id="3-yuv">3. YUV 有哪些常见格式？</h2>
+<h3 id="yuv"><strong>YUV 格式分两大类：抽样方式 + 排列方式</strong></h3>
+<h4 id="1">（1）<strong>按采样率分类</strong>（重点关注）</h4>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>Y:U:V 比例</th>
+<th>含义</th>
+<th>数据量</th>
+<th>常见应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>YUV444</td>
+<td>4:4:4</td>
+<td>Y/U/V 每像素都有</td>
+<td>最大</td>
+<td>专业场合/高品质</td>
+</tr>
+<tr>
+<td>YUV422</td>
+<td>4:2:2</td>
+<td>Y 每像素，U/V 每2像素共用</td>
+<td>2/3</td>
+<td>采集、监控、电视</td>
+</tr>
+<tr>
+<td>YUV420</td>
+<td>4:2:0</td>
+<td>Y 每像素，U/V 每4像素共用</td>
+<td>1/2</td>
+<td>编码、存储、播放</td>
+</tr>
+<tr>
+<td>YUV411</td>
+<td>4:1:1</td>
+<td>Y 每像素，U/V 每4像素共用</td>
+<td>更少</td>
+<td>部分特殊应用</td>
+</tr>
+<tr>
+<td>YUV400</td>
+<td>4:0:0</td>
+<td>只有 Y，无色彩（灰度）</td>
+<td>最少</td>
+<td>黑白图像</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2">（2）<strong>按排列/存储方式分类</strong>（面试常考）</h4>
+<ul>
+<li><strong>打包（Packed/Interleaved）格式</strong></li>
+<li>典型如 YUYV（YUV422 Packed），一行里 Y/U/V 按顺序排列，如：Y0 U0 Y1 V0 Y2 U1 Y3 V1...</li>
+<li><strong>平面（Planar）格式</strong></li>
+<li>Y、U、V 分开存储，如 YYYYY...UUUU...VVVV...（YUV420P、YUV422P）</li>
+</ul>
+<h4 id="3">（3）<strong>典型格式举例</strong></h4>
+<ul>
+<li><strong>YUYV/YUY2/YUV422P</strong></li>
+<li>一行里数据交错（YUYVYUYV...）</li>
+<li><strong>NV12/NV21（YUV420SP）</strong></li>
+<li>Y 在前，UV 紧跟在后且交错排列（NV12: YYYYY...UVUVUV...；NV21: YYYYY...VUVUVU...）</li>
+<li><strong>I420/YUV420P</strong></li>
+<li>Y 在前，U在中间，V在最后，三个分量分开存储（YYYY...UUU...VVV...）</li>
+</ul>
+<hr />
+<h2 id="4">4. 常用格式对比表</h2>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>Y分量存储</th>
+<th>U/V存储</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>YUV444P</td>
+<td>平面</td>
+<td>平面</td>
+<td>Y/U/V 各自完整分量</td>
+</tr>
+<tr>
+<td>YUV422P</td>
+<td>平面</td>
+<td>平面</td>
+<td>每2像素共用U/V</td>
+</tr>
+<tr>
+<td>YUYV422</td>
+<td>交错</td>
+<td></td>
+<td>YUYV YUYV YUYV...</td>
+</tr>
+<tr>
+<td>YUV420P</td>
+<td>平面</td>
+<td>平面</td>
+<td>最常用存储/编码格式</td>
+</tr>
+<tr>
+<td>NV12</td>
+<td>平面</td>
+<td>UV交错</td>
+<td>Intel/FFmpeg常用，硬件友好</td>
+</tr>
+<tr>
+<td>NV21</td>
+<td>平面</td>
+<td>VU交错</td>
+<td>Android常用，和NV12顺序相反</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-yuv">5. 为什么嵌入式开发常用 YUV？</h2>
+<ul>
+<li><strong>高效、节省带宽/存储</strong></li>
+<li><strong>编码器、显示/采集接口标准（如V4L2）广泛支持</strong></li>
+<li><strong>方便各种后处理和视频算法直接操作亮度/色度分量</strong></li>
+</ul>
+<hr />
+<h2 id="6">6. 小结</h2>
+<ul>
+<li><strong>YUV 是一种面向“效率”和“兼容”的颜色编码格式，核心是分离亮度与色度，易于压缩和处理。</strong></li>
+<li><strong>YUV420/422/444/NV12/YUYV/I420/NV21 等是常见变种，要根据场合选择合适的格式。</strong></li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#1-yuv">1. 什么是 YUV？</a></li>
+<li><a href="#2-yuv">2. YUV 为什么会出现？</a></li>
+<li><a href="#3-yuv">3. YUV 有哪些常见格式？</a><ul>
+<li><a href="#yuv">YUV 格式分两大类：抽样方式 + 排列方式</a><ul>
+<li><a href="#1">（1）按采样率分类（重点关注）</a></li>
+<li><a href="#2">（2）按排列/存储方式分类（面试常考）</a></li>
+<li><a href="#3">（3）典型格式举例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#4">4. 常用格式对比表</a></li>
+<li><a href="#5-yuv">5. 为什么嵌入式开发常用 YUV？</a></li>
+<li><a href="#6">6. 小结</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

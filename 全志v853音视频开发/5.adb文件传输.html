@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>5.adb文件传输</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="windows">从windows传到开发板</h2>
+<ul>
+<li>先创建一个测试文件夹tset</li>
+</ul>
+<p><img alt="image-20250722042327574" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722042327574.png" /></p>
+<p>使用adb命令 push</p>
+<pre><code>adb push 文件名 开发板的文件路径
+
+exampel
+
+adb push 1.pdf_process.py /test
+</code></pre>
+<p><img alt="image-20250722042523941" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722042523941.png" /></p>
+<ul>
+<li>开发板查看</li>
+</ul>
+<p><img alt="image-20250722042656234" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722042656234.png" /></p>
+<h2 id="windwos">从开发板传到windwos</h2>
+<ul>
+<li>在test目录随便创建一个文件写点东西 （我这里创建了1.txt）</li>
+</ul>
+<p><img alt="image-20250722042906705" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722042906705.png" /></p>
+<p>在电脑上使用pull命令</p>
+<pre><code>
+adb pull 文件路径/文件名
+
+example
+
+adb pull /test/1.txt
+</code></pre>
+<p><img alt="image-20250722043048577" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722043048577.png" /></p>
+<p>查看</p>
+<p><img alt="image-20250722043213712" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722043213712.png" /></p>
+<h2 id="ubuntu">ubuntu与开发板文件互传</h2>
+<p>与windows上的命令一致</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#windows">从windows传到开发板</a></li>
+<li><a href="#windwos">从开发板传到windwos</a></li>
+<li><a href="#ubuntu">ubuntu与开发板文件互传</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.视频传输流程</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <pre><code>[Sensor 采集输出]
+       │
+       ▼
+    RAW 数据                 ←───① 原始像素，物理采集
+       │
+       ▼
+    ISP 处理（硬件或软件）
+       │
+       ▼
+    YUV 数据                 ←───② 色彩/格式转换，适合编码和压缩
+       │
+       ├─────────────→ [视频编码]
+       │                  │
+       │                  ▼
+       │              H.264/H.265 数据流      ←───③ 视频编码压缩
+       │                  │
+       │            ┌─────┴────────────────────────────────────────────────────┐
+       │            │                                                          │
+       │            │   【网络/本地传输协议】                                   │
+       │            │                                                          │
+       │            │   RTSP   —— 实时流协议（IP摄像头/NVR/网络监控）           │
+       │            │   HTTP   —— 网络点播、下载（网页/云存储视频）             │
+       │            │   RTP    —— 实时传输协议，RTSP常用底层协议                 │
+       │            │   RTMP   —— Flash、直播推流常用协议                       │
+       │            │   WebRTC —— P2P低延迟互动传输，浏览器/视频会议            │
+       │            │   SRT    —— 安全、可靠的低延迟流媒体传输                  │
+       │            │   TS/UDP —— 机顶盒、广电流媒体                            │
+       │            │   FILE   —— 本地文件拷贝、U盘/SD卡/硬盘                   │
+       │            └──────────────────────────────────────────────────────────┘
+       │                  │
+       │             (网络、硬盘、SD卡等传输/存储)
+       │                  │
+       │                  ▼
+       │           [解码还原]     ←───④ 解码器/播放器
+       │                  │
+       │                  ▼
+       │               YUV数据
+       ▼
+    (显示流程)
+       │
+       ▼
+   YUV 转 RGB              ←───⑤ 最终上屏前颜色空间转换
+       │
+       ▼
+   屏幕显示                ←───⑥ 最终显示（LCD/HDMI/VGA等）
+
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul></ul>
+</div>
+
+</div>
+</body>
+</html>

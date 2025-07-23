@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>7.sdk安装以及使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p>提供了vmware配置好的镜像，sdk包含在里面，镜像安装好以后，输入登录密码 ubuntu</p>
+<p>用户目录有一个文件 tina-v853-100ask.tar.gz</p>
+<p>解压</p>
+<pre><code>tar -xzvf tina-v853-100ask.tar.gz
+</code></pre>
+<p>设置编译环境</p>
+<pre><code>cd tina-v853-100ask/
+source build/envsetup.sh 
+lunch
+</code></pre>
+<p>编译</p>
+<pre><code>make -j16
+</code></pre>
+<p>打包</p>
+<pre><code>pack
+</code></pre>
+<p><img alt="image-20250722163103565" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722163103565.png" /></p>
+<pre><code>cd out/v853-100ask
+</code></pre>
+<pre><code class="language-shell">ubuntu@ubuntu1804:~/tina-v853-100ask/out/v853-100ask$ ls
+aw_pack_src  boot.img  compile_dir  image  md5sums  packages  rootfs.img  sha256sums  staging_dir  tina_v853-100ask_uart0.img  v853-100ask-boot.img  v853-100ask-uImage  v853-100ask-zImage
+</code></pre>
+<p><strong>tina_v853-100ask_uart0.img  为打包好的系统镜像，可以直接烧录</strong></p>
+<h1 id="_1">更改分区大小</h1>
+<p>添加包</p>
+<pre><code>make menuconfig
+</code></pre>
+<p><img alt="image-20250722164624195" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722164624195.png" /></p>
+<p>再次编译</p>
+<pre><code>make -j16
+</code></pre>
+<p>打包</p>
+<pre><code>pack
+</code></pre>
+<p>打包失败，提示</p>
+<p><strong>分区表（MBR）和 rootfs 文件太大，超出了分配的分区空间</strong>，导致<strong>烧录镜像生成失败</strong>。</p>
+<p><img alt="image-20250722164805772" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722164805772.png" /></p>
+<pre><code>ERROR: dl file rootfs.fex size too large
+ERROR: filename = rootfs.fex 
+ERROR: dl_file_size = 53760 sector
+ERROR: part_size = 35840 sector
+update_for_part_info -1
+ERROR: update mbr file fail
+ERROR: update_mbr failed
+</code></pre>
+<ul>
+<li>当前设置的大小 35840 sector  </li>
+<li>当前需要的镜像 53760 sector</li>
+</ul>
+<h2 id="_2">解决错误</h2>
+<h3 id="rootfs"><strong>增大 rootfs 分区大小</strong></h3>
+<h4 id="_3">直接修改分区表</h4>
+<pre><code>vim device/config/chips/v853/configs/100ask/linux/sys_partition.fex
+</code></pre>
+<pre><code>;    mbr的大小, 以Kbyte为单位
+;****************************************************
+[mbr]
+size = 4096
+
+;********************************************************************************************************
+;                                              分区配置
+;
+;
+;  partition 定义范例:
+;    [partition]                ;  //表示是一个分区
+;    name        = USERFS2      ; //分区名称
+;    size        = 16384        ; //分区大小 单位: 扇区.分区表示个数最多2^31 * 512 = 2T
+;    downloadfile = &quot;123.fex&quot;   ; //下载文件的路径和名称，可以使用相对路径，相对是指相对于image.cfg文件所在分区。也可以使用绝对路径
+;    keydata     = 1            ; //私有数据分区，重新量产数据将不丢失
+;    encrypt     = 1            ; //采用加密方式烧录，将提供数据加密，但损失烧录速度
+;    user_type   = ?            ; //私有用法
+;    verify      = 1            ; //要求量产完成后校验是否正确
+;
+; 注：1、name唯一, 不允许同名
+;     2、name最大12个字符
+;     3、size = 0, 将创建一个无大小的空分区
+;     4、为了安全和效率考虑，分区大小最好保证为16M字节的整数倍
+;********************************************************************************************************
+[partition_start]
+
+[partition]
+    name         = boot-resource
+    size         = 6016
+    downloadfile = &quot;boot-resource.fex&quot;
+    user_type    = 0x8000
+
+[partition]
+    name         = env
+    size         = 1008
+    downloadfile = &quot;env.fex&quot;
+    user_type    = 0x8000
+
+[partition]
+    name         = boot
+    ;size         = 4096
+    size         = 25200
+    downloadfile = &quot;boot.fex&quot;
+    user_type    = 0x8000
+
+[partition]
+    name         = rootfs
+    size         = 35840
+    downloadfile = &quot;rootfs.fex&quot;
+    user_type    = 0x8000
+
+</code></pre>
+<p>将rootfs 的大小由35840 更改为53760 即可</p>
+<p>更改后重新打包</p>
+<pre><code>pack
+</code></pre>
+<p>就成功打包了镜像</p>
+<p><img alt="image-20250722165738879" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722165738879.png" /></p>
+<p>烧录后测试 lv_g2d_test</p>
+<p><img alt="image-20250722170354933" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250722170354933.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">更改分区大小</a><ul>
+<li><a href="#_2">解决错误</a><ul>
+<li><a href="#rootfs">增大 rootfs 分区大小</a><ul>
+<li><a href="#_3">直接修改分区表</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>iperf3测速</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><strong>Windows</strong> 和 <strong>Ubuntu</strong> 都可以运行 <code>iperf3</code>，下面是详细操作步骤：</p>
+<hr />
+<h2 id="_1">一、准备工作</h2>
+<h3 id="1-windows-iperf3">1. <strong>Windows 上安装 iperf3</strong></h3>
+<ul>
+<li>下载 Windows 版 iperf3   https://iperf.fr/iperf-download.php#windows</li>
+<li>解压后，得到 <code>iperf3.exe</code>，比如放在 <code>D:\iperf3\</code> 目录下。</li>
+<li>打开“命令提示符”窗口（Win+R 输入 <code>cmd</code>）。</li>
+</ul>
+<h3 id="2-ubuntu-iperf3">2. <strong>Ubuntu 上安装 iperf3</strong></h3>
+<pre><code>sudo apt update
+sudo apt install iperf3
+</code></pre>
+<hr />
+<h2 id="_2">二、测试流程</h2>
+<p>假设：</p>
+<ul>
+<li><strong>Windows 作为客户端</strong>（你操作的本机，测速入口）</li>
+<li><strong>Ubuntu 作为服务器</strong>（一直监听，等你连接）</li>
+</ul>
+<h3 id="1-ubuntu-iperf3">1. <strong>在 Ubuntu 上运行 iperf3 服务端</strong></h3>
+<pre><code>iperf3 -s
+</code></pre>
+<p>运行后会看到“Server listening on 5201”。</p>
+<h3 id="2-windows">2. <strong>在 Windows 上运行客户端</strong></h3>
+<ul>
+<li>
+<p>假设 Ubuntu 的局域网 IP 是 <code>192.168.0.99</code>（可以用 <code>ifconfig</code> 或 <code>ip a</code> 查到）。</p>
+</li>
+<li>
+<p>在 Windows 的命令行里进入 <code>iperf3.exe</code> 所在目录：</p>
+</li>
+</ul>
+<p><code>cd D:\iperf3</code></p>
+<ul>
+<li>测试“上传速度”（Windows → Ubuntu）:</li>
+</ul>
+<p><code>iperf3.exe -c 192.168.0.99</code></p>
+<blockquote>
+<p><strong>注意</strong>：<code>-c</code> 后面跟的是 Ubuntu 的 IP 地址。</p>
+</blockquote>
+<ul>
+<li>测试“下载速度”（Ubuntu → Windows）:</li>
+</ul>
+<p><code>iperf3.exe -c 192.168.0.99 -R</code></p>
+<hr />
+<h2 id="_3">三、结果解读</h2>
+<ul>
+<li>运行完后，会看到如下结尾输出：</li>
+</ul>
+<p><code>matlab复制编辑[ ID] Interval           Transfer     Bandwidth
+  [  5]   0.00-10.00 sec   1.10 GBytes   944 Mbits/sec  sender
+  [  5]   0.00-10.00 sec   1.10 GBytes   944 Mbits/sec  receiver</code></p>
+<ul>
+<li><code>944 Mbits/sec</code> 就是两台设备间的真实传输带宽。</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">一、准备工作</a><ul>
+<li><a href="#1-windows-iperf3">1. Windows 上安装 iperf3</a></li>
+<li><a href="#2-ubuntu-iperf3">2. Ubuntu 上安装 iperf3</a></li>
+</ul>
+</li>
+<li><a href="#_2">二、测试流程</a><ul>
+<li><a href="#1-ubuntu-iperf3">1. 在 Ubuntu 上运行 iperf3 服务端</a></li>
+<li><a href="#2-windows">2. 在 Windows 上运行客户端</a></li>
+</ul>
+</li>
+<li><a href="#_3">三、结果解读</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
