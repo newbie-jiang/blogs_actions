@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>3.全志tina_sdk添加自己的board</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="tina_sdkboards">全志tina_sdk添加自己的boards</h1>
+<p>参考</p>
+<p>https://blog.csdn.net/weixin_44179831/article/details/126845384?spm=1001.2014.3001.5502</p>
+<p>1.添加设备树</p>
+<pre><code>tina-v85x-release\device\config\chips\v853\configs
+</code></pre>
+<p><img alt="image-20250724014712813" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250724014712813.png" /></p>
+<p>2.添加自己的板</p>
+<pre><code>tina-v85x-release\target\allwinner
+</code></pre>
+<p><img alt="image-20250724014745523" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250724014745523.png" /></p>
+<p>编译</p>
+<pre><code>make -j &amp;&amp; pack
+</code></pre>
+<p>编译失败</p>
+<pre><code>Error: arch/arm/boot/dts/board.dts:988.1-7 Label or path spif0 not found
+Error: arch/arm/boot/dts/board.dts:1861.1-12 Label or path e907_rproc not found
+FATAL ERROR: Syntax error parsing input tree
+scripts/Makefile.lib:313: recipe for target 'arch/arm/boot/dts/board.dtb' failed
+make[6]: *** [arch/arm/boot/dts/board.dtb] Error 1
+arch/arm/Makefile:343: recipe for target 'dtbs' failed
+make[5]: *** [dtbs] Error 2
+make[5]: Leaving directory '/home/ubuntu/opt/V85x/tina-v85x-release/lichee/linux-4.9'
+Makefile:31: recipe for target '/home/ubuntu/opt/V85x/tina-v85x-release/out/v853-100ask/compile_dir/target/linux-v853-100ask/linux-4.9.191/.image' failed
+make[4]: *** [/home/ubuntu/opt/V85x/tina-v85x-release/out/v853-100ask/compile_dir/target/linux-v853-100ask/linux-4.9.191/.image] Error 2
+make[4]: Leaving directory '/home/ubuntu/opt/V85x/tina-v85x-release/target/allwinner/v853-100ask'
+Makefile:13: recipe for target 'install' failed
+make[3]: *** [install] Error 2
+make[3]: Leaving directory '/home/ubuntu/opt/V85x/tina-v85x-release/target/allwinner'
+target/Makefile:21: recipe for target 'target/allwinner/install' failed
+make[2]: *** [target/allwinner/install] Error 2
+make[2]: Leaving directory '/home/ubuntu/opt/V85x/tina-v85x-release'
+
+</code></pre>
+<p>这表示<strong>在 <code>board.dts</code> 文件的第 988 行和第 1861 行引用了名为 <code>spif0</code> 和 <code>e907_rproc</code> 的 label，但这两个 label 在你的 DTS/DTSI 文件中并不存在</strong>。</p>
+<pre><code>Y:\tina-v853-100ask\lichee\linux-4.9\arch\arm\boot\dts\sun8iw21p1.dtsi
+</code></pre>
+<p>对照着百问网的查找更改或者直接替换，在dtsi中添加上 spif0  和 e907_rproc</p>
+<pre><code>Y:\opt\V85x\tina-v85x-release\lichee\linux-4.9\arch\arm\boot\dts\sun8iw21p1-clk.dtsi
+</code></pre>
+<p>添加</p>
+<pre><code>    clk_e907_gate: e907_gate{
+            #clock-cells = &lt;0&gt;;
+            compatible = &quot;allwinner,periph-clock&quot;;
+            clock-output-names = &quot;e907_gate&quot;;
+        };
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#tina_sdkboards">全志tina_sdk添加自己的boards</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

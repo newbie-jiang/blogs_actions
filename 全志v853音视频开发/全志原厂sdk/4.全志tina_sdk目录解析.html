@@ -1,0 +1,1103 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>4.全志tina_sdk目录解析</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="tina-linux">Tina Linux目录解析</h1>
+<h3 id="_1">目录与文件说明</h3>
+<table>
+<thead>
+<tr>
+<th>目录/文件</th>
+<th>作用描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Config.in</strong></td>
+<td>顶层配置入口，kconfig 配置（菜单配置用，决定 menuconfig 菜单结构）。可以忽略，除非你要加新配置项。</td>
+</tr>
+<tr>
+<td><strong>Makefile</strong></td>
+<td>SDK 的总 Makefile，入口文件，定义了编译的主流程。经常要用来读懂构建流程，但一般不用改。</td>
+</tr>
+<tr>
+<td><strong>build/</strong></td>
+<td>编译中间产物和构建相关脚本。一般不用关注。</td>
+</tr>
+<tr>
+<td><strong>command/</strong></td>
+<td>存放一些辅助脚本和命令，部分自定义命令行工具在这里。可以逛逛，遇到疑问命令可以查查。</td>
+</tr>
+<tr>
+<td><strong>config/</strong></td>
+<td>存放各种配置文件，比如默认配置、产品定制配置。需要定制板卡参数时可能会关注。</td>
+</tr>
+<tr>
+<td><strong>device/</strong></td>
+<td>板级设备相关的描述和配置，涉及 dtb、分区、板卡信息等，和你适配自己的硬件关系密切，<strong>重点关注</strong>。</td>
+</tr>
+<tr>
+<td><strong>dl/</strong></td>
+<td>存放源码下载下来的 tar 包等文件（download cache），构建时自动生成，几乎不用动。</td>
+</tr>
+<tr>
+<td><strong>docs/</strong></td>
+<td>文档说明目录，有时会有 API 说明、编译流程、开发指导等，可以找找有没有帮助文档。</td>
+</tr>
+<tr>
+<td><strong>external/</strong></td>
+<td>外部项目的适配支持，比如一些第三方库或工具。用的不多，可以跳过。</td>
+</tr>
+<tr>
+<td><strong>lichee/</strong></td>
+<td><strong>重点目录</strong>。平台底层代码，包括 u-boot、kernel、工具链下载等，这里会有 lichee 相关的脚本、内核、bootloader 的源码和构建脚本。自己要改内核、uboot，主要就在这。</td>
+</tr>
+<tr>
+<td><strong>name/</strong></td>
+<td>存放产品名称/标识用的，不常用。</td>
+</tr>
+<tr>
+<td><strong>out/</strong></td>
+<td><strong>重点目录</strong>。编译输出目录，所有最终镜像、分区文件、可烧录的 bin 文件等都在这里产生。烧录、调试都得来这找镜像。</td>
+</tr>
+<tr>
+<td><strong>package/</strong></td>
+<td><strong>重点目录</strong>。所有的软件包源码都在这，比如应用、驱动、中间件、BusyBox、网络协议栈等。自己加包、改包都要关注。</td>
+</tr>
+<tr>
+<td><strong>prebuilt/</strong></td>
+<td>预编译二进制包（如工具链、blobs），通常不用动。</td>
+</tr>
+<tr>
+<td><strong>rules.mk</strong></td>
+<td>Makefile 的公共规则文件，被顶层 Makefile include，一般不用改。</td>
+</tr>
+<tr>
+<td><strong>scripts/</strong></td>
+<td>各类构建辅助脚本，有时候会有打包、烧录、升级等相关脚本。可以了解下。</td>
+</tr>
+<tr>
+<td><strong>start/</strong></td>
+<td>启动相关文件（比如启动脚本、配置文件等），有些系统没有这个目录，不常用。</td>
+</tr>
+<tr>
+<td><strong>target/</strong></td>
+<td><strong>重点目录</strong>。目标板相关文件，定义了各类硬件平台的构建参数、分区、软件选择、设备树映射等，适配自己板子必看。</td>
+</tr>
+<tr>
+<td><strong>tmp/</strong></td>
+<td>构建临时文件夹，自动生成，没啥用。</td>
+</tr>
+<tr>
+<td><strong>toolchain/</strong></td>
+<td>工具链目录，gcc/arm-linux-gnueabihf-gcc 等交叉编译工具。熟悉交叉编译会用到。</td>
+</tr>
+<tr>
+<td><strong>tools/</strong></td>
+<td>构建/维护过程中的辅助工具，如 mkimage、打包工具等。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2"><strong>应该重点关注的目录</strong></h3>
+<ol>
+<li><strong>lichee/</strong></li>
+<li>要修改内核、uboot，做底层驱动适配，一定会进这里。</li>
+<li>内核源码/uboot源码/编译配置都在这里。</li>
+<li><strong>package/</strong></li>
+<li>要开发/修改应用、加驱动、改中间件，基本都和这个目录相关。</li>
+<li><strong>out/</strong></li>
+<li>产物、固件镜像、可烧录文件等都在这里找。</li>
+<li><strong>device/</strong> 和 <strong>target/</strong></li>
+<li>板级支持包、设备树、分区布局、板卡适配相关的东西，都要看这两个目录。</li>
+<li><strong>toolchain/</strong></li>
+<li>配置/升级工具链或者要手工交叉编译用得到。</li>
+<li><strong>config/</strong></li>
+<li>自定义构建参数、配置选项时也会碰到，特别是做产品定制。</li>
+</ol>
+<hr />
+<h3 id="_3"><strong>一般不用动的目录</strong>/文件</h3>
+<ul>
+<li>build/</li>
+<li>dl/</li>
+<li>prebuilt/</li>
+<li>name</li>
+<li>tmp/</li>
+<li>rules.mk（除非想研究构建系统）</li>
+<li>external/</li>
+<li>start</li>
+</ul>
+<h3 id="tips"><strong>Tips</strong></h3>
+<ul>
+<li>真正开发中，<strong>package/</strong>、<strong>lichee/</strong>、<strong>target/</strong>、<strong>device/</strong> 这几个是修改最多的。</li>
+<li>生成的固件和分区镜像都在 <strong>out/</strong>，调试烧录主要看这里。</li>
+<li>研究构建流程或者加全局自定义动作，要关注顶层 <strong>Makefile</strong> 和部分脚本。</li>
+</ul>
+<h2 id="external">external目录（重点）</h2>
+<ul>
+<li>external/ 目录就是“SDK 集成的所有第三方和定制外部库、demo、增强包”的仓库</li>
+</ul>
+<pre><code class="language-c">29955@newbie MINGW64 /y/opt/V85x/tina-v85x-release/external
+$ tree -L 1
+.
+|-- aispeech
+|-- alsa-conf-aw
+|-- alsa-plugins-aw
+|-- asan_demo
+|-- avs
+|-- awcast
+|-- awsystrace
+|-- bluetooth
+|-- boot-play
+|-- btmanager
+|-- cairo
+|-- camerademo
+|-- crash-handler
+|-- displayd
+|-- evevehicledetect
+|-- eyesee-mpp
+|-- flutter-sunxi
+|-- gmems
+|-- gst1-libav
+|-- gst1-omx
+|-- gst1-plugins-bad
+|-- gst1-plugins-base
+|-- gst1-plugins-good
+|-- gst1-plugins-ugly
+|-- gstreamer1
+|-- healthd
+|-- hpplay-receiver
+|-- legacy
+|-- libAWIspApi
+|-- libaec-xt
+|-- libcedarc
+|-- libcedarx
+|-- libconv
+|-- libcutils
+|-- libdisplay
+|-- libkey
+|-- libminui
+|-- libnl-tiny
+|-- libsocket_db
+|-- libsysutils
+|-- libuapi
+|-- libutils
+|-- libvop
+|-- logwrapper
+|-- mad-demo
+|-- mediaplayer
+|-- minigui
+|-- minigui_aw
+|-- miracast-receiver
+|-- miracast2
+|-- misc-upgrade
+|-- mtdbadblk
+|-- mtop
+|-- mtp
+|-- multimedia
+|-- multimedia_demo
+|-- nativepower
+|-- networkd
+|-- ota-burnboot
+|-- p2p_utils
+|-- peq
+|-- pixman
+|-- player-utils
+|-- powerkey
+|-- qt
+|-- recovery-mode
+|-- rtk
+|-- smartlinkd
+|-- softap
+|-- sona
+|-- stress-ng
+|-- sys_info
+|-- tconfigs
+|-- testtools
+|-- tina-app-upgrade
+|-- tina-upgrade
+|-- tinacvr
+|-- tinymp3
+|-- tvd_demo
+|-- uevent-monitor
+|-- usb-gadget
+|-- uvoice
+|-- wayland
+|-- wayland-ivi-extension
+|-- wayland-protocols
+|-- weston
+-- wifimanager
+
+87 directories, 0 files
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>目录名</th>
+<th>主要作用/说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aispeech</td>
+<td>科大讯飞等语音识别/语音处理SDK集成</td>
+</tr>
+<tr>
+<td>alsa-conf-aw</td>
+<td>全志平台的 ALSA 音频配置文件</td>
+</tr>
+<tr>
+<td>alsa-plugins-aw</td>
+<td>ALSA 音频插件（全志平台定制）</td>
+</tr>
+<tr>
+<td>asan_demo</td>
+<td>AddressSanitizer 内存检查功能演示</td>
+</tr>
+<tr>
+<td>avs</td>
+<td>Alexa Voice Service 相关（语音助手/智能音箱）</td>
+</tr>
+<tr>
+<td>awcast</td>
+<td>全志自有无线投屏/屏幕镜像相关</td>
+</tr>
+<tr>
+<td>awsystrace</td>
+<td>全志系统级追踪分析工具</td>
+</tr>
+<tr>
+<td>bluetooth</td>
+<td>蓝牙协议栈及相关应用</td>
+</tr>
+<tr>
+<td>boot-play</td>
+<td>启动音效/启动动画相关（可能播放启动音乐）</td>
+</tr>
+<tr>
+<td>btmanager</td>
+<td>蓝牙设备管理工具</td>
+</tr>
+<tr>
+<td>cairo</td>
+<td>图形库 Cairo（2D矢量绘图库）</td>
+</tr>
+<tr>
+<td>camerademo</td>
+<td>摄像头功能演示/测试demo</td>
+</tr>
+<tr>
+<td>crash-handler</td>
+<td>崩溃处理/日志收集/异常上报</td>
+</tr>
+<tr>
+<td>displayd</td>
+<td>显示守护进程/显示输出管理</td>
+</tr>
+<tr>
+<td>evevehicledetect</td>
+<td>智能车载/车辆检测相关算法库</td>
+</tr>
+<tr>
+<td>eyesee-mpp</td>
+<td>全志多媒体处理平台SDK（摄像头、视频录制、AI等核心库及demo）</td>
+</tr>
+<tr>
+<td>flutter-sunxi</td>
+<td>Flutter UI引擎全志适配</td>
+</tr>
+<tr>
+<td>gmems</td>
+<td>MEMS传感器相关库（如陀螺仪/加速度）</td>
+</tr>
+<tr>
+<td>gst1-libav</td>
+<td>GStreamer 1.x libav 插件（FFmpeg后端）</td>
+</tr>
+<tr>
+<td>gst1-omx</td>
+<td>GStreamer 1.x OpenMAX 插件（硬件编解码支持）</td>
+</tr>
+<tr>
+<td>gst1-plugins-bad</td>
+<td>GStreamer 1.x 非官方插件（bad版）</td>
+</tr>
+<tr>
+<td>gst1-plugins-base</td>
+<td>GStreamer 1.x 基础官方插件</td>
+</tr>
+<tr>
+<td>gst1-plugins-good</td>
+<td>GStreamer 1.x 官方优质插件（good版）</td>
+</tr>
+<tr>
+<td>gst1-plugins-ugly</td>
+<td>GStreamer 1.x 商业授权受限插件（ugly版）</td>
+</tr>
+<tr>
+<td>gstreamer1</td>
+<td>GStreamer 1.x 主框架</td>
+</tr>
+<tr>
+<td>healthd</td>
+<td>健康监控守护进程（如电池/温度/硬件状态）</td>
+</tr>
+<tr>
+<td>hpplay-receiver</td>
+<td>华为Cast+ 投屏协议接收端</td>
+</tr>
+<tr>
+<td>legacy</td>
+<td>旧版/遗留支持库</td>
+</tr>
+<tr>
+<td>libAWIspApi</td>
+<td>全志ISP（图像信号处理器）接口库</td>
+</tr>
+<tr>
+<td>libaec-xt</td>
+<td>音频回声消除库</td>
+</tr>
+<tr>
+<td>libcedarc</td>
+<td>全志CedarC多媒体加速库（视频解码）</td>
+</tr>
+<tr>
+<td>libcedarx</td>
+<td>全志CedarX多媒体加速库</td>
+</tr>
+<tr>
+<td>libconv</td>
+<td>数据转换相关通用库</td>
+</tr>
+<tr>
+<td>libcutils</td>
+<td>通用C工具函数库</td>
+</tr>
+<tr>
+<td>libdisplay</td>
+<td>显示层/帧缓冲操作库</td>
+</tr>
+<tr>
+<td>libkey</td>
+<td>按键检测和处理库</td>
+</tr>
+<tr>
+<td>libminui</td>
+<td>迷你图形库（通常用于recovery界面）</td>
+</tr>
+<tr>
+<td>libnl-tiny</td>
+<td>精简版netlink通信库</td>
+</tr>
+<tr>
+<td>libsocket_db</td>
+<td>Socket数据库/网络相关支持库</td>
+</tr>
+<tr>
+<td>libsysutils</td>
+<td>系统工具库</td>
+</tr>
+<tr>
+<td>libuapi</td>
+<td>通用API定义库</td>
+</tr>
+<tr>
+<td>libutils</td>
+<td>通用工具库</td>
+</tr>
+<tr>
+<td>libvop</td>
+<td>视频输出处理（Video Output Processor）相关库</td>
+</tr>
+<tr>
+<td>logwrapper</td>
+<td>日志包装和重定向工具</td>
+</tr>
+<tr>
+<td>mad-demo</td>
+<td>MP3解码库MAD的测试demo</td>
+</tr>
+<tr>
+<td>mediaplayer</td>
+<td>媒体播放器实现/集成</td>
+</tr>
+<tr>
+<td>minigui</td>
+<td>MiniGUI轻量级GUI库</td>
+</tr>
+<tr>
+<td>minigui_aw</td>
+<td>全志定制MiniGUI</td>
+</tr>
+<tr>
+<td>miracast-receiver</td>
+<td>Miracast无线投屏接收端</td>
+</tr>
+<tr>
+<td>miracast2</td>
+<td>Miracast相关第二版实现</td>
+</tr>
+<tr>
+<td>misc-upgrade</td>
+<td>升级相关杂项工具/脚本</td>
+</tr>
+<tr>
+<td>mtdbadblk</td>
+<td>MTD存储坏块管理工具</td>
+</tr>
+<tr>
+<td>mtop</td>
+<td>全志平台top系统监控工具</td>
+</tr>
+<tr>
+<td>mtp</td>
+<td>媒体传输协议（MTP）相关库</td>
+</tr>
+<tr>
+<td>multimedia</td>
+<td>多媒体综合管理/中间件</td>
+</tr>
+<tr>
+<td>multimedia_demo</td>
+<td>多媒体相关功能演示/测试</td>
+</tr>
+<tr>
+<td>nativepower</td>
+<td>电源管理相关库</td>
+</tr>
+<tr>
+<td>networkd</td>
+<td>网络管理守护进程</td>
+</tr>
+<tr>
+<td>ota-burnboot</td>
+<td>OTA升级及引导程序工具</td>
+</tr>
+<tr>
+<td>p2p_utils</td>
+<td>P2P（点对点）通信相关工具</td>
+</tr>
+<tr>
+<td>peq</td>
+<td>音频均衡器（Parametric Equalizer）库</td>
+</tr>
+<tr>
+<td>pixman</td>
+<td>2D图形运算库，常用于cairo等</td>
+</tr>
+<tr>
+<td>player-utils</td>
+<td>播放器辅助工具</td>
+</tr>
+<tr>
+<td>powerkey</td>
+<td>电源键控制/处理</td>
+</tr>
+<tr>
+<td>qt</td>
+<td>Qt图形库相关移植包</td>
+</tr>
+<tr>
+<td>recovery-mode</td>
+<td>恢复模式相关程序/脚本</td>
+</tr>
+<tr>
+<td>rtk</td>
+<td>Realtek相关适配代码</td>
+</tr>
+<tr>
+<td>smartlinkd</td>
+<td>快速配网守护进程</td>
+</tr>
+<tr>
+<td>softap</td>
+<td>软件AP（热点）服务</td>
+</tr>
+<tr>
+<td>sona</td>
+<td>可能为音频/信号相关库（不常见）</td>
+</tr>
+<tr>
+<td>stress-ng</td>
+<td>压力测试工具</td>
+</tr>
+<tr>
+<td>sys_info</td>
+<td>系统信息采集和显示工具</td>
+</tr>
+<tr>
+<td>tconfigs</td>
+<td>Tina系统配置管理</td>
+</tr>
+<tr>
+<td>testtools</td>
+<td>各类测试工具和脚本</td>
+</tr>
+<tr>
+<td>tina-app-upgrade</td>
+<td>Tina平台应用升级工具</td>
+</tr>
+<tr>
+<td>tina-upgrade</td>
+<td>Tina平台系统升级工具</td>
+</tr>
+<tr>
+<td>tinacvr</td>
+<td>行车记录仪/视频录像/安防录像相关功能</td>
+</tr>
+<tr>
+<td>tinymp3</td>
+<td>轻量级MP3解码库</td>
+</tr>
+<tr>
+<td>tvd_demo</td>
+<td>TV解码/电视相关演示</td>
+</tr>
+<tr>
+<td>uevent-monitor</td>
+<td>uevent事件监控工具</td>
+</tr>
+<tr>
+<td>usb-gadget</td>
+<td>USB设备模式/OTG相关开发</td>
+</tr>
+<tr>
+<td>uvoice</td>
+<td>语音唤醒/语音识别功能库</td>
+</tr>
+<tr>
+<td>wayland</td>
+<td>Wayland显示协议栈</td>
+</tr>
+<tr>
+<td>wayland-ivi-extension</td>
+<td>Wayland车载IVI（车载信息娱乐）扩展</td>
+</tr>
+<tr>
+<td>wayland-protocols</td>
+<td>Wayland协议扩展包</td>
+</tr>
+<tr>
+<td>weston</td>
+<td>Wayland窗口管理器Weston</td>
+</tr>
+<tr>
+<td>wifimanager</td>
+<td>WiFi管理工具/守护进程</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4"><strong>一般开发常用查找建议</strong></h3>
+<ol>
+<li><strong>做音视频多媒体</strong>
+    重点关注 <code>eyesee-mpp</code>、<code>gst1-*</code>、<code>gstreamer1</code>、<code>libcedarc</code>、<code>libcedarx</code>、<code>mediaplayer</code>、<code>tinacvr</code>。</li>
+<li><strong>做显示/GUI</strong>
+    重点看 <code>cairo</code>、<code>minigui</code>、<code>qt</code>、<code>wayland*</code>、<code>weston</code>、<code>flutter-sunxi</code>。</li>
+<li><strong>做蓝牙/WiFi</strong>
+    关注 <code>bluetooth</code>、<code>btmanager</code>、<code>wifimanager</code>、<code>softap</code>、<code>smartlinkd</code>。</li>
+<li><strong>做语音相关</strong>
+    关注 <code>aispeech</code>、<code>avs</code>、<code>uvoice</code>。</li>
+<li><strong>做升级/恢复</strong>
+    关注 <code>ota-burnboot</code>、<code>tina-app-upgrade</code>、<code>recovery-mode</code>、<code>misc-upgrade</code>。</li>
+<li><strong>工具&amp;测试</strong>
+    关注 <code>stress-ng</code>、<code>testtools</code>、<code>mtdbadblk</code>、<code>sys_info</code>、<code>asan_demo</code>。</li>
+</ol>
+<h2 id="eyesee-mpp-externaleyesee-mpp">eyesee-mpp 目录(external\eyesee-mpp)</h2>
+<ul>
+<li>Allwinner 的多媒体处理平台（Media Processing Platform）SDK，摄像头/视频解码相关的底层驱动库，Allwinner 平台视频开发核心库之一，重点</li>
+</ul>
+<pre><code class="language-C">29955@newbie MINGW64 /y/opt/V85x/tina-v85x-release/external/eyesee-mpp/framework/sun8iw21/demo
+$ tree -L 1
+.
+|-- RecordDemo
+|-- audio_demo
+|-- cdrPlayerDemo
+|-- demo_camera
+|-- sample_2VIPPRecord
+|-- sample_ADAS
+|-- sample_AFBCVerify
+|-- sample_AILib
+|-- sample_AI_BDII
+|-- sample_AudioEncode
+|-- sample_CDREmergency
+|-- sample_Camera
+|-- sample_Camera_2VIPP
+|-- sample_Camera_takepicture
+|-- sample_DualRecord
+|-- sample_EncodeResolutionChange
+|-- sample_EyeseeEIS
+|-- sample_EyeseeIse
+|-- sample_EyeseeIse2
+|-- sample_IseAILib
+|-- sample_LargeFile
+|-- sample_Motion
+|-- sample_OSD
+|-- sample_Player
+|-- sample_RecordLowDelay
+|-- sample_RecordMultiStream
+|-- sample_RecordSwitchFileNormal
+|-- sample_RecorderCallbackOut
+|-- sample_RecorderSegment
+|-- sample_ThumbRetriever
+|-- sample_USBCamera
+|-- sample_VideoResizer
+|-- sample_fisheye
+`-- test
+
+</code></pre>
+<h2 id="_5">目录说明与常见用途</h2>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RecordDemo</strong></td>
+<td>录制功能演示（视频/音频录制Demo，演示如何采集并保存文件）</td>
+</tr>
+<tr>
+<td><strong>audio_demo</strong></td>
+<td>音频功能测试Demo，包含音频采集、播放等</td>
+</tr>
+<tr>
+<td><strong>cdrPlayerDemo</strong></td>
+<td>行车记录仪（Car DVR）播放器演示Demo</td>
+</tr>
+<tr>
+<td><strong>demo_camera</strong></td>
+<td>摄像头基础功能演示Demo（最基础的Camera采集示例）</td>
+</tr>
+<tr>
+<td><strong>sample_2VIPPRecord</strong></td>
+<td>双通道（2路VIP通道）录制功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_ADAS</strong></td>
+<td>ADAS（高级驾驶辅助系统）相关功能演示或测试</td>
+</tr>
+<tr>
+<td><strong>sample_AFBCVerify</strong></td>
+<td>AFBC格式（Arm Frame Buffer Compression）验证Demo</td>
+</tr>
+<tr>
+<td><strong>sample_AILib</strong></td>
+<td>AI库（可能是平台AI推理/算法相关）示例</td>
+</tr>
+<tr>
+<td><strong>sample_AI_BDII</strong></td>
+<td>AI行为检测或人脸检测等相关示例</td>
+</tr>
+<tr>
+<td><strong>sample_AudioEncode</strong></td>
+<td>音频编码功能演示Demo</td>
+</tr>
+<tr>
+<td><strong>sample_CDREmergency</strong></td>
+<td>行车记录仪紧急录制场景演示</td>
+</tr>
+<tr>
+<td><strong>sample_Camera</strong></td>
+<td>Camera功能演示（常用参考Demo，含基础采集、回调等）</td>
+</tr>
+<tr>
+<td><strong>sample_Camera_2VIPP</strong></td>
+<td>多通道（2路VIP）摄像头演示</td>
+</tr>
+<tr>
+<td><strong>sample_Camera_takepicture</strong></td>
+<td>拍照/图片采集功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_DualRecord</strong></td>
+<td>双录制流功能演示（如主/副码流同时录制）</td>
+</tr>
+<tr>
+<td><strong>sample_EncodeResolutionChange</strong></td>
+<td>编码分辨率动态切换测试</td>
+</tr>
+<tr>
+<td><strong>sample_EyeseeEIS</strong></td>
+<td>电子防抖（EIS，Electronic Image Stabilization）功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_EyeseeIse / sample_EyeseeIse2</strong></td>
+<td>ISE（图像空间增强/畸变矫正/鱼眼校正）相关功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_IseAILib</strong></td>
+<td>ISE功能与AI库结合的演示</td>
+</tr>
+<tr>
+<td><strong>sample_LargeFile</strong></td>
+<td>大文件录制测试Demo</td>
+</tr>
+<tr>
+<td><strong>sample_Motion</strong></td>
+<td>运动检测功能测试（如动态检测）</td>
+</tr>
+<tr>
+<td><strong>sample_OSD</strong></td>
+<td>OSD（屏幕显示/叠加）功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_Player</strong></td>
+<td>视频/音频播放功能演示Demo</td>
+</tr>
+<tr>
+<td><strong>sample_RecordLowDelay</strong></td>
+<td>低延迟录制演示（比如监控等低延迟场景）</td>
+</tr>
+<tr>
+<td><strong>sample_RecordMultiStream</strong></td>
+<td>多路流录制功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_RecordSwitchFileNormal</strong></td>
+<td>正常切换录制文件（分段录像）测试</td>
+</tr>
+<tr>
+<td><strong>sample_RecorderCallbackOut</strong></td>
+<td>录制回调接口演示</td>
+</tr>
+<tr>
+<td><strong>sample_RecorderSegment</strong></td>
+<td>分段录制功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_ThumbRetriever</strong></td>
+<td>缩略图提取演示</td>
+</tr>
+<tr>
+<td><strong>sample_USBCamera</strong></td>
+<td>USB摄像头采集和录制测试</td>
+</tr>
+<tr>
+<td><strong>sample_VideoResizer</strong></td>
+<td>视频分辨率缩放功能演示</td>
+</tr>
+<tr>
+<td><strong>sample_fisheye</strong></td>
+<td>鱼眼校正相关功能演示</td>
+</tr>
+<tr>
+<td><strong>test</strong></td>
+<td>一般为综合性或杂项功能测试</td>
+</tr>
+</tbody>
+</table>
+<pre><code>29955@newbie MINGW64 /y/opt/V85x/tina-v85x-release/external/eyesee-mpp/middleware/sun8iw21/sample
+$ tree -L 1
+.
+|-- Readme.txt
+|-- SampleManual.md
+|-- bin
+|-- configfileparser
+|-- sample_CodecParallel
+|-- sample_MotionDetect
+|-- sample_OnlineVenc
+|-- sample_PersonDetect
+|-- sample_RegionDetect
+|-- sample_UILayer
+|-- sample_UVC
+|-- sample_adec
+|-- sample_adec2ao
+|-- sample_aec
+|-- sample_aenc
+|-- sample_ai
+|-- sample_ai2aenc
+|-- sample_ai2aenc2muxer
+|-- sample_ai2ao
+|-- sample_ai_Demo_0.9.2
+|-- sample_ai_Demo_0.9.6
+|-- sample_ao
+|-- sample_ao2ai_aec
+|-- sample_ao2ai_aec_rate_mixer
+|-- sample_aoSync
+|-- sample_ao_resample_mixer
+|-- sample_demux
+|-- sample_demux2adec
+|-- sample_demux2adec2ao
+|-- sample_demux2vdec
+|-- sample_demux2vdec2vo
+|-- sample_demux2vdec_saveFrame
+|-- sample_directIORead
+|-- sample_driverVipp
+|-- sample_file_repair
+|-- sample_fish
+|-- sample_g2d
+|-- sample_glog
+|-- sample_hello
+|-- sample_isposd
+|-- sample_motor
+|-- sample_multi_vi2venc2muxer
+|-- sample_odet_demo
+|-- sample_pthread_cancel
+|-- sample_recorder
+|-- sample_region
+|-- sample_rtsp
+|-- sample_select
+|-- sample_smartIPC_demo
+|-- sample_smartPreview_demo
+|-- sample_sound_controler
+|-- sample_takePicture
+|-- sample_timelapse
+|-- sample_twinchn_virvi2venc2ce
+|-- sample_uac
+|-- sample_usbcamera
+|-- sample_uvcout
+|-- sample_vdec
+|-- sample_venc
+|-- sample_venc2muxer
+|-- sample_vencGdcZoom
+|-- sample_vencQpMap
+|-- sample_vencRecreate
+|-- sample_vi_g2d
+|-- sample_vi_reset
+|-- sample_vin_isp_test
+|-- sample_virvi
+|-- sample_virvi2eis2venc
+|-- sample_virvi2fish2venc
+|-- sample_virvi2fish2vo
+|-- sample_virvi2venc
+|-- sample_virvi2venc2ce
+|-- sample_virvi2venc2muxer
+|-- sample_virvi2vo
+|-- sample_virvi2vo_zoom
+|-- sample_vo
+`-- tina.mk
+
+74 directories, 3 files
+
+</code></pre>
+<h2 id="_6">视频</h2>
+<ul>
+<li>sample_driverVipp。演示直接调用linux内核驱动获取frame。</li>
+<li>sample_virvi。视频采集。</li>
+<li>sample_virvi2vo。演示视频采集预览。</li>
+<li>sample_virvi2vo_zoom。演示缩放。</li>
+<li>sample_vi_reset。演示mpi_vi组件的reset流程。</li>
+<li>sample_isposd。测试isp相关。</li>
+<li>sample_vin_isp_test。通过调用isp接口抓图的demo。</li>
+<li>sample_region。测试osd。</li>
+<li>sample_venc。视频编码。</li>
+<li>sample_venc2muxer。演示视频编码和封装mp4。</li>
+<li>sample_virvi2venc。演示采集到编码，支持测试GDC畸变矫正。</li>
+<li>sample_timelapse。演示缩时录影。</li>
+<li>sample_virvi2venc2muxer。演示采集到编码到封装mp4，支持测试GDC畸变矫正。</li>
+<li>sample_multi_vi2venc2muxer。演示多路编码。</li>
+<li>sample_rtsp。演示视频编码后的rtsp传输。</li>
+<li>sample_CodecParallel。演示同编同解。</li>
+<li>sample_vdec。视频解码。</li>
+<li>sample_demux2vdec。演示解封装和解码。</li>
+<li>sample_demux2vdec_saveFrame。从原始文件中分离出视频数据帧并解码生成yuv文件。</li>
+<li>sample_demux2vdec2vo。演示解码显示。</li>
+<li>sample_vencQpMap。演示视频编码QPMAP模式。</li>
+<li>sample_OnlineVenc。在线编码。</li>
+<li>sample_vencGdcZoom。编码GDC数字变焦。</li>
+<li>sample_takePicture。演示单拍和连拍。</li>
+<li>sample_recorder。演示四路录制编码封装或者预览显示。</li>
+</ul>
+<h2 id="_7">音频</h2>
+<ul>
+<li>sample_ai</li>
+<li>sample_ao</li>
+<li>sample_aoSync。演示采用同步的方式send pcm frame。而sample_ao是采用异步的方式。</li>
+<li>sample_ao_resample_mixer。演示读取pcm数据，然后播放声音，从耳机口输出声音。</li>
+<li>sample_ao2ai_aec。回声消除，初版</li>
+<li>sample_ao2ai_aec_rate_mixer。回声消除，初版基础上测试打开音频输出重采样和混音功能后，回声消除是否正常。</li>
+<li>sample_aec。回声消除，修改版。</li>
+<li>sample_aenc。音频编码。</li>
+<li>sample_ai2aenc。音频采集和编码。</li>
+<li>sample_ai2aenc2muxer。音频采集、编码和封装。</li>
+<li>sample_select。演示多路音频编码，用select()方式获取编码码流。</li>
+<li>sample_adec。音频解码。</li>
+<li>sample_demux2adec。从原始文件中分离出音频数据帧并解码。</li>
+<li>sample_demux2adec2ao。从原始文件中分离出音频数据帧并解码输出音频。</li>
+</ul>
+<h2 id="iseeis">ISE和EIS</h2>
+<ul>
+<li>sample_fish。演示单目鱼眼功能。</li>
+<li>sample_virvi2fish2venc。演示鱼眼图像畸形校正后做编码。</li>
+<li>sample_virvi2fish2vo。演示鱼眼图像畸形校正后预览。</li>
+<li>sample_virvi2eis2venc。演示防抖功能。</li>
+</ul>
+<h2 id="_8">视频显示</h2>
+<ul>
+<li>sample_vo。演示视频YUV预览。</li>
+<li>sample_UILayer。验证UILayer的格式。</li>
+</ul>
+<h2 id="g2d">g2d</h2>
+<ul>
+<li>sample_g2d。演示直接用G2D处理YUV文件做透明叠加、旋转和镜像、缩放等。</li>
+<li>sample_vi_g2d。演示从VI获取视频帧，用G2D做旋转、裁剪、缩放等处理后送VO显示。</li>
+</ul>
+<h2 id="ce">CE</h2>
+<ul>
+<li>sample_twinchn_virvi2venc2ce。两路ce加解密测试。</li>
+<li>sample_virvi2venc2ce。单路ce加解密测试。</li>
+</ul>
+<h2 id="uvcuac">uvc和uac</h2>
+<ul>
+<li>sample_uvc2vdec_vo。做主，mjpeg解码显示。</li>
+<li>sample_uvc2vdenc2vo。做主，mjpeg解码显示。</li>
+<li>sample_uvc2vo。做主，yuv显示。</li>
+<li>sample_uvc_vo。做主，yuv显示。</li>
+<li>sample_uvcout。做从，mjpeg编码输出。</li>
+<li>sample_uac。演示uac测试。</li>
+<li>sample_usbcamera。测试UVC、UAC复合设备。</li>
+</ul>
+<h2 id="_9">多媒体文件</h2>
+<ul>
+<li>sample_demux。解复用mp4文件。</li>
+<li>sample_file_repair。修复mp4文件。</li>
+</ul>
+<h2 id="demo">智能算法 demo</h2>
+<ul>
+<li>sample_MotionDetect。移动侦测。</li>
+<li>sample_RegionDetect。演示区域检测。</li>
+<li>sample_PersonDetect。人形检测。</li>
+<li>sample_smartIPC_demo。演示人形检测+人脸检测+画框+RTSP功能。</li>
+<li>sample_smartPreview_demo。演示人形检测+人脸检测+画框+预览功能。</li>
+<li>sample_facekit_demo。演示人脸识别功能。</li>
+</ul>
+<h2 id="_10">其他</h2>
+<ul>
+<li>sample_glog。演示glog库的用法。</li>
+<li>sample_hello。演示MPP helloworld程序。</li>
+<li>sample_pthread_cancel。测试pthread_cancel()</li>
+<li>sample_motor。电机测试。</li>
+<li>sample_sound_controler，语音识别。</li>
+<li>sample_ai_Demo_0.9.2。智能算子demo</li>
+<li>sample_ai_Demo_0.9.6。智能算子demo</li>
+<li>sample_directIORead。演示使用directIO方式读文件。</li>
+</ul>
+<h2 id="deprecated">deprecated</h2>
+<p>准备删除以下sample：</p>
+<ul>
+<li>sample_ai2ao。引起啸叫，无意义。sample_aec会测试ai和ao同时工作的场景。</li>
+<li>sample_ao2ai。ao和ai的绑定是为了回声消除，而现在回声消除在底层完成，和mpp组件没有关系。mpi_ao和mpi_ai的绑定已经废除。</li>
+<li>sample_face_detect。已废弃，sample_ai_Demo包含了人脸检测。</li>
+<li>sample_odet_demo。已废弃，可参考sample_smartIPC_demo人脸检测部分。</li>
+</ul>
+<h2 id="_11">总结：</h2>
+<p>现在各个厂商的sdk都做了大量demo，芯片厂商在推出芯片方案时，基本都会有大量的相关示例，比如工作中使用过瑞昱的芯片做 IPC项目,也是做了大量的适配，可极大方便的快速应用</p>
+<p>瑞昱sdk参考</p>
+<p>https://github.com/Ameba-AIoT/ameba-rtos-pro2/tree/main/project/realtek_amebapro2_v0_example/src/mmfv2_video_example</p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#tina-linux">Tina Linux目录解析</a><ul>
+<li><a href="#_1">目录与文件说明</a></li>
+<li><a href="#_2">应该重点关注的目录</a></li>
+<li><a href="#_3">一般不用动的目录/文件</a></li>
+<li><a href="#tips">Tips</a></li>
+<li><a href="#external">external目录（重点）</a><ul>
+<li><a href="#_4">一般开发常用查找建议</a></li>
+</ul>
+</li>
+<li><a href="#eyesee-mpp-externaleyesee-mpp">eyesee-mpp 目录(external\eyesee-mpp)</a></li>
+<li><a href="#_5">目录说明与常见用途</a></li>
+<li><a href="#_6">视频</a></li>
+<li><a href="#_7">音频</a></li>
+<li><a href="#iseeis">ISE和EIS</a></li>
+<li><a href="#_8">视频显示</a></li>
+<li><a href="#g2d">g2d</a></li>
+<li><a href="#ce">CE</a></li>
+<li><a href="#uvcuac">uvc和uac</a></li>
+<li><a href="#_9">多媒体文件</a></li>
+<li><a href="#demo">智能算法 demo</a></li>
+<li><a href="#_10">其他</a></li>
+<li><a href="#deprecated">deprecated</a></li>
+<li><a href="#_11">总结：</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
