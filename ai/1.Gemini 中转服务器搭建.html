@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.Gemini 中转服务器搭建</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="gemini">Gemini中转服务器搭建</h1>
+<p>可使用的模型（绝大多数都免费）</p>
+<p>https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn</p>
+<h2 id="_1">为什么要中转？</h2>
+<p>国内以及一些地区被限制不能使用，所以拿一台可访问Gemini的服务器作中转，代理访问就可以了</p>
+<p>中转服务器我使用了一台美国的vps</p>
+<h2 id="1">1.安装依赖库</h2>
+<ol>
+<li>必须安装的依赖库
+Python 版本
+推荐 Python 3.9+（google-generativeai 需要 Python &gt;=3.9）</li>
+</ol>
+<pre><code>pip install flask google-generativeai
+
+安装失败则使用Python 3.9+安装
+python3.10 -m pip install flask google-generativeai
+
+</code></pre>
+<p>较低版本的python安装失败解决方法 可通过编译安装</p>
+<pre><code># 1. 安装依赖
+sudo apt update
+sudo apt install -y wget build-essential libssl-dev zlib1g-dev \
+    libncurses5-dev libbz2-dev libreadline-dev libsqlite3-dev \
+    libffi-dev liblzma-dev tk-dev
+
+# 2. 下载 Python 3.10 源码（或替换为 3.11.x）
+cd /usr/src
+sudo wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
+sudo tar xzf Python-3.10.14.tgz
+cd Python-3.10.14
+
+# 3. 编译安装
+sudo ./configure --enable-optimizations
+sudo make altinstall   # 用 altinstall 不会覆盖系统 python3
+
+# 4. 检查版本
+python3.10 --version
+
+新装的 pip 也要升级
+python3.10 -m ensurepip
+python3.10 -m pip install --upgrade pip
+</code></pre>
+<h2 id="2">2.基础中转文件编写</h2>
+<pre><code>from flask import Flask, request, jsonify
+import google.generativeai as genai
+
+app = Flask(__name__)
+
+# 你的Gemini API Key
+GEMINI_API_KEY = &quot;API_KEY&quot;  # 改为自己的API_KEY
+genai.configure(api_key=GEMINI_API_KEY)
+
+@app.route(&quot;/chat&quot;, methods=[&quot;POST&quot;])
+def chat():
+    data = request.get_json()
+    prompt = data.get(&quot;prompt&quot;, &quot;&quot;)
+    if not prompt:
+        return jsonify({&quot;error&quot;: &quot;No prompt provided&quot;}), 400
+
+    try:
+        model = genai.GenerativeModel('gemini-2.5-pro')
+        response = model.generate_content(prompt)
+        return jsonify({&quot;reply&quot;: response.text})
+    except Exception as e:
+        return jsonify({&quot;error&quot;: str(e)}), 500
+
+if __name__ == &quot;__main__&quot;:
+    app.run(host=&quot;0.0.0.0&quot;, port=8000)
+
+</code></pre>
+<p>运行</p>
+<pre><code>python3.10 gemini_proxy.py
+</code></pre>
+<pre><code>root@blogs:~/gemini# python3.10 gemini_proxy.py
+ * Serving Flask app 'gemini_proxy'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://142.xxx.xxx.xx:8000
+Press CTRL+C to quit
+
+</code></pre>
+<h2 id="_2">在国内的服务器上测试</h2>
+<p>编写一个简单脚本 gemini.py</p>
+<pre><code>import requests
+
+resp = requests.post(&quot;http://142.xxx.xxx.xx:8000/chat&quot;,
+                     json={&quot;prompt&quot;: &quot;介绍一下STM32&quot;})
+print(resp.json()[&quot;reply&quot;])
+
+</code></pre>
+<p>运行即可</p>
+<pre><code>python3 gemini.py
+</code></pre>
+<p>回复的是标准的md文档格式</p>
+<pre><code>hdj@hdj-virtual-machine:~/api_request$ python3 gemini.py 
+好的，这里为您全面介绍一下STM32。
+
+STM32是一系列由**意法半导体（STMicroelectronics,简称ST）**公司生产的**32位微控制器（Microcontroller Unit, MCU）**。它是目前全球最受欢迎、应用最广泛的MCU家族之一，无论是在工业界、消费电子还是个人爱好者（Maker）领域，都有着极高的占有率。
+
+可以把STM32理解为一个微型的、可编程的计算机核心，它被集成在一块小小的芯片上。
+
+---
+
+### 一、 STM32的核心特点（为什么它如此受欢迎？）
+
+1.  **强大的ARM Cortex-M内核**：
+    STM32全系列都基于ARM公司的Cortex-M系列内核。这是一个行业标准，意味着它有极高的性能、能效比和成熟的工具链支持。常见的内核有：
+    *   **Cortex-M0/M0+**：入门级，超低功耗，用于替代传统的8位/16位MCU。
+    *   **Cortex-M3**：主流，性能和成本的完美平衡，是STM32F1系列的经典内核。
+    *   **Cortex-M4**：高性能，在M3的基础上增加了DSP（数字信号处理）指令和FPU（浮点运算单元），非常适合需要进行音频处理、电机控制等复杂计算的场景。
+    *   **Cortex-M7**：旗舰级，拥有最高的性能，具备超级标量流水线和缓存，用于图形界面、高级控制等要求苛刻的应用。
+
+2.  **丰富的产品线**：
+    STM32不是单一芯片，而是一个庞大的家族。ST公司根据不同的应用需求，划分出了多个系列，几乎可以满足任何嵌入式设计需求。
+    *   **主流型 (Mainstream) - STM32F系列**：如F0, F1, F2, F3, F4, F7。这是最经典和应用最广的系列，提供了从基础到高性能的完整选择。
+        *   **F103** 是“一代神机”，无数开发者入门和产品的首选。
+        *   **F4系列** 因其强大的M4内核和丰富的片上外设而广受欢迎。
+    *   **超低功耗型 (Ultra-low-power) - STM32L系列**：如L0, L1, L4, L5。专为电池供电和对功耗有严格要求的设备设计，例如可穿戴设备、物联网传感器节点。
+    *   **高性能型 (High-performance) - STM32H系列**：如H7。这是目前性能最强的系列，主频可达数百MHz，甚至有双核版本，适用于实时性要求极高的工业控制、高端人机界面等。
+    *   **无线型 (Wireless) - STM32W/WB/WL系列**：集成了射频（RF）功能，支持蓝牙(BLE)、Zigbee、LoRa等无线通信协议，是开发物联网（IoT）设备的首选。
+    *   **微处理器 (MPU) - STM32MP系列**：如MP1。这已经不是MCU了，而是MPU（微处理器），可以运行Linux等完整操作系统，用于开发复杂的嵌入式系统，如工业网关、智能家居中控等。
+
+3.  **强大的片上外设 (Peripherals)**：
+    STM32内部集成了大量功能模块，开发者无需外接太多芯片就能实现复杂功能。常见的外设包括：
+    *   **通用输入/输出 (GPIO)**
+    *   **定时器 (Timer)**：可用于生成PWM波控制电机/舵机/LED亮度、精确延时等。
+    *   **通信接口**：UART (串口), I2C, SPI。
+    *   **高级通信接口**：CAN (汽车总线), USB, Ethernet (以太网)。
+    *   **模拟器件**：ADC (模数转换器), DAC (数模转换器)。
+    *   **其他**：DMA (直接存储器存取), RTC (实时时钟) 等。
+
+4.  **无与伦比的生态系统 (Ecosystem)**：
+    这是STM32成功的关键！ST公司提供了从硬件到软件的完整、免费、易用的开发工具链。
+    *   **STM32CubeMX**：一个图形化配置工具，你只需用鼠标点几下，就能完成芯片的引脚分配、时钟树配置、外设初始化等工作，并自动生成C语言初始化代码。这极大地降低了入门门槛。
+    *   **STM32CubeIDE**：一个集成了STM32CubeMX、代码编辑器、编译器（GCC）和调试器于一体的官方集成开发环境（IDE），完全免费。
+    *   **HAL库 (硬件抽象层库)** 和 **LL库 (底层库)**：ST官方提供的标准驱动库。HAL库封装了底层细节，让开发者可以轻松调用API来操作外设，可移植性好；LL库则更接近寄存器操作，效率更高，适合资深开发者。
+    *   **丰富的文档和社区支持**：官网有海量的数据手册、参考手册、应用笔记。网络上也有数不清的教程、视频、开源项目和活跃的开发者社区。遇到问题，你总能找到答案。
+
+5.  **高性价比和易于获取**：
+    STM32在提供强大性能的同时，价格非常有竞争力。同时，各种型号的芯片和开发板（如Nucleo、Discovery系列）在全球范围内都非常容易购买到。
+
+---
+
+### 二、如何开始学习STM32？
+
+对于初学者，推荐的路径如下：
+
+1.  **准备硬件**：购买一块 **STM32 Nucleo** 开发板。比如 `Nucleo-F103RB` 或 `Nucleo-L476RG`。这种板子价格便宜（通常在100元人民币左右），并且自带ST-LINK调试器，无需额外购买烧录工具，插上USB线就能开始开发。
+
+2.  **安装软件**：下载并安装官方免费的 **STM32CubeIDE**。
+
+3.  **学习C语言**：STM32的开发语言主要是C语言，你需要掌握C语言的基本语法，尤其是指针、结构体和位操作。
+
+4.  **点亮第一盏灯 (Blinky)**：
+    *   在STM32CubeIDE中新建一个工程，使用内置的CubeMX图形化工具配置一个GPIO引脚为输出模式。
+    *   生成代码后，在主循环 `while(1)` 中添加几行代码，让这个引脚高低电平交替变化，从而点亮和熄灭开发板上的LED灯。
+    *   这个过程会让你熟悉整个开发流程：**配置 -&gt; 生成代码 -&gt; 编写逻辑 -&gt; 编译 -&gt; 下载 -&gt; 调试**。
+
+5.  **逐步深入**：
+    *   学习使用**串口(UART)**，通过它向电脑发送调试信息，这是最重要的调试手段。
+    *   学习使用**定时器(Timer)**，实现精确延时和PWM输出。
+    *   学习使用**ADC**，读取电位器或传感器的模拟信号。
+    *   学习 **中断** 机制，这是嵌入式系统事件驱动编程的核心。
+
+---
+
+### 三、STM32的应用领域
+
+它的应用无处不在：
+*   **消费电子**：无人机、扫地机器人、智能手环、电子烟、电动牙刷。
+*   **工业控制**：PLC、变频器、伺服驱动器、工业机器人。
+*   **物联网 (IoT)**：智能家居设备、环境监测传感器、共享单车锁。
+*   **汽车电子**：车载娱乐系统、车窗控制器、仪表盘。
+*   **个人DIY项目**：各种机器人、智能小车、创意电子作品。
+
+### 总结
+
+**STM32** 不仅仅是一颗芯片，它是一个集**高性能内核、丰富产品选择、强大片上外设和顶级开发生态**于一体的平台。它极大地降低了嵌入式开发的门槛，同时又能满足专业和复杂的应用需求，是连接软件世界和物理世界的强大桥梁。对于任何想进入嵌入式领域的人来说，学习STM32都是一个极好的选择。
+
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#gemini">Gemini中转服务器搭建</a><ul>
+<li><a href="#_1">为什么要中转？</a></li>
+<li><a href="#1">1.安装依赖库</a></li>
+<li><a href="#2">2.基础中转文件编写</a></li>
+<li><a href="#_2">在国内的服务器上测试</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
