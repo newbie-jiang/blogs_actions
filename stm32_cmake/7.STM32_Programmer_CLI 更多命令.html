@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>7.STM32_Programmer_CLI 更多命令</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="stm32_programmer_cli">STM32_Programmer_CLI 更多命令</h1>
+<pre><code>STM32_Programmer_CLI --help
+</code></pre>
+<p>工具支持命令分类</p>
+<h2 id="1"><strong>1. 连接目标板</strong></h2>
+<ul>
+<li><code>-c, --connect</code>
+   指定端口与设备建立连接（SWD、JTAG、UART、USB DFU、CAN、I2C等）</li>
+</ul>
+<p><code>-c port=SWD
+  -c port=COM3</code></p>
+<hr />
+<h2 id="2"><strong>2. 下载/烧录固件</strong></h2>
+<ul>
+<li><code>-w, --write</code>
+   烧录 bin/hex/elf 文件（可指定地址或直接烧hex/srec文件）</li>
+</ul>
+<p><code>-w app.bin 0x08000000
+  -w app.hex</code></p>
+<ul>
+<li><code>-d, --download</code>
+   功能同 <code>-w</code>，但命名为 download</li>
+</ul>
+<hr />
+<h2 id="3-flash"><strong>3. 擦除 Flash</strong></h2>
+<ul>
+<li><code>-e, --erase [all|指定扇区]</code></li>
+</ul>
+<p><code>-e all             # 擦除全部Flash
+  -e [0 3]           # 擦除扇区0到3</code></p>
+<hr />
+<h2 id="4"><strong>4. 校验固件</strong></h2>
+<ul>
+<li><code>-v, --verify</code>
+   烧录后立即校验固件是否烧写成功</li>
+</ul>
+<hr />
+<h2 id="5-mcu-flash"><strong>5. 读取/导出 MCU Flash 内容</strong></h2>
+<ul>
+<li><code>-u, --upload</code></li>
+</ul>
+<p><code>-u 0x08000000 0x10000 backup.bin   # 从Flash读取内容保存为bin</code></p>
+<hr />
+<h2 id="6-mcu"><strong>6. 复位/运行 MCU</strong></h2>
+<ul>
+<li><code>-rst</code>       软件复位</li>
+<li><code>-hardRst</code>   硬件复位</li>
+<li><code>-g, --go [address]</code>  跳转并运行</li>
+</ul>
+<hr />
+<h2 id="7-option-bytes"><strong>7. 查看/操作 Option Bytes</strong></h2>
+<ul>
+<li><code>-ob, --optionbytes [displ|unlockchip|OptByte=xxx]</code></li>
+</ul>
+<hr />
+<h2 id="8"><strong>8. 读写内存</strong></h2>
+<ul>
+<li><code>-r8/-r16/-r32</code>   读内存</li>
+<li><code>-w8/-w16/-w32</code>   写内存</li>
+</ul>
+<hr />
+<h2 id="9"><strong>9. 检查空白/校验</strong></h2>
+<ul>
+<li><code>-blankcheck</code>   检查Flash是否为空</li>
+<li><code>-checksum, --checksum</code>  校验某一段Flash内容</li>
+</ul>
+<hr />
+<h2 id="10"><strong>10. 设备/调试相关操作</strong></h2>
+<ul>
+<li><code>-list, --list</code>    枚举所有连接的ST-Link/串口等设备</li>
+<li><code>-l 31</code>            输出详细调试信息（日志）</li>
+</ul>
+<hr />
+<h3 id="mpu">其它高级/安全/MPU相关命令</h3>
+<ul>
+<li>譬如 option bytes, TrustZone, Secure Boot, HSM, OTP, Provisioning, key、证书等管理，都在后面的高级命令和 Beta 命令里，普通应用/生产/量产基本用不上。</li>
+</ul>
+<h2 id="loader">自定义外部 Loader 的命令（后面用到再详细介绍制作过程）</h2>
+<p>CubeProgrammer 使用自定义外部 Loader 的命令</p>
+<h2 id="_1"><strong>官方文档参数说明（关键部分）</strong></h2>
+<p>help 里的相关说明：</p>
+<pre><code>-el,     --extload     : Select a custom external memory-loader for JTAG/SWD
+     &lt;file_path&gt;        : External memory-loader file path 
+</code></pre>
+<p><strong>作用：</strong>
+ 让 CubeProgrammer 在烧录时，将自己制作的 loader（<code>.stldr</code> 文件）加载到 MCU 内存，再通过 loader 控制外部 Flash 烧录。</p>
+<hr />
+<h2 id="_2"><strong>命令用法举例</strong></h2>
+<p>假设你的外部 loader 文件叫 <code>my_qspi_loader.stldr</code>，你的固件叫 <code>app_qspi.bin</code>，你打算写到外部 QSPI Flash（典型起始地址如 0x90000000）：</p>
+<pre><code>STM32_Programmer_CLI -c port=SWD -el my_qspi_loader.stldr -w app_qspi.bin 0x90000000 -v
+</code></pre>
+<ul>
+<li><code>-c port=SWD</code>                 连接的板卡</li>
+<li><code>-el my_qspi_loader.stldr</code>    指定自定义 Loader 文件（stldr 格式）</li>
+<li><code>-w app_qspi.bin 0x90000000</code>  写入 bin 文件到外部 Flash 的映射区（起始地址）</li>
+<li><code>-v</code>                          烧录后校验</li>
+</ul>
+<blockquote>
+<p>Loader 文件（<code>.stldr</code>）制作方法见st官方仓库   https://github.com/STMicroelectronics/stm32-external-loader</p>
+</blockquote>
+<pre><code>STM32_Programmer_CLI -c port=SWD -el path/to/your_external_loader.stldr -w your_flash_image.bin 0x90000000 -v
+</code></pre>
+<ul>
+<li><code>-el</code> 或 <code>--extload</code> 后面跟的是你的外部 Loader 文件（.stldr），</li>
+<li><code>-w ... 0x90000000</code> 是你希望写到外部 Flash 的映射地址（比如 QSPI、OSPI 通常在 0x9000_0000 或 0x7000_0000）</li>
+</ul>
+<h2 id="_3">所有命令</h2>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/build$ STM32_Programmer_CLI --help
+      -------------------------------------------------------------------
+                        STM32CubeProgrammer v2.20.0                  
+      -------------------------------------------------------------------
+
+
+Usage : 
+STM32_Programmer_CLI.exe [command_1] [Arguments_1][[command_2] [Arguments_2]...] 
+
+Generic commands:
+
+ -?, -h, --help         : Show this help
+ -c,     --connect      : Establish connection to the device
+     &lt;port=&lt;PortName&gt;   : Interface identifier. ex COM1, /dev/ttyS0, usb1,
+                          JTAG, SWD, JLINK...)
+    USB port optional parameters:  
+     [sn=&lt;serialNumber&gt;]   : Serial number of the usb dfu
+     [PID=&lt;Product ID&gt;]    : Product ID. ex: 0xA38F, etc, default 0xDF11
+     [VID=&lt;Vendor ID&gt;]     : Vendor ID. ex: 0x0389, etc, default x0483
+    UART port optional parameters:  
+     [br=&lt;baudrate&gt;]    : Baudrate. ex: 115200, 9600, etc, default 115200
+     [P=&lt;parity&gt;]       : Parity bit, value in {NONE,ODD,EVEN}, default EVEN
+     [db=&lt;data_bits&gt;]   : Data bit, value in {6, 7, 8} ..., default 8
+     [sb=&lt;stop_bits&gt;]   : Stop bit, value in {1, 1.5, 2} ..., default 1
+     [fc=&lt;flowControl&gt;] : Flow control 
+                          Value in {OFF,Hardware,Software} ..., default OFF
+     rts=&lt;status&gt;       : low or high
+     dtr=&lt;status&gt;       : low or high
+                          Not supported for STM32MP
+     [noinit=noinit_bit]: Set No Init bits, value in {0,1} ..., default 0
+     [console]          : Enter UART console mode
+    JTAG/SWD debug port optional parameters:  
+     [freq=&lt;frequency&gt;] : Frequency in KHz. Default frequencies: 
+                          4000 SWD 9000 JTAG with STLINKv2
+                          8000 SWD 21333 with STLINKv3
+     [index=&lt;index&gt;]    : Index of the debug probe. default index 0
+     [sn=&lt;serialNumber&gt;]: Serial Number of the debug probe
+     [ap=&lt;accessPort&gt;]  : Access Port index to connect to. default ap 0
+     [mode=&lt;mode&gt;]      : Connection mode. Value in {UR/HOTPLUG/NORMAL/POWERDOWN/HWRSTPULSE}
+                          default mode: NORMAL
+     [reset=&lt;mode&gt;]     : Reset modes: SWrst/HWrst/Crst. Default mode: SWrst
+                          Reset mode with UR connection mode is HWrst
+     [shared]           : Enable shared mode allowing connection of two or more
+                          instances of STM32CubeProgrammer or other debugger
+                          to the same ST-LINK probe.
+     [tcpport=&lt;Port&gt;]   : Port used for running ST-Link Server, default 7184
+     [LPM]              : Enable debug in Low Power mode(default mode)
+     [dLPM]             : Disable debug in Low Power mode
+     [getAuthID]        : Get device identification (Option only for STM32U5 series)
+     [speed=&lt;Reliable/fast&gt;]: Choose flashing  Reliable/fast (Option only for STM32U5 series)
+    SPI port optional parameters:  
+     [br=&lt;baudrate&gt;]    : Baudrate.
+     [cpha=&lt;cpha_val&gt;]  : 1Edge or 2Edge. default 1Edge
+     [cpol=&lt;cpol_val&gt;]  : low or high
+     [crc=&lt;crc_val&gt;]    : enable or disable (0/1).
+     [crcpol=&lt;crc_pol&gt;] : crc polynom value.
+     [datasize=&lt;size&gt;]  : 8bit/16bit
+     [direction=&lt;val&gt;]  : Direction: 2LFullDuplex/2LRxOnly/1LRx/1LTx
+     [firstbit=&lt;val&gt;]   : First Bit: MSB/LSB
+     [frameformat=&lt;val&gt;]: Frame Format: Motorola/TI
+     [mode=&lt;val&gt;]       : Mode: master/slave
+     [nss=&lt;val&gt;]        : NSS: soft/hard
+     [nsspulse=&lt;val&gt;]   : NSS pulse: Pulse/NoPulse
+     [delay=&lt;val&gt;]      : Delay: Delay/NoDelay, delay of few microseconds
+     [noinit=noinit_bit]: Set No Init bits, value in {0,1} ..., default 0
+    CAN port optional parameters:  
+     [br=&lt;rbaudrate&gt;]   : Baudrate : 125, 250, 500, 1000 Kbps, default 125
+     [mode=&lt;canmode&gt;]   : CAN Mode : NORMAL, LOOPBACK..., default NORMAL
+     [ide=&lt;type&gt;]       : CAN Type : STANDARD or EXTENDED, default STANDARD
+     [rtr=&lt;format&gt;]     : Frame Format: DATA or REMOTE, default DATA
+     [fifo=&lt;afifo&gt;]     : Msg Receive : FIFO0 or FIFO1, default FIFO0
+     [fm=&lt;fmode]        : Filter Mode : MASK or LIST, default MASK
+     [fs=&lt;fscale&gt;]      : Filter Scale: 16 or 32, default 32
+     [fe=&lt;fenable&gt;]     : Filter Activation : ENABLE or DISABLE, default ENABLE
+     [fbn=&lt;fbanknb&gt;]    : Filter Bank Number : 0 to 13, default 0
+     [noinit=noinit_bit]: Set No Init bits, value in {0,1} ..., default 0
+    I2C port optional parameters:  
+     [add=&lt;ownadd&gt;]     : Slave address : address in hex format
+     [br=&lt;sbaudrate&gt;]   : Baudrate : 100 or 400 Kbps, default 400
+     [sm=&lt;smode&gt;]       : Speed Mode : STANDARD or FAST, default FAST
+     [am=&lt;addmode&gt;]     : Address Mode : 7 or 10 bits, default 7
+     [af=&lt;afilter&gt;]     : Analog filter : ENABLE or DISABLE, default ENABLE
+     [df=&lt;dfilter&gt;]     : Digital filter : ENABLE or DISABLE, default DISABLE
+     [dnf=&lt;dnfilter&gt;]   : Digital noise filter : 0 to 15, default 0
+     [rt=&lt;rtime&gt;]       : Rise time : 0-1000(STANDARD), 0-300(FAST), default 0
+     [ft=&lt;ftime&gt;]       : Fall time : 0-300 (STANDARD), 0-300(FAST), default 0
+     [noinit=noinit_bit]: Set No Init bits, value in {0,1} ..., default 0
+ -version, --version    : Displays the tool's version
+ -l,     --list         : List all available communication interfaces
+     &lt;uart&gt;             : UART interface
+     &lt;usb&gt;              : USB interface
+     &lt;st-link&gt;          : st-link interface
+     &lt;stlink&gt;           
+     &lt;st-link-only&gt;     : Enumarte st-link list without connecting and intruse the target
+     &lt;stlink-only&gt;        Access port number is set to zero.
+     &lt;shared&gt;           : Allowing to list all boards connected to other instance(s)
+     &lt;stlink-shared&gt;      of STM32CubeProgrammer where the shared mode is enabled.
+ -q,     --quietMode    : Enable quiet mode. No progress bar displayed
+ -log,   --log          : Store the detailed output in log file
+     [&lt;file_Path.log&gt;]  : Path of the log file,
+                          default path = $HOME/.STM32Programmer/trace.log
+ -vb,    --verbosity    : Specify verbosity level
+     &lt;Level&gt;            : Verbosity level, value in {1, 2, 3}
+ -y, --yes              : Ignore confirmation prompt message
+
+Available commands for STM32 MCU:
+
+ --skipErase            : Skip sector erase before programming
+ -sl,    --safelib      : Add a segment into a firmware file (elf,bin
+                          hex,srec and s19) containing computed CRC values
+                          To use only with the safety lib component
+     &lt;file_path&gt;        : File path to be modified
+     &lt;start_address&gt;    : Flash memory start address
+     &lt;end_address&gt;      : Flash memory end address
+     &lt;slice_size&gt;       : Size of data per CRC value
+     &lt;pattern&gt;          : Optional pattern from 0x0 to 0xFF. Default pattern 0x00
+ -ms,    --mergesbsfu   : Add a binary header and a sbsfu segment to an elf file
+     &lt;elf_file_path&gt;    : File path to be modified
+     &lt;header_file_path&gt; : Header file path
+     &lt;sbsfu_file_path&gt;  : SBSFU file path
+ -e,     --erase        : Erase memory pages/sectors devices: 
+                          Not supported for STM32MP
+     [all]              : Erase all sectors
+     [&lt;sectorsCodes&gt;]   : Erase the specified sectors identified by sectors
+                          codes. ex: 0, 1, 2 to erase sectors 0, 1 and 2
+                          for EEPROM : ed1 &amp; ed2  
+     [&lt;[start end]&gt;]    : Erase the specified sectors starting from
+                          start code to end code, ex: -e [5 10]
+ -w,     --write            
+ -d,     --download     : Download the content of a file into device memory
+     &lt;file_path&gt;        : File path name to be downloaded: (bin, hex, srec, s19
+                          elf, stm32 or tsv file)
+     [&lt;address&gt;]        : Start address of download
+     [incremental]         : Optional, new write mechanism 
+     If the parameter [incremental] is not indicated, the tool will use the legacy write mechanism 
+     The new write mechanism programs only modified sectors to accelerate the flashing operation
+     The legacy write mechanism programs the full firmware into flash memory
+ -w32                   : Write a 32-bits data into device memory
+     &lt;address&gt;          : Start address of download
+     &lt;32-bit_data&gt;      : 32-bit data to be downloaded
+                          values should be separated by space
+ -w16                   : Write a 16-bits data into device memory
+     &lt;address&gt;          : Start address of download
+     &lt;16-bit_data&gt;      : 16-bit data to be downloaded
+                          values should be separated by space
+ -w8                    : Write a 8-bits data into device memory
+     &lt;address&gt;          : Start address of download
+     &lt;8-bit_data&gt;       : 8-bit data to be downloaded
+                          values should be separated by space
+ -v,     --verify       : Verify if the programming operation is achieved 
+                          successfully
+     [fast]         : Optional, new verify mechanism 
+     If the parameter [fast] is not indicated, the tool will use the legacy verify mechanism 
+     The new verify mechanism verifies the integrity of data sector per sector
+     The legacy verify mechanism verifies the integrity of data byte per byte
+ -nv,    --noverify     : Do not verify if the programming operation is achieved 
+                          successfully, used with -w32/-w16/-w8 commands
+ -checksum, --checksum  : Memory checksum calculation
+     &lt;address&gt;          : Optional, Start address
+     &lt;size&gt;             : Optional, Size of memory region
+                        : If the parameters &lt;address&gt; and &lt;size&gt; are not indicated, the tool will calculate the full internal Flash
+ -r32                   : Read a 32-bit data from device memory
+     &lt;address&gt;          : Read start address
+     &lt;size&gt;             : Size of data
+ -r16                   : Read a 16-bit data from device memory
+     &lt;address&gt;          : Read start address
+     &lt;size&gt;             : Size of data
+ -r8                    : Read a 8-bit data from device memory
+     &lt;address&gt;          : Read start address
+     &lt;size&gt;             : Size of data
+ -rst                   : Reset system
+ -hardRst               : Hardware reset
+ -rstbl                 : Reset Bootloader
+                          Available only with JTAG/SWD debug port
+ -halt                  : Halt core
+ -run                   : Run core
+ -step                  : Step core
+                          Available only with JTAG/SWD debug port
+ -score                 : Get core status
+                          Available only with JTAG/SWD debug port
+ -coreReg               : Read/Write core registers
+     [&lt;core_register&gt;]    R0/../R15/PC/LR/PSP/MSP/XPSR/APSR/IPSR/EPSR/
+                          PRIMASK/BASEPRI/FAULTMASK/CONTROL
+     [core_reg=&lt;value&gt;]   value in case of write opration
+                          Note: multiple registers can be handled at once
+                          Available only with JTAG/SWD debug port
+ -r,     --read         
+ -u,     --upload       : Upload the device memory content to a .bin/.hex/.srec/.s19 file
+     &lt;address&gt;          : Start address of read and upload
+     &lt;size&gt;             : Size of memory content to be read
+     &lt;file_path&gt;        : file path with .bin/.hex/.srec/.s19 extension
+
+ -el,     --extload     : Select a custom external memory-loader for JTAG/SWD
+     &lt;file_path&gt;        : External memory-loader file path 
+ -elbl,   --extloadbl   : Select a custom external memory-loader for Bootloader interface (SFIx only)
+     &lt;file_path&gt;        : External memory-loader file path 
+ -s,     --start          
+ -g,     --go           : Run the code at the specified address.
+     [&lt;address&gt;]        : Start address
+ -rdu,   --readunprotect: Remove memory's Read Protection by shifting the RDP
+                          level from level 1 to level 0.
+
+ -tzenreg,   --tzenregression: Remove TrustZone Protection by disabling the TZEN
+                           from 1 to 0.
+
+ -ob,    --optionbytes  : This command allows the user to manipulate the device
+                          's OptionBytes by displaying or modifying them.
+      [displ]           : This option allows the user to display the whole set
+                          of Option Bytes.
+      [unlockchip]      : This option allows the user to unlock the chip in case
+                          of bad Option Bytes already programmed.
+      [OptByte=&lt;value&gt;] : This option allows the user to program the given
+                          Option Byte.
+
+ -force_no_da, --force_no_da 
+                        : Froce OB programming if the DA is not already configured.
+                          Available only for STM32H50x devices
+
+ -noreconnect, --noreconnect 
+                        : Programming OB without performing a reconnect
+ -w32dbgmcu             : Write a 32-bits data into DBGMCU DBG AUTH HOST register
+     &lt;32-bit_data&gt;        32-bit data to be downloaded, only for STM32H5xx devices.
+
+ -lockRDP1, -setOEM1KEY : Lock RDP level 1
+     &lt;LSB&gt;              : OEM1 least significant bytes key
+     &lt;MSB&gt;              : OEM1 most significant bytes key
+ -unlockRDP1            : Unlock RDP level 1
+     &lt;LSB&gt;              : OEM1 least significant bytes key
+     &lt;MSB&gt;              : OEM1 most significant bytes key
+ -lockRDP2, -setOEM2KEY : Lock RDP level 2
+     &lt;LSB&gt;              : OEM2 least significant bytes key
+     &lt;MSB&gt;              : OEM2 most significant bytes key
+ -unlockRDP2            : Unlock RDP level 2
+     &lt;LSB&gt;              : OEM2 least significant bytes key
+     &lt;MSB&gt;              : OEM2 most significant bytes key
+ -ssigfoxc              : Save the chip Certificate, 
+                          supported for STM32WL devices
+     &lt;file_path&gt;        : Certificate file path
+
+ -wsigfoxc              : Write the Sigfox credential, 
+                          supported for STM32WL devices
+     &lt;file_path&gt;        : Certificate file path (binary, header)
+     &lt;address&gt;          : start address for write
+
+ -fillmemory            : Fill memory with the given pattern from the chosen address.
+     &lt;start_address&gt;    : Start address for write. The address 0x08000000 is used by default
+     [size=&lt;value&gt;]     : Size of the data to write
+     [pattern=&lt;value&gt;]  : The pattern value to write.
+     [dataWidth=8|16|32]: The filling data size:
+                          8 bits is selected by default.
+ -blankcheck            : Verifies that the STM32 Flash memory is blank.
+                          If the Flash memory is not blank, the first address with data is highlighted in a message.
+ -fchecksum, --file-checksum  : File checksum calculation 
+     &lt;file_path&gt;              : File path
+
+Beta commands: 
+
+ -regdump                     : Read and dump Core and MCU registers
+     &lt;file_path&gt;              : Log file path with extension .log or .txt
+     [choice=&lt;number&gt;]        : Device number from the list of compatible devices (optional), this list
+                                is displayed if the command is performed without this optional argument
+ -hf                          : Hard fault analyzer
+                                Helps to identify system faults that occur when the CPU
+                                is driven into a fault condition by the application code.
+
+ -pwr, --power                : Perform power ON/OFF, only for STLINK supporting this capability
+     &lt;on/off&gt;                 : Select the power type
+     [index=&lt;number&gt;]         : Index of the debug probe.
+Available commands for STM32 MPU:
+
+ -c,     --connect      : Establish connection to the device
+     &lt;port=&lt;PortName&gt;   : Interface identifer. ex COM1, /dev/ttyS0, usb1)
+    USB port optional parameters:  
+     [sn=&lt;serialNum&gt;]   : Serial number of the usb dfu
+     [serial]           : Activate USB serial Gadget for MPU devices
+    UART port optional parameters:  
+     [br=&lt;baudrate&gt;]    : Baudrate. ex: 115200, 9600, etc, default 115200
+     [P=&lt;parity&gt;]       : Parity bit, value in {NONE,ODD,EVEN}, default NONE
+     [db=&lt;data_bits&gt;]   : Data bit, value in {6, 7, 8} ..., default 8
+     [sb=&lt;stop_bits&gt;]   : Stop bit, value in {1, 1.5, 2} ..., default 1
+     [fc=&lt;flowControl&gt;] : Flow control (Not yet supported for STM32MP)
+                          Value in {OFF,Hardware,Software} ..., default OFF
+     [noinit=noinit_bit]: Set No Init bits, value in {0,1} ..., default 0
+ -s,     --start          
+ -g,     --go           : Run the code at the specified partition ID.
+     [&lt;partitionID&gt;]    : Partition ID
+                          If not specified, last loaded partition
+                          will be started
+
+     [&lt;startAdress&gt;]    : Start address
+                          If not specified, last loaded segment address
+     [&lt;noack&gt;]          : No acknowledgment required
+                          If not specified, acknowledgment will be required
+
+ -detach                : Send detach command to DFU
+
+ -wb                    : Write blob 
+
+     &lt;blob_file_path&gt;   : Blob file path
+ -pmic                  : Program PMIC NVM 
+
+     &lt;PMIC file_path&gt;   : PMIC file_path
+ -gc, --getcertificate  : Get the chip Certificate, 
+                          supported for devices with security features
+     &lt;file_path&gt;        : Certificate file path into which the chip
+                          certificate will be uploaded
+     &lt;tfa-ssp-path&gt;     : Input TFA SSP signed firmware path. Used only with STM32MP1 devices
+
+ -p,     --phaseID      : Display the current partition ID to be loaded 
+
+ -w,     --write            
+ -d,     --download     : Download the content of a file into device memory
+     &lt;file_path&gt;        : File path name to be downloaded: (bin, stm32 file
+     &lt;partition_id&gt;     : Partition ID to be downloaded
+ -rp,    --readPart     : Upload a memory partion ID content to a .bin file
+     &lt;partionID&gt;        : Partion to be read
+     [&lt;offset address&gt;] : Offset address of read and upload
+     &lt;size&gt;             : Size of partion content to be read
+     &lt;file_path&gt;        : Binary file path 
+
+ -ssp, --ssp                  : Program an SSP file
+     &lt;ssp_file_path&gt;          : SSP file path to be programmed, bin or ssp extension
+     &lt;ssp-fw-path&gt;            : SSP signed firmware path
+     [hsm=0|1]                : Set user option for HSM use
+                                value in {0 (do not use HSM), 1 (use HSM)}
+                                Default value : hsm=0
+     &lt;lic_path|slot=slotID&gt;   : Path to the license file (if hsm=0)
+                                or reader slot ID if HSM is used (hsm=1)
+     plugin=&lt;plugin-fw-path&gt;  : Optional, binary plugin firmware path. Used only with STM32MP2x devices
+ -tm                          : Force timeout
+     &lt;value&gt;                  : Number of milliseconds
+ -rst                         : Reset USB device
+
+  OTP commands :
+ -otp displ             : This command allows the user to display all or parts
+                          of the OTP structure
+      [word=&lt;id&gt;]       : {Optional} display a specific OTP registers {values and status}
+                          Up to 96 OTP words [0 to 95], id value in hex/dec format 
+
+ -otp write             : This command allows to fuse or update OTP words
+                          Up to 96 OTP words [0 to 95] at the same command line
+      [lock]            : {Optional} indicate the operation type, update or permanent lock
+      [word=&lt;id&gt;]       : This field contains the OTP word number in hex/dec format
+      [value=&lt;value&gt;]   : Value to be written in hex format 
+
+ -otp lock              : This command allows to fuse permanently OTP words
+                          Up to 96 OTP words [0 to 95] at the same command line
+      [word=&lt;id&gt;]       : This field contains the OTP word number in hex/dec format 
+
+ -otp fwrite            : This command allows to program a binary file
+      [lock]            : {Optional} indicate the operation type, update or permanent lock
+      &lt;bin_path&gt;        : Binary file path, 32-bits aligned data
+      [word=&lt;id&gt;]       : OTP word number in hex/dec format, start word of program 
+
+  STM32WB0 series OTP store command:
+ -storekeyotp ,    --storekeyotp   : Store OTP key
+     &lt;key_path.c&gt;      : Folder with the public_key.c file to store in OTP
+     &lt;start_address&gt; : Start FW address
+MCU Secure programming specific commands: 
+
+ -installipmodule, --installipmodule : Install ip module file
+     &lt;file_path&gt;               : Path of smu file to be programmed
+     [hsm=0|1]                 : Set user option for HSM use
+                                 value in {0 (do not use HSM), 1 (use HSM)}
+                                 Default value : hsm=0
+     &lt;lic_path|slot=slotID&gt;   : Path to the license file (if hsm=0)
+                                or reader slot ID if HSM is used (hsm=1)
+                               note that if it is the case of global license,
+                               please use hsm  = 0 with license path.
+     [&lt;address&gt;]              : Destination address of the smu module
+ -updateipmodule, --updateipmodule : update ip module. 
+     &lt;file_path&gt;              : Path of SMU file containing the update.
+     [&lt;address&gt;]              : Destination address of the smu module
+ -sfi, --sfi                  : Program an sfi file
+     [&lt;protocol=Ptype&gt;]       : Protocol type to be used : static/live
+                                Only static protocol is supported so far
+                                Default value static
+     &lt;file_path&gt;              : Path of sfi file to be programmed
+     [hsm=0|1]                : Set user option for HSM use
+                                value in {0 (do not use HSM), 1 (use HSM)}
+                                Default value : hsm=0
+     &lt;lic_path|slot=slotID&gt;   : Path to the SFI license file (if hsm=0)
+                                or reader slot ID if HSM is used (hsm=1)
+ -ssfi, --ssfi                : Program an ssfi file
+     &lt;ssfi_file_path&gt;              : Path of ssfi file to be programmed
+     &lt;rsse_file_path&gt;              : RSSe file path
+
+ -rsse, --rsse                : Set the RSSe file path, 
+                                supported for devices with security extension
+     &lt;file_path&gt;              : RSSe file path
+
+ -mcsv, --mcsv                : Set the MCSV file path indicating SFI's modules configuration
+                                supported for STM32H5xx devices
+     &lt;file_path&gt;              : MCSV file path with .mcsv extension
+
+ -ecsv, --ecsv                : Set the ECSV file path indicating SFI's external modules configuration
+                                supported for STM32H5xx devices
+     &lt;file_path&gt;              : ECSV file path with .ecsv extension
+
+ -a, --abort                  : This command allows the user
+                                to clean a not properly finished process.
+                                The currently ongoing operation will stop
+                                and the system will return to idle state
+
+ -dsecurity                   : Disable the security for STM32WL
+
+ -setdefaultob                : Set default Option Bytes for STM32WL
+
+ -rssgetversion, --rssgetversion : get the version of RSS
+HSM related commands:
+ -hsmgetinfo                : Read the HSM available information
+     [slot=&lt;SlotID&gt;]        : Slot ID of the Smart Card Reader
+                              Default value: slot=1 (the PC integrated SC reader)
+ -hsmgetcounter             : Read the current value of the license counter
+     [slot=&lt;SlotID&gt;]        : Slot ID of the Smart Card Reader
+                              Default value: slot=1 (the PC integrated SC reader)
+ -hsmgetfwid                : Read the Firmware/Module Identifier
+     [slot=&lt;SlotID&gt;]        : Slot ID of the Smart Card Reader
+                              Default value: slot=1 (the PC integrated SC reader)
+ -hsmgetstatus              : Read the current card life-cycle state
+     [slot=&lt;SlotID&gt;]        : Slot ID of the Smart Card Reader
+                              Default value: slot=1 (the PC integrated SC reader)
+ -hsmgetlicense             : Get a license for the current chip
+                              if counter is not null
+     &lt;file_path&gt;            : File path into which the received license
+                              will be stored
+     [slot=&lt;SlotID&gt;]        : Slot ID of the Smart Card Reader
+                              Default value: slot=1 (the PC integrated SC reader)
+     [protocol=&lt;Ptype&gt;]     : Protocol type to be used : static/live
+                              Only static protocol is supported so far
+                              Default value static
+     &lt;tfa-ssp-path&gt;         : Input TFA SSP signed firmware path. Used only for STM32MP1 devices
+
+ -hsmgetlicensefromcertifbin, -hsmglfcb : Get a license for the input certificate
+                                          if counter is not null
+     &lt;certif_file_path.bin&gt;             : Input certificate file path
+     &lt;license_file_path.bin&gt;            : File path into which the received license
+                                          will be stored
+     [slot=&lt;SlotID&gt;]                    : Slot ID of the Smart Card Reader
+                                          Default value: slot=1 (the PC integrated SC reader)
+     [protocol=&lt;Ptype&gt;]                 : Protocol type to be used : static/live
+                                          Only static protocol is supported so far
+                                          Default value static
+
+STM32WBxx specific commands:
+
+ -getuid64              : Read the device UID
+ -fusgetstate           : Read the FUS state
+ -fusopgetversion       : Read the FUS Operator version
+ -antirollback          : Perform the antirollback operation (Only on Bootloader interface) 
+ -startfus              : Perform the startfus operation
+  Firmware Upgrade commands:
+ -fwdelete              : Delete the BLE stack firmware
+ -fwupgrade             : Upgrade the BLE stack firmware or the FUS firmware
+     &lt;file_path&gt;        : New firmware image file path
+     &lt;address&gt;          : Start address of download
+     [firstinstall=0|1] : 1 if it is a first install otherwise 0
+                          optional, Default value: firstinstall=0
+     [startstack=0|1]   : 1 to start the stack after the upgrade otherwise 0
+                          optional, Default value: startstack=1
+      -v                : Verify if the download operation is achieved 
+                          successfully before starting upgrade
+ -startwirelessstack    : Start the wireless stack
+  Key management commands:
+ -authkeyupdate         : Authentication key update
+     &lt;file_path&gt;        : New authentication key file path.
+                        : This is the public key generated by
+                        : STM32TrustedPackageCreator using -sign command.
+ -authkeylock           : Authentication key lock
+                        : Once locked, it's no longuer possible to change it
+                        : using authkeyupdate command
+ -wusrkey               : Write user key
+     &lt;file_path&gt;        : User key file path
+     &lt;keytype=1|2|3&gt;    : User key type, values : 1, 2 or 3.
+                        : 1 = simple key, 2 = master key, 3 = encrypted key.
+Serial Wire Viewer specific commands:
+
+ -swv                       : Printf via SWO
+     &lt;freq=&lt;frequency&gt;&gt;     : System Clock in MHz
+     &lt;portnumber=0-31|all&gt;  : ITM port number, values : 0-31, or all for All ports
+     [&lt;file_Path.log&gt;]      : Path of the SWV log file (optional),
+                            : default path = $USER_HOME/STMicroelectronics/STM32Programmer/SWV_Log/swv.log
+      -RA                   : Start the reception of swv automatically
+ -startswv                  :  Printf via SWO &amp; Start the reception of swv automatically
+Script Manager command:
+
+ -script                    : Start the execution of Script File
+ &lt;file_Path.prg&gt;            : Path of the script file (.prg)
+Provisionning Command: 
+
+ -sdp                    : Start the OBKey Provisioning
+ &lt;File_Path&gt;             : OBKey File Path
+Provisioning with password :
+
+ -pwd                    : Start Provisioning with password
+ value=&lt;password_value&gt;           : Password value
+ path=&lt;password_path&gt;             : location of password file to be used in Debug Authentication
+Set Product State RSS Command: 
+
+ -psrss                    : Start the RSS Product State
+ &lt;Value&gt;                   : An hexadecimal value
+Get Product State RSS Command: 
+
+ -psrss displ              : Start the Get RSS Product State
+Option Bytes RSS Command: 
+
+ -obrss                    : Start the Option Bytes RSS Change
+ &lt;Value 1&gt; &lt;Value 2&gt; &lt;Value 3&gt; &lt;Value 4&gt;  : An hexadecimal values
+Debug Authentication options: 
+
+      [debugauth=&lt;1|2&gt;]               : to choose starting authentication(1) or discovery(2)
+      [pwd=&lt;password_file_path&gt;]      : required in case of authentication with password
+      [key=&lt;key_file_path&gt;]           : required in case of authentication with certificate
+      [cert=&lt;certificate_file_path&gt;]  : required in case of authentication with certificate
+      [per=&lt;requested_permission&gt;]    : required in case of authentication with certificate.
+                                      : Each permission is referred to by a specific letter and a numerical bit value.
+                                      : Enable debugauth=2 to access the permissions list with bit numbers and letters.
+                                      : Debug Authentication requires the selection of one specific permission.
+                                      : Certain products also provide optional actions to choose from. Example:Forced Download
+Key Wrapping Command
+ -rssekw                                                  : Set The Key Wrapping RSSe File Path
+                                                            supported for devices with security extension
+     &lt;file_path&gt;                                          : RSSe Key Wrapping file path
+
+     &lt;file_path&gt;                                          : Private Key .pem file path [Not to be added for ECC CPVK wrapping using DHUK or DHUK xOR BHK]
+
+     &lt;file_path&gt;                                          : Output .bin file path
+
+     [KeyType=&lt;eccchipfu|eccchiplu&gt;]                      : The Type of the ECC Chip Key to wrap
+     [ExportPublicKey=&lt;Yes|No&gt;]                           : Generate or Not the public Key
+     [WrappingKeySelect=&lt;DHUK|DHUK_XOR_BHK&gt;]              : Used Method to wrap the private key
+     [KeyUsage=&lt;ECDSA_USAGE_SIGN|ECC_USAGE_SCALAR_MUL&gt;]   : Usage of the private key
+     [SecAttr=&lt;SECURE|NON_SECURE&gt;]                        : Secure or Non Secure context
+     [PrivAttr=&lt;PRIVILEGE|NON_PRIVILEGE&gt;]               : Privileged or Non Priviledged context
+     [AESMode=&lt;ECB|CBC|GCM&gt;]                              : AES mode for wrapping with user Key
+
+</code></pre>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#stm32_programmer_cli">STM32_Programmer_CLI 更多命令</a><ul>
+<li><a href="#1">1. 连接目标板</a></li>
+<li><a href="#2">2. 下载/烧录固件</a></li>
+<li><a href="#3-flash">3. 擦除 Flash</a></li>
+<li><a href="#4">4. 校验固件</a></li>
+<li><a href="#5-mcu-flash">5. 读取/导出 MCU Flash 内容</a></li>
+<li><a href="#6-mcu">6. 复位/运行 MCU</a></li>
+<li><a href="#7-option-bytes">7. 查看/操作 Option Bytes</a></li>
+<li><a href="#8">8. 读写内存</a></li>
+<li><a href="#9">9. 检查空白/校验</a></li>
+<li><a href="#10">10. 设备/调试相关操作</a><ul>
+<li><a href="#mpu">其它高级/安全/MPU相关命令</a></li>
+</ul>
+</li>
+<li><a href="#loader">自定义外部 Loader 的命令（后面用到再详细介绍制作过程）</a></li>
+<li><a href="#_1">官方文档参数说明（关键部分）</a></li>
+<li><a href="#_2">命令用法举例</a></li>
+<li><a href="#_3">所有命令</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

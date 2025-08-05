@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>6.stm32_ubuntu下烧录</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="stm32-ubuntu">stm32 ubuntu烧录</h1>
+<p>我使用的是stlink烧录，在ubuntu上安装cubeprogrammer 工具</p>
+<p>生成的默认只有elf文件</p>
+<h2 id="elfhexbin">elf文件转hex与bin文件</h2>
+<pre><code># 转 bin
+arm-none-eabi-objcopy -O binary STM32H750XB.elf STM32H750XB.bin
+
+# 转 hex
+arm-none-eabi-objcopy -O ihex STM32H750XB.elf STM32H750XB.hex
+</code></pre>
+<h2 id="bin">烧录 bin 文件</h2>
+<h3 id="_1">默认擦除对应扇区</h3>
+<pre><code>STM32_Programmer_CLI -c port=SWD -w STM32H750XB.bin 0x08000000 -v
+</code></pre>
+<ul>
+<li><code>-w STM32H750XB.bin 0x08000000</code>：指定 bin 文件写入起始地址，一般 STM32 Flash 起始地址为 <code>0x08000000</code></li>
+<li><code>-v</code>：写入后校验</li>
+</ul>
+<h3 id="_2">擦除全部扇区</h3>
+<p>加 <code>-e all</code></p>
+<pre><code>STM32_Programmer_CLI -c port=SWD -e all -w STM32H750XB.bin 0x08000000 -v
+</code></pre>
+<h3 id="hex">烧录 hex 文件</h3>
+<pre><code>STM32_Programmer_CLI -c port=SWD -w STM32H750XB.hex -v
+</code></pre>
+<ul>
+<li>烧 hex 文件时<strong>无需写入地址</strong>，工具会自动按 hex 文件内部地址烧录</li>
+<li>擦除全部扇区也是加 -e all  </li>
+</ul>
+<h2 id="_3">烧录日志</h2>
+<h3 id="hex_1">烧录hex</h3>
+<pre><code class="language-c">hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/build$ STM32_Programmer_CLI -c port=SWD -w STM32H750XB.hex -v
+      -------------------------------------------------------------------
+                        STM32CubeProgrammer v2.20.0                  
+      -------------------------------------------------------------------
+
+ST-LINK SN  : 0669FF505750888667051238
+ST-LINK FW  : V2J43M28
+Board       : --
+Voltage     : 3.25V
+SWD freq    : 4000 KHz
+Connect mode: Normal
+Reset mode  : Software reset
+Device ID   : 0x450
+Revision ID : Rev V
+Device name : STM32H7xx
+Flash size  : 128 KBytes
+Device type : MCU
+Device CPU  : Cortex-M7
+BL Version  : 0x90
+
+
+
+Opening and parsing file: STM32H750XB.hex
+
+
+Memory Programming ...
+  File          : STM32H750XB.hex
+  Size          : 58.52 KB 
+  Address       : 0x08000000
+
+
+Erasing memory corresponding to segment 0:
+Download in Progress:
+[==================================================] 100% 
+
+File download complete
+Time elapsed during download operation: 00:00:09.568
+
+
+
+Verifying...
+
+
+Read progress:
+[==================================================] 100% 
+
+Time elapsed during verifying operation: 00:00:00.540
+
+
+Download verified successfully 
+
+</code></pre>
+<h3 id="bin_1">烧录bin</h3>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/build$ STM32_Programmer_CLI -c port=SWD -w STM32H750XB.bin 0x08000000 -v
+      -------------------------------------------------------------------
+                        STM32CubeProgrammer v2.20.0                  
+      -------------------------------------------------------------------
+
+ST-LINK SN  : 0669FF505750888667051238
+ST-LINK FW  : V2J43M28
+Board       : --
+Voltage     : 3.25V
+SWD freq    : 4000 KHz
+Connect mode: Normal
+Reset mode  : Software reset
+Device ID   : 0x450
+Revision ID : Rev V
+Device name : STM32H7xx
+Flash size  : 128 KBytes
+Device type : MCU
+Device CPU  : Cortex-M7
+BL Version  : 0x90
+
+
+
+Opening and parsing file: STM32H750XB.bin
+
+
+Memory Programming ...
+  File          : STM32H750XB.bin
+  Size          : 58.52 KB 
+  Address       : 0x08000000
+
+
+Erasing memory corresponding to segment 0:
+Download in Progress:
+[==================================================] 100% 
+
+File download complete
+Time elapsed during download operation: 00:00:09.541
+
+
+
+Verifying...
+
+
+Read progress:
+[==================================================] 100% 
+
+Time elapsed during verifying operation: 00:00:00.565
+
+
+Download verified successfully 
+
+</code></pre>
+<h2 id="_4"></h2>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#stm32-ubuntu">stm32 ubuntu烧录</a><ul>
+<li><a href="#elfhexbin">elf文件转hex与bin文件</a></li>
+<li><a href="#bin">烧录 bin 文件</a><ul>
+<li><a href="#_1">默认擦除对应扇区</a></li>
+<li><a href="#_2">擦除全部扇区</a></li>
+<li><a href="#hex">烧录 hex 文件</a></li>
+</ul>
+</li>
+<li><a href="#_3">烧录日志</a><ul>
+<li><a href="#hex_1">烧录hex</a></li>
+<li><a href="#bin_1">烧录bin</a></li>
+</ul>
+</li>
+<li><a href="#_4"></a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

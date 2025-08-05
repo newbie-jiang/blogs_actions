@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>nordic sdk安装以及第一个测试程序</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h2 id="nordic-sdk">nordic sdk安装  以及第一个测试程序</h2>
+<p>视频教程</p>
+<p>https://www.youtube.com/watch?v=EAJdOqsL9m8&amp;list=PLx_tBuQ_KSqEt7NK-H7Lu78lT2OijwIMl</p>
+<p>doc</p>
+<p>https://docs.nordicsemi.com/bundle/nrf-connect-vscode/page/get_started/quick_setup.html</p>
+<h2 id="1">1.安装命令行工具</h2>
+<p>https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools/Download?utm_campaign=Product%20Launches&amp;utm_source=youtube&amp;utm_medium=social&amp;utm_content=Download%20nRF%20Command%20Line%20Tools</p>
+<p><img alt="image-20250804134717900" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804134717900.png" /></p>
+<p>一路安装，最后可能要求安装j-link ,安装更新就行</p>
+<h2 id="2vscodenordic">2.在vscode中搜索nordic的扩展包并安装</h2>
+<p><img alt="image-20250804135226408" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804135226408.png" /></p>
+<h2 id="3sdk">3.手动安装sdk与工具链</h2>
+<ul>
+<li>这里可以选择安装最新版本，过程很慢</li>
+<li>安装好默认在C盘ncs目录</li>
+</ul>
+<p><img alt="image-20250804135735742" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804135735742.png" /></p>
+<h2 id="4-nrfutil">4.安装 nrfutil</h2>
+<p>https://www.nordicsemi.com/Products/Development-tools/nRF-Util</p>
+<p>下载一个nrfutil.exe 文件，直接添加到环境变量</p>
+<ul>
+<li>nRF Util<code>device</code>命令可以列出、编程、恢复、擦除以及对 Nordic 设备执行各种操作。它支持 MCUboot 和 J-Link。 </li>
+</ul>
+<h2 id="5">5.构建第一个应用程序</h2>
+<p><strong>以nrf52840-dk为例</strong></p>
+<h3 id="1vscodesdk">1.vscode打开sdk文件夹</h3>
+<p><img alt="image-20250804203146025" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203146025.png" /></p>
+<h3 id="2">2. 拷贝一个示例程序</h3>
+<p><img alt="image-20250804203410509" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203410509.png" /></p>
+<p><strong>选择使用的sdk</strong></p>
+<p><img alt="image-20250804203510484" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203510484.png" /></p>
+<p><strong>输入要拷贝的示例并选择</strong></p>
+<p><img alt="image-20250804203642596" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203642596.png" /></p>
+<p><strong>输入要拷贝的路径作为工作目录</strong></p>
+<ul>
+<li>输入好以后回车</li>
+</ul>
+<p><img alt="image-20250804203752045" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203752045.png" /></p>
+<h3 id="3">3.打开拷贝好的示例工作目录</h3>
+<p><img alt="image-20250804203829576" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804203829576.png" /></p>
+<h3 id="4">4. 添加编译配置项，编译，在此之前可以先打开一个终端查看编译过程</h3>
+<p><img alt="image-20250804204811908" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804204811908.png" /></p>
+<p>编译信息如下</p>
+<pre><code class="language-shell"> *  正在执行任务: nRF Connect: Generate config nrf52840dk/nrf52840 for c:\ncs\nrf52840\blinky 
+
+Building blinky
+C:\WINDOWS\system32\cmd.exe /d /s /c &quot;west build --build-dir c:/ncs/nrf52840/blinky/build c:/ncs/nrf52840/blinky --pristine --board nrf52840dk/nrf52840 -- -DBOARD_ROOT=c:/ncs/nrf52840/blinky&quot;
+
+-- west build: generating a build system
+Loading Zephyr module(s) (Zephyr base): sysbuild_default
+-- Found Python3: C:/ncs/toolchains/0b393f9e1b/opt/bin/python.exe (found suitable version &quot;3.12.4&quot;, minimum required is &quot;3.10&quot;) found components: Interpreter 
+-- Cache files will be written to: C:/ncs/v3.0.2/zephyr/.cache
+-- Found west (found suitable version &quot;1.2.0&quot;, minimum required is &quot;0.14.0&quot;)
+-- Board: nrf52840dk, qualifiers: nrf52840
+Parsing C:/ncs/v3.0.2/zephyr/share/sysbuild/Kconfig
+Loaded configuration 'C:/ncs/nrf52840/blinky/build/_sysbuild/empty.conf'
+Merged configuration 'C:/ncs/nrf52840/blinky/build/_sysbuild/empty.conf'
+Configuration saved to 'C:/ncs/nrf52840/blinky/build/zephyr/.config'
+Kconfig header saved to 'C:/ncs/nrf52840/blinky/build/_sysbuild/autoconf.h'
+-- 
+   ****************************
+   * Running CMake for blinky *
+   ****************************
+
+Loading Zephyr default modules (Zephyr base).
+-- Application: C:/ncs/nrf52840/blinky
+-- CMake version: 3.21.0
+-- Found Python3: C:/ncs/toolchains/0b393f9e1b/opt/bin/python.exe (found suitable version &quot;3.12.4&quot;, minimum required is &quot;3.10&quot;) found components: Interpreter 
+-- Cache files will be written to: C:/ncs/v3.0.2/zephyr/.cache
+-- Zephyr version: 4.0.99 (C:/ncs/v3.0.2/zephyr)
+-- Found west (found suitable version &quot;1.2.0&quot;, minimum required is &quot;0.14.0&quot;)
+-- Board: nrf52840dk, qualifiers: nrf52840
+-- Found host-tools: zephyr 0.17.0 (C:/ncs/toolchains/0b393f9e1b/opt/zephyr-sdk)
+-- Found toolchain: zephyr 0.17.0 (C:/ncs/toolchains/0b393f9e1b/opt/zephyr-sdk)
+-- Found Dtc: C:/ncs/toolchains/0b393f9e1b/opt/bin/dtc.exe (found suitable version &quot;1.4.7&quot;, minimum required is &quot;1.4.6&quot;) 
+-- Found BOARD.dts: C:/ncs/v3.0.2/zephyr/boards/nordic/nrf52840dk/nrf52840dk_nrf52840.dts
+-- Generated zephyr.dts: C:/ncs/nrf52840/blinky/build/blinky/zephyr/zephyr.dts
+-- Generated pickled edt: C:/ncs/nrf52840/blinky/build/blinky/zephyr/edt.pickle
+-- Generated zephyr.dts: C:/ncs/nrf52840/blinky/build/blinky/zephyr/zephyr.dts
+-- Generated devicetree_generated.h: C:/ncs/nrf52840/blinky/build/blinky/zephyr/include/generated/zephyr/devicetree_generated.h
+-- Including generated dts.cmake file: C:/ncs/nrf52840/blinky/build/blinky/zephyr/dts.cmake
+Parsing C:/ncs/v3.0.2/zephyr/Kconfig
+Loaded configuration 'C:/ncs/v3.0.2/zephyr/boards/nordic/nrf52840dk/nrf52840dk_nrf52840_defconfig'
+Merged configuration 'C:/ncs/nrf52840/blinky/prj.conf'
+Merged configuration 'C:/ncs/nrf52840/blinky/build/blinky/zephyr/.config.sysbuild'
+Configuration saved to 'C:/ncs/nrf52840/blinky/build/blinky/zephyr/.config'
+Kconfig header saved to 'C:/ncs/nrf52840/blinky/build/blinky/zephyr/include/generated/zephyr/autoconf.h'
+-- Found GnuLd: c:/ncs/toolchains/0b393f9e1b/opt/zephyr-sdk/arm-zephyr-eabi/arm-zephyr-eabi/bin/ld.bfd.exe (found version &quot;2.38&quot;) 
+-- The C compiler identification is GNU 12.2.0
+-- The CXX compiler identification is GNU 12.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: C:/ncs/toolchains/0b393f9e1b/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc.exe
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/ncs/nrf52840/blinky/build/blinky
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/ncs/nrf52840/blinky/build
+-- west build: building application
+[4/152] Generating include/generated/zephyr/version.h
+-- Zephyr version: 4.0.99 (C:/ncs/v3.0.2/zephyr), build: v4.0.99-ncs1-2
+[152/152] Linking C executable zephyr\zephyr.elf
+Memory region         Used Size  Region Size  %age Used
+           FLASH:       22012 B         1 MB      2.10%
+             RAM:        7680 B       256 KB      2.93%
+        IDT_LIST:          0 GB        32 KB      0.00%
+Generating files from C:/ncs/nrf52840/blinky/build/blinky/zephyr/zephyr.elf for board: nrf52840dk
+[10/10] Generating ../merged.hex
+</code></pre>
+<h2 id="_1">下载</h2>
+<p><img alt="image-20250804205251343" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250804205251343.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#nordic-sdk">nordic sdk安装 以及第一个测试程序</a></li>
+<li><a href="#1">1.安装命令行工具</a></li>
+<li><a href="#2vscodenordic">2.在vscode中搜索nordic的扩展包并安装</a></li>
+<li><a href="#3sdk">3.手动安装sdk与工具链</a></li>
+<li><a href="#4-nrfutil">4.安装 nrfutil</a></li>
+<li><a href="#5">5.构建第一个应用程序</a><ul>
+<li><a href="#1vscodesdk">1.vscode打开sdk文件夹</a></li>
+<li><a href="#2">2. 拷贝一个示例程序</a></li>
+<li><a href="#3">3.打开拷贝好的示例工作目录</a></li>
+<li><a href="#4">4. 添加编译配置项，编译，在此之前可以先打开一个终端查看编译过程</a></li>
+</ul>
+</li>
+<li><a href="#_1">下载</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
