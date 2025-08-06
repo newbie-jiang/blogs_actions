@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>3.miniz压缩库使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><strong>miniz</strong>：zlib 的极简实现，单文件、适合 MCU。</p>
+<ul>
+<li><strong>优点</strong>：只需一个源文件即可集成，内存占用低。</li>
+</ul>
+<p>https://github.com/richgel999/miniz</p>
+<h2 id="_1">文件结构</h2>
+<p>文件结构看着非常简单，提供了6个测试文件</p>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/miniz-3.0.2$ tree -L 2
+.
+├── ChangeLog.md
+├── examples
+│   ├── example1.c
+│   ├── example2.c
+│   ├── example3.c
+│   ├── example4.c
+│   ├── example5.c
+│   └── example6.c
+├── miniz.c
+├── miniz.h
+└── readme.md
+
+1 directory, 10 files
+</code></pre>
+<p>文件较少就不写cmake文件了，直接测试, 我先改了一下文件结构，如下</p>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/miniz-3.0.2$ tree -L 2
+.
+├── ChangeLog.md
+├── examples_src
+│   ├── example1.c
+│   ├── example2.c
+│   ├── example3.c
+│   ├── example4.c
+│   ├── example5.c
+│   └── example6.c
+├── readme.md
+└── src
+    ├── miniz.c
+    └── miniz.h
+</code></pre>
+<p>在miniz-3.0.2目录下直接编译</p>
+<pre><code>gcc examples_src/example1.c src/miniz.c -I./src -o example1
+</code></pre>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/miniz-3.0.2$ gcc examples_src/example1.c src/miniz.c -I./src -o example1
+src/miniz.c:3185:9: note: ‘#pragma message: Using fopen, ftello, fseeko, stat() etc. path for file I/O - this path may not support large files.’
+ 3185 | #pragma message(&quot;Using fopen, ftello, fseeko, stat() etc. path for file I/O - this path may not support large files.&quot;)
+      |         ^~~~~~~
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/miniz-3.0.2$ ls
+ChangeLog.md  example1  examples_src  miniz_test.c  readme.md  src
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/miniz-3.0.2$ ./example1
+miniz.c version: 11.0.2
+Compressed from 490 to 81 bytes
+Decompressed from 81 to 490 bytes
+Success.
+
+</code></pre>
+<h2 id="_2">六个测试文件解析</h2>
+<h3 id="example1c"><strong>example1.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   最简单的字符串内存压缩与解压。
+   <strong>主要用 miniz 的 <code>compress()</code> 和 <code>uncompress()</code>（zlib 兼容接口）</strong></li>
+<li><strong>测试重点：</strong></li>
+<li>字符串压缩后长度/解压后数据正确性</li>
+<li>支持简单模糊测试（故意篡改压缩数据）</li>
+<li><strong>适合</strong>：快速验证 miniz/zlib API 在 MCU、嵌入式环境能否跑通</li>
+</ul>
+<hr />
+<h3 id="example2c"><strong>example2.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   ZIP 文件归档（压缩/解压 ZIP 文件）API 用法</li>
+<li><strong>测试重点：</strong></li>
+<li>批量将内存字符串作为文件加入 ZIP 包</li>
+<li>打开 ZIP 文件遍历内容，按文件名解压验证数据</li>
+<li>支持目录、文件注释</li>
+<li><strong>适合</strong>：测试 miniz 的 ZIP 归档功能、ZIP 文件互操作兼容性</li>
+</ul>
+<hr />
+<h3 id="example3c"><strong>example3.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   使用 <code>deflate()</code>/<code>inflate()</code> 实现文件压缩/解压</li>
+<li><strong>测试重点：</strong></li>
+<li>命令行工具模式：<code>c</code> 压缩文件、<code>d</code> 解压文件</li>
+<li>支持调整压缩等级</li>
+<li><strong>适合</strong>：模拟实际文件的压缩/解压，验证流式接口与大数据兼容性</li>
+</ul>
+<hr />
+<h3 id="example4c"><strong>example4.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   使用底层 <code>tinfl_decompress_mem_to_callback()</code> 接口，将内存中的 zlib 压缩流解压到文件</li>
+<li><strong>测试重点：</strong></li>
+<li>读入整个压缩流到内存</li>
+<li>解压到回调输出（本例输出到文件）</li>
+<li><strong>适合</strong>：测试底层 tinfl 解压性能与自定义数据流解包能力</li>
+</ul>
+<hr />
+<h3 id="example5c"><strong>example5.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   演示 miniz 最底层的 tdefl_compress()（无动态分配，无 zlib API/无 malloc/无 stdio/无 archive API）和 tinfl_inflate()</li>
+<li><strong>测试重点：</strong></li>
+<li>超低依赖、适合最极限嵌入式环境</li>
+<li>文件压缩/解压流处理，零动态分配</li>
+<li>用法非常灵活、效率最高</li>
+<li><strong>适合</strong>：资源极度有限、需要极小移植体积的场景或做库最底层测试</li>
+</ul>
+<hr />
+<h3 id="example6c"><strong>example6.c</strong></h3>
+<ul>
+<li><strong>演示内容：</strong>
+   演示 miniz PNG 写入器 API，生成曼德勃罗特分形图片并保存为 PNG 文件</li>
+<li><strong>测试重点：</strong></li>
+<li>图像生成（无外部依赖），色彩转换</li>
+<li>调用 miniz 的 PNG 内存写接口生成高分辨率 PNG</li>
+<li><strong>适合</strong>：验证 miniz 的图片编码能力和内存/输出流接口（需要链接 libm）</li>
+</ul>
+<hr />
+<h2 id="_3"><strong>总结表</strong></h2>
+<table>
+<thead>
+<tr>
+<th>示例</th>
+<th>功能/测试点</th>
+<th>用途/场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>example1.c</td>
+<td>compress/uncompress 内存压缩</td>
+<td>基本压缩解压API测试、快速验证</td>
+</tr>
+<tr>
+<td>example2.c</td>
+<td>ZIP归档API，批量加文件、解包</td>
+<td>文件归档/解包、兼容性验证</td>
+</tr>
+<tr>
+<td>example3.c</td>
+<td>deflate/inflate 流式文件压缩/解压</td>
+<td>文件压缩解压命令行模拟、流API测试</td>
+</tr>
+<tr>
+<td>example4.c</td>
+<td>tinfl底层解压，内存流到文件输出</td>
+<td>底层流解压/自定义输出回调</td>
+</tr>
+<tr>
+<td>example5.c</td>
+<td>tdefl/tinfl底层无依赖压缩/解压</td>
+<td>极简嵌入式移植、零动态分配场景</td>
+</tr>
+<tr>
+<td>example6.c</td>
+<td>PNG写入器API+分形图生成</td>
+<td>图像编码能力、复杂数据流测试</td>
+</tr>
+</tbody>
+</table>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1">文件结构</a></li>
+<li><a href="#_2">六个测试文件解析</a><ul>
+<li><a href="#example1c">example1.c</a></li>
+<li><a href="#example2c">example2.c</a></li>
+<li><a href="#example3c">example3.c</a></li>
+<li><a href="#example4c">example4.c</a></li>
+<li><a href="#example5c">example5.c</a></li>
+<li><a href="#example6c">example6.c</a></li>
+</ul>
+</li>
+<li><a href="#_3">总结表</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

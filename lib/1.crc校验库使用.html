@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>1.crc校验库使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="crc-lib-c">crc-lib-c</h1>
+<p>基于C语言的CRC校验库，包括常用的21个CRC参数模型实现</p>
+<h4 id="crc">常用的CRC参数模型</h4>
+<table>
+<thead>
+<tr>
+<th>CRC算法名称</th>
+<th>多项式公式</th>
+<th>WIDTH</th>
+<th>POLY</th>
+<th>INIT</th>
+<th>XOROUT</th>
+<th>REFIN</th>
+<th>REFOUT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRC-4/ITU</td>
+<td>x4 +  x + 1</td>
+<td>4</td>
+<td>03</td>
+<td>00</td>
+<td>00</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-5/EPC</td>
+<td>x5 +  x3 + 1</td>
+<td>5</td>
+<td>09</td>
+<td>09</td>
+<td>00</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-5/ITU</td>
+<td>x5 +  x4 + x2 + 1</td>
+<td>5</td>
+<td>15</td>
+<td>00</td>
+<td>00</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-5/USB</td>
+<td>x5 +  x2 + 1</td>
+<td>5</td>
+<td>05</td>
+<td>1F</td>
+<td>1F</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-6/ITU</td>
+<td>x6 +  x + 1</td>
+<td>6</td>
+<td>03</td>
+<td>00</td>
+<td>00</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-7/MMC</td>
+<td>x7 +  x3 + 1</td>
+<td>7</td>
+<td>09</td>
+<td>00</td>
+<td>00</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-8</td>
+<td>x8 +  x2 + x + 1</td>
+<td>8</td>
+<td>07</td>
+<td>00</td>
+<td>00</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-8/ITU</td>
+<td>x8 +  x2 + x + 1</td>
+<td>8</td>
+<td>07</td>
+<td>00</td>
+<td>55</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-8/ROHC</td>
+<td>x8 +  x2 + x + 1</td>
+<td>8</td>
+<td>07</td>
+<td>FF</td>
+<td>00</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-8/MAXIM</td>
+<td>x8 +  x5 + x4 + 1</td>
+<td>8</td>
+<td>31</td>
+<td>00</td>
+<td>00</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/IBM</td>
+<td>x16 +  x15 + x2 + 1</td>
+<td>16</td>
+<td>8005</td>
+<td>0000</td>
+<td>0000</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/MAXIM</td>
+<td>x16 +  x15 + x2 + 1</td>
+<td>16</td>
+<td>8005</td>
+<td>0000</td>
+<td>FFFF</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/USB</td>
+<td>x16 +  x15 + x2 + 1</td>
+<td>16</td>
+<td>8005</td>
+<td>FFFF</td>
+<td>FFFF</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/MODBUS</td>
+<td>x16 +  x15 + x2 + 1</td>
+<td>16</td>
+<td>8005</td>
+<td>FFFF</td>
+<td>0000</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/CCITT</td>
+<td>x16 +  x12 + x5 + 1</td>
+<td>16</td>
+<td>1021</td>
+<td>0000</td>
+<td>0000</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/CCITT-FALSE</td>
+<td>x16 +  x12 + x5 + 1</td>
+<td>16</td>
+<td>1021</td>
+<td>FFFF</td>
+<td>0000</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-16/X25</td>
+<td>x16 +  x12 + x5 + 1</td>
+<td>16</td>
+<td>1021</td>
+<td>FFFF</td>
+<td>FFFF</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-16/XMODEM</td>
+<td>x16 +  x12 + x5 + 1</td>
+<td>16</td>
+<td>1021</td>
+<td>0000</td>
+<td>0000</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>CRC-16/DNP</td>
+<td>x16 +  x13 + x12 + x11 + x10 + x8 + x6 + x5 +  x2 + 1</td>
+<td>16</td>
+<td>3D65</td>
+<td>0000</td>
+<td>FFFF</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-32</td>
+<td>x32 +  x26 + x23 + x22 + x16 + x12 + x11 + x10 +  x8 + x7 + x5 + x4 + x2 + x + 1</td>
+<td>32</td>
+<td>04C11DB7</td>
+<td>FFFFFFFF</td>
+<td>FFFFFFFF</td>
+<td>TRUE</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>CRC-32/MPEG-2</td>
+<td>x32 +  x26 + x23 + x22 + x16 + x12 + x11 + x10 +  x8 + x7 + x5 + x4 + x2 + x + 1</td>
+<td>32</td>
+<td>04C11DB7</td>
+<td>FFFFFFFF</td>
+<td>0</td>
+<td>FALSE</td>
+<td>FALSE</td>
+</tr>
+</tbody>
+</table>
+<h4 id="crc_1">CRC计算工具</h4>
+<p>在线计算工具：www.ip33.com/crc.html</p>
+<p>离线计算工具：</p>
+<ul>
+<li>CRC_Calc v0.1：http://xz.w10a.com/Small/CRCJISUANQI.zip</li>
+<li>格西CRC计算器：http://www.geshe.com/home/products/GToolbox/bin/GCRC.exe</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#crc-lib-c">crc-lib-c</a><ul>
+<li><a href="#crc">常用的CRC参数模型</a></li>
+<li><a href="#crc_1">CRC计算工具</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

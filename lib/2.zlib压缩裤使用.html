@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>2.zlib压缩裤使用</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="zlib">zlib 使用</h1>
+<p>https://zlib.net/</p>
+<ul>
+<li><strong>zlib</strong>：历史最悠久、应用最广泛的通用压缩库（基于 DEFLATE 算法）。</li>
+<li><strong>优点</strong>：有很多移植经验、兼容性好，成熟稳定。</li>
+<li><strong>缺点</strong>：标准 zlib 代码体积较大，在资源极其有限的 MCU 上可能需要做裁剪。</li>
+</ul>
+<h2 id="_1">编译</h2>
+<p>下载下来可以用camke编译测试</p>
+<pre><code class="language-shell">cd zlib-1.3.1
+mkdir build &amp;&amp; cd build
+cmake ..
+make
+./example
+</code></pre>
+<pre><code class="language-SHELL">hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ ls
+CMakeCache.txt  CMakeFiles  cmake_install.cmake  CTestTestfile.cmake  example  example64  foo.gz  libz.a  libz.so  libz.so.1  libz.so.1.3.1  Makefile  minigzip  minigzip64  zconf.h  zlib.pc
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ tree -L 1
+.
+├── CMakeCache.txt
+├── CMakeFiles
+├── cmake_install.cmake
+├── CTestTestfile.cmake
+├── example
+├── example64
+├── foo.gz
+├── libz.a
+├── libz.so -&gt; libz.so.1
+├── libz.so.1 -&gt; libz.so.1.3.1
+├── libz.so.1.3.1
+├── Makefile
+├── minigzip
+├── minigzip64
+├── zconf.h
+└── zlib.pc
+
+1 directory, 15 files
+</code></pre>
+<h2 id="_2"><strong>官方自带测试程序</strong></h2>
+<p>你的 <code>build</code> 目录下有以下可执行文件：</p>
+<ul>
+<li><code>example</code>（zlib功能自测Demo）</li>
+<li><code>minigzip</code>（gzip兼容性测试Demo）</li>
+<li><code>example64</code> 和 <code>minigzip64</code>（64位文件支持测试）</li>
+</ul>
+<hr />
+<h3 id="1-zlib"><strong>（1）运行 zlib 官方例程</strong></h3>
+<p><strong>运行 example：</strong></p>
+<pre><code>./example
+</code></pre>
+<ul>
+<li>如果一切正常，输出会包含 <code>zlib version x.x.x = 0xxxx, compile flags = ...</code></li>
+<li>并显示一系列 <code>test passed</code> 字样。</li>
+</ul>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ ./example
+zlib version 1.3.1 = 0x1310, compile flags = 0xa9
+uncompress(): hello, hello!
+gzread(): hello, hello!
+gzgets() after gzseek:  hello!
+inflate(): hello, hello!
+large_inflate(): OK
+after inflateSync(): hello, hello!
+inflate with dictionary: hello, hello!
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ 
+</code></pre>
+<p><strong>运行 example64：</strong></p>
+<pre><code>./example64
+</code></pre>
+<ul>
+<li>输出应该与上面类似（测试64位文件支持）。</li>
+</ul>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ ./example64
+zlib version 1.3.1 = 0x1310, compile flags = 0xa9
+uncompress(): hello, hello!
+gzread(): hello, hello!
+gzgets() after gzseek:  hello!
+inflate(): hello, hello!
+large_inflate(): OK
+after inflateSync(): hello, hello!
+inflate with dictionary: hello, hello!
+</code></pre>
+<hr />
+<h3 id="2-minigzip"><strong>（2）运行 minigzip 测试压缩/解压</strong></h3>
+<p><strong>压缩一个文件：</strong></p>
+<ul>
+<li>压缩后会删除源文件</li>
+</ul>
+<pre><code>echo &quot;hello zlib&quot; &gt; test.txt
+./minigzip test.txt
+</code></pre>
+<ul>
+<li>得到 <code>test.txt.gz</code></li>
+</ul>
+<p><img alt="image-20250806173043135" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250806173043135.png" /></p>
+<p><strong>解压：</strong></p>
+<pre><code>./minigzip -d test.txt.gz
+cat test.txt
+</code></pre>
+<ul>
+<li>会得到 <code>test.txt</code>（内容和原来一样）</li>
+</ul>
+<pre><code>hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ ./minigzip -d test.txt.gz
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ ls
+CMakeCache.txt  CMakeFiles  cmake_install.cmake  CTestTestfile.cmake  example  example64  foo.gz  libz.a  libz.so  libz.so.1  libz.so.1.3.1  Makefile  minigzip  minigzip64  test.txt  zconf.h  zlib.pc
+hdj@hdj-virtual-machine:~/stm32-cmake-for-vscode/lib/zlib-1.3.1/build$ cat test.txt
+hello zlib
+</code></pre>
+<p>zlib 默认只需要运行 <code>example</code> 和 <code>minigzip</code> 就可以验证基本功能。</p>
+<h2 id="_3">核心文件介绍</h2>
+<p>直接看camke文件中那些文件参与了编译</p>
+<pre><code>set(ZLIB_SRCS
+    adler32.c
+    compress.c
+    crc32.c
+    deflate.c
+    gzclose.c
+    gzlib.c
+    gzread.c
+    gzwrite.c
+    inflate.c
+    infback.c
+    inftrees.c
+    inffast.c
+    trees.c
+    uncompr.c
+    zutil.c
+)
+</code></pre>
+<h3 id="1-adler32c">1. <strong>adler32.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：实现 Adler-32 校验算法（一个快速的流式校验码算法）</li>
+<li><strong>用途</strong>：为压缩流和数据块生成校验值，检测数据完整性</li>
+</ul>
+<hr />
+<h3 id="2-compressc">2. <strong>compress.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：提供 zlib 高层接口的压缩函数（如 <code>compress()</code>）</li>
+<li><strong>用途</strong>：封装底层 deflate 算法，为用户提供简单的压缩 API</li>
+</ul>
+<hr />
+<h3 id="3-crc32c">3. <strong>crc32.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：实现 CRC32 校验算法</li>
+<li><strong>用途</strong>：生成更强的32位数据校验码，常用于 gzip、zip、png 等格式的数据完整性校验</li>
+</ul>
+<hr />
+<h3 id="4-deflatec">4. <strong>deflate.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：核心压缩算法（deflate）</li>
+<li><strong>用途</strong>：实现 LZ77 + Huffman 编码压缩，zlib 的“压缩心脏”，大部分数据压缩逻辑都在这里</li>
+</ul>
+<hr />
+<h3 id="5-gzclosec">5. <strong>gzclose.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：<code>.gz</code> 文件高层接口的关闭操作</li>
+<li><strong>用途</strong>：实现 <code>gzclose()</code>，用于关闭压缩文件流，释放相关资源</li>
+</ul>
+<hr />
+<h3 id="6-gzlibc">6. <strong>gzlib.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：<code>.gz</code> 文件读写的主库代码</li>
+<li><strong>用途</strong>：封装底层压缩/解压，对应 <code>gzopen()</code>、<code>gzread()</code>、<code>gzwrite()</code> 等 API，实现 <code>.gz</code> 文件的操作</li>
+</ul>
+<hr />
+<h3 id="7-gzreadc">7. <strong>gzread.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：<code>.gz</code> 文件的读取实现</li>
+<li><strong>用途</strong>：处理 <code>.gz</code> 文件流的解压和数据读取，解码压缩数据</li>
+</ul>
+<hr />
+<h3 id="8-gzwritec">8. <strong>gzwrite.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：<code>.gz</code> 文件的写入实现</li>
+<li><strong>用途</strong>：处理 <code>.gz</code> 文件流的压缩和数据写入，编码并保存数据</li>
+</ul>
+<hr />
+<h3 id="9-inflatec">9. <strong>inflate.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：核心解压缩算法（inflate）</li>
+<li><strong>用途</strong>：实现 deflate 格式的解码与解压，是 zlib 的“解压心脏”，对应流式解压操作</li>
+</ul>
+<hr />
+<h3 id="10-infbackc">10. <strong>infback.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：特殊的“向后”解压算法（backwards inflate）</li>
+<li><strong>用途</strong>：为需要自定义输入输出（如嵌入式流式解压）提供更灵活的 inflate 接口（<code>inflateBack</code>）</li>
+</ul>
+<hr />
+<h3 id="11-inftreesc">11. <strong>inftrees.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：Huffman 树的构建和处理</li>
+<li><strong>用途</strong>：支持 deflate/inflate 的 Huffman 编码/解码树管理（压缩率优化和解压效率提升）</li>
+</ul>
+<hr />
+<h3 id="12-inffastc">12. <strong>inffast.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：加速版的 inflate 解码实现</li>
+<li><strong>用途</strong>：为 inflate 操作提供快速路径，提高解压速度</li>
+</ul>
+<hr />
+<h3 id="13-treesc">13. <strong>trees.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：Huffman 树的生成、管理和优化</li>
+<li><strong>用途</strong>：支持压缩算法中的动态/静态树构建，决定数据如何编码以获得最优压缩率</li>
+</ul>
+<hr />
+<h3 id="14-uncomprc">14. <strong>uncompr.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：高层“解压”接口（如 <code>uncompress()</code>）</li>
+<li><strong>用途</strong>：为用户提供简单的解压缩函数，直接调用底层 inflate 算法</li>
+</ul>
+<hr />
+<h3 id="15-zutilc">15. <strong>zutil.c</strong></h3>
+<ul>
+<li><strong>功能</strong>：zlib 内部工具函数（通用支持）</li>
+<li><strong>用途</strong>：包含内存管理、错误处理、字节序转换等 zlib 公用辅助函数</li>
+</ul>
+<hr />
+<h2 id="_4">核心文件总结</h2>
+<ul>
+<li><strong>deflate.c/inflate.c</strong>：压缩与解压核心</li>
+<li><strong>crc32.c/adler32.c</strong>：数据校验核心</li>
+<li><strong>gzlib.c/gzread.c/gzwrite.c/gzclose.c</strong>：<code>.gz</code> 文件操作接口</li>
+<li><strong>compress.c/uncompr.c</strong>：简单易用的高层（单次）压缩解压API</li>
+<li><strong>inftrees.c/trees.c/inffast.c/infback.c</strong>：Huffman树算法和快速路径、灵活的流式支持</li>
+<li><strong>zutil.c</strong>：内部通用工具</li>
+</ul>
+<h2 id="_5">官方测试文件</h2>
+<p><img alt="image-20250806174231415" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250806174231415.png" /></p>
+<ol>
+<li><code>infcover.c</code> —— <strong>inflate 覆盖率测试程序</strong></li>
+</ol>
+<h3 id="_6">作用：</h3>
+<ul>
+<li>专门为<strong>测试 zlib 的解压（inflate）相关代码的覆盖率</strong>而写。</li>
+<li>用于 zlib 官方 CI 或开发人员，确保各种代码路径、边界、异常和 corner case 都被测试到。</li>
+</ul>
+<h3 id="_7">主要内容与结构：</h3>
+<ul>
+<li><strong>自定义内存分配跟踪</strong>（mem_setup/mem_limit/mem_used/mem_high/mem_done）：</li>
+<li>检测内存分配/释放的正确性，查内存泄漏、非法释放等。</li>
+<li><strong>一系列特殊输入构造和解压用例</strong>（如 bad header、bad method、需要字典、内存限制等）。</li>
+<li><strong>多种 inflate 初始化参数</strong>，覆盖所有 inflate* 系列函数及不同窗口大小、header、字典相关、buffer 行为等。</li>
+<li><strong>直接调用 zlib 内部函数（如 inflate_table）</strong>，甚至包括部分未导出的 API。</li>
+<li><strong>主要用于自动化测试和开发者调试，不建议普通用户或嵌入式直接移植。</strong></li>
+</ul>
+<h3 id="_8">典型场景：</h3>
+<ul>
+<li>想改 zlib 的源码，或者做“全路径单元测试”，这个程序可以帮助你发现解压相关的极端/错误处理是否被覆盖。</li>
+</ul>
+<hr />
+<ol>
+<li><code>minigzip.c</code> —— <strong>简化版 gzip 压缩/解压工具</strong></li>
+</ol>
+<p>作用：</p>
+<ul>
+<li><strong>最小实现的 gzip 命令行工具</strong>，基于 zlib。</li>
+<li>既能压缩（生成 .gz 文件），也能解压 .gz 文件。</li>
+<li>主要用来演示 zlib 的实际文件流压缩/解压接口（gz* 系列函数）用法。</li>
+<li>不同于官方 gzip，minigzip 是个教学/测试工具，不含复杂参数和平台兼容性，仅为示例用途。</li>
+</ul>
+<p>主要内容与结构：</p>
+<ul>
+<li><strong>压缩/解压核心流程</strong>：</li>
+<li><code>gz_compress()</code>：将文件/流压缩成 .gz。</li>
+<li><code>gz_uncompress()</code>：将 .gz 文件解压成普通文件/流。</li>
+<li><strong>主函数支持 gzip/gunzip/zcat/minigzip 多种行为</strong>：</li>
+<li>支持常用参数（如 -c、-d、-1...-9 压缩级别）。</li>
+<li><strong>支持 MMAP 优化</strong>（可选，用于一次 mmap 读取整个文件，适合大文件）。</li>
+<li><strong>文件和管道模式兼容</strong>：可用于普通文件和标准输入/输出流压缩。</li>
+<li><strong>移植性好，代码风格接近 POSIX。</strong></li>
+</ul>
+<p>典型场景：</p>
+<ul>
+<li>想用 zlib 作为后端写自己的压缩/解压工具，可以照着 minigzip 学习。</li>
+<li>想了解 gz* API 的实际用法。</li>
+</ul>
+<hr />
+<ol>
+<li><code>example.c</code> —— <strong>zlib API 综合功能演示样例</strong></li>
+</ol>
+<p>作用：</p>
+<ul>
+<li><strong>zlib 官方最全功能演示代码</strong>，包含内存压缩/解压、文件压缩/解压、流模式、带字典、flush/sync、各种 buffer 策略等全部主流 API 用法。</li>
+<li>适合作为“zlib 编程入门教材”或最小可运行样例。</li>
+</ul>
+<p>主要内容与结构：</p>
+<ul>
+<li><strong>compress()/uncompress()</strong>：一步到位的内存压缩/解压。</li>
+<li><strong>deflate/inflate 流模式</strong>：手动管理输入/输出 buffer，控制 flush/sync 行为，兼容高级用法。</li>
+<li><strong>.gz 文件读写</strong>：用 gzopen/gzread/gzwrite/gzseek/gzgetc/gzputs/gzprintf/gzgets 等 API 操作 gzip 文件。</li>
+<li><strong>带字典压缩/解压</strong>：展示 deflateSetDictionary/inflateSetDictionary 的用法。</li>
+<li><strong>main() 按顺序测试上述所有功能点</strong>，并输出结果。</li>
+<li><strong>代码注释清晰，非常适合嵌入式或新手移植参考。</strong></li>
+</ul>
+<p>典型场景：</p>
+<ul>
+<li>嵌入式开发需要内存压缩/解压功能，可以摘取相应部分直接复用。</li>
+<li>学习 zlib API 之间的关系、调用流程，调试 zlib 库。</li>
+<li>验证自己编译的 zlib 库基本功能是否正常。</li>
+</ul>
+<hr />
+<p>官方测试文件总结与适用建议</p>
+<ul>
+<li><strong>infcover.c</strong>：面向 zlib 内部开发/测试，自动化全覆盖解压代码路径，不用于实际数据压缩任务。</li>
+<li><strong>minigzip.c</strong>：功能简明的 gzip 命令行工具 demo，适合学习文件级流压缩/解压和 gz* API。</li>
+<li><strong>example.c</strong>：zlib 各种典型用法的完整展示，最适合做入门样例、嵌入式移植参考、功能验证。</li>
+</ul>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#zlib">zlib 使用</a><ul>
+<li><a href="#_1">编译</a></li>
+<li><a href="#_2">官方自带测试程序</a><ul>
+<li><a href="#1-zlib">（1）运行 zlib 官方例程</a></li>
+<li><a href="#2-minigzip">（2）运行 minigzip 测试压缩/解压</a></li>
+</ul>
+</li>
+<li><a href="#_3">核心文件介绍</a><ul>
+<li><a href="#1-adler32c">1. adler32.c</a></li>
+<li><a href="#2-compressc">2. compress.c</a></li>
+<li><a href="#3-crc32c">3. crc32.c</a></li>
+<li><a href="#4-deflatec">4. deflate.c</a></li>
+<li><a href="#5-gzclosec">5. gzclose.c</a></li>
+<li><a href="#6-gzlibc">6. gzlib.c</a></li>
+<li><a href="#7-gzreadc">7. gzread.c</a></li>
+<li><a href="#8-gzwritec">8. gzwrite.c</a></li>
+<li><a href="#9-inflatec">9. inflate.c</a></li>
+<li><a href="#10-infbackc">10. infback.c</a></li>
+<li><a href="#11-inftreesc">11. inftrees.c</a></li>
+<li><a href="#12-inffastc">12. inffast.c</a></li>
+<li><a href="#13-treesc">13. trees.c</a></li>
+<li><a href="#14-uncomprc">14. uncompr.c</a></li>
+<li><a href="#15-zutilc">15. zutil.c</a></li>
+</ul>
+</li>
+<li><a href="#_4">核心文件总结</a></li>
+<li><a href="#_5">官方测试文件</a><ul>
+<li><a href="#_6">作用：</a></li>
+<li><a href="#_7">主要内容与结构：</a></li>
+<li><a href="#_8">典型场景：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

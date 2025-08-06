@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>kernel启动</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <p><strong>Linux内核在启动后，只会启动一个“第一个用户空间进程”——也就是<code>init</code>（通常是 <code>/sbin/init</code> 或 <code>/init</code>），</strong>
+ <strong>后面所有的应用程序、服务、shell、后台守护进程，都是由<code>init</code>进程（或systemd、busybox init等）来负责启动和管理的。</strong></p>
+<h2 id="_1"></h2>
+<ol>
+<li>
+<p><strong>内核启动后发生了什么？</strong></p>
+</li>
+<li>
+<p>内核初始化硬件、挂载根文件系统后，</p>
+</li>
+<li>会寻找一个可执行文件作为第一个用户空间进程。这个进程必须是：</li>
+<li><code>/sbin/init</code></li>
+<li><code>/etc/init</code></li>
+<li><code>/bin/init</code></li>
+<li><code>/bin/sh</code></li>
+<li>
+<p>或者通过启动参数<code>init=/xxx</code>指定
+     只要有一个能找到并运行，就当作第1号进程（PID 1）。</p>
+</li>
+<li>
+<p><strong>init进程的作用是什么？</strong></p>
+</li>
+<li>
+<p>这个<code>init</code>进程，是所有其它用户空间进程的祖先、父亲、控制者。</p>
+</li>
+<li>它<strong>按照配置（比如<code>/etc/inittab</code>、<code>/etc/init.d/</code>、systemd的unit文件等），</strong>决定启动哪些应用程序、后台服务、登录shell等。</li>
+<li>
+<p><strong>它可以启动和管理任意多个应用程序（进程），并可以对它们进行监控、重启等管理。</strong></p>
+</li>
+<li>
+<p><strong>实际表现</strong></p>
+</li>
+<li>
+<p>内核：只负责“拉起第一个进程”。</p>
+</li>
+<li><code>init</code>：根据配置批量启动shell、web服务器、后台守护进程、你的App等，系统里就会有很多进程和服务。</li>
+</ol>
+<hr />
+<p><strong>举例说明</strong></p>
+<p><strong>嵌入式极简系统（init就是你自己的程序）</strong></p>
+<ul>
+<li>你把自己的应用编译成<code>/init</code>，其他什么都没有。</li>
+<li>系统启动后，只运行你的程序。</li>
+</ul>
+<p><strong>正常Linux系统</strong></p>
+<ul>
+<li><code>init</code>会按照配置自动启动：</li>
+<li><code>getty</code>（串口/终端登录shell）</li>
+<li><code>sshd</code>（远程登录服务）</li>
+<li><code>cron</code>（定时任务）</li>
+<li><code>dbus</code>、<code>networkd</code>、<code>udevd</code>等</li>
+<li>你自己的app</li>
+</ul>
+<hr />
+<p><strong>小结</strong></p>
+<ul>
+<li><strong>内核本身不会主动启动多个应用。它“启动第一个进程init”，之后所有进程的启动和管理全交给init。</strong></li>
+<li><strong>init才是用户空间所有进程的“祖宗”，决定了整个系统“跑什么程序”。</strong></li>
+</ul>
+<h2 id="ubuntu">在我自己的ubuntu上如何找到第一个进程，以及如何知道第一个进程之后启动默认会启动什么？</h2>
+<ol>
+<li>
+<p><strong>如何找到第一个进程？</strong></p>
+</li>
+<li>
+<p><strong>第一个进程的特点是：PID（进程号）为1。</strong></p>
+</li>
+<li>在现代Ubuntu（比如18.04/20.04/22.04/24.04），<strong>PID 1 通常是 <code>systemd</code> 进程</strong>（更早以前是 <code>/sbin/init</code>）。</li>
+</ol>
+<p>你可以直接在终端执行：</p>
+<pre><code>ps -p 1 -o pid,ppid,user,comm,args
+</code></pre>
+<pre><code>hdj@hdj-virtual-machine:~$ ps -p 1 -o pid,ppid,user,comm,args
+    PID    PPID USER     COMMAND         COMMAND
+      1       0 root     systemd         /sbin/init auto noprompt splash
+
+</code></pre>
+<p>说明PID 1是systemd（即<code>/sbin/init</code>的软链接），用户是root，父进程是0（内核）。</p>
+<ol>
+<li>
+<p><strong>如何知道init（第一个进程）之后会默认启动什么？</strong></p>
+</li>
+<li>
+<p>在Ubuntu、Debian等现代Linux，<strong>init其实就是systemd</strong>，它通过一堆“unit文件”决定系统服务的启动顺序和内容。</p>
+</li>
+<li><strong>systemd的配置和服务管理都集中在 <code>/etc/systemd/</code> 以及 <code>/lib/systemd/</code> 下面</strong>。</li>
+</ol>
+<p>2.1 查看所有自启动的服务（显示所有服务的开机启动状态）</p>
+<pre><code>systemctl list-unit-files --type=service
+</code></pre>
+<pre><code>hdj@hdj-virtual-machine:~$ systemctl list-unit-files --type=service
+UNIT FILE                                  STATE           VENDOR PRESET
+accounts-daemon.service                    enabled         enabled      
+acpid.service                              disabled        enabled      
+alsa-restore.service                       static          -            
+alsa-state.service                         static          -            
+alsa-utils.service                         masked          enabled      
+anacron.service                            enabled         enabled      
+app.service                                enabled         enabled      
+apparmor.service                           enabled         enabled      
+apport-autoreport.service                  static          -            
+apport-forward@.service                    static          -            
+apport.service                             generated       -            
+apt-daily-upgrade.service                  static          -            
+apt-daily.service                          static          -            
+apt-news.service                           static          -            
+autovt@.service                            alias           -            
+avahi-daemon.service                       enabled         enabled      
+binfmt-support.service                     enabled         enabled      
+bluetooth.service                          enabled         enabled      
+bolt.service                               static          -            
+brltty-udev.service                        static          -            
+brltty.service                             disabled        enabled      
+bt.service                                 generated       -            
+colord.service                             static          -            
+configure-printer@.service                 static          -            
+console-getty.service                      disabled        disabled     
+console-setup.service                      enabled         enabled      
+container-getty@.service                   static          -            
+cron.service                               enabled         enabled      
+cryptdisks-early.service                   masked          enabled      
+cryptdisks.service                         masked          enabled      
+cups-browsed.service                       enabled         enabled      
+cups.service                               enabled         enabled      
+dbus-fi.w1.wpa_supplicant1.service         alias           -            
+dbus-org.bluez.service                     alias           -            
+dbus-org.freedesktop.Avahi.service         alias           -            
+dbus-org.freedesktop.hostname1.service     alias           -            
+dbus-org.freedesktop.locale1.service       alias           -            
+dbus-org.freedesktop.login1.service        alias           -            
+
+</code></pre>
+<p>2.2 查看当前正在运行的所有服务</p>
+<pre><code>systemctl
+</code></pre>
+<p>或者</p>
+<pre><code>systemctl list-units --type=service
+</code></pre>
+<p>2.3 查看默认会启动什么（开机时自动启动的服务/目标）</p>
+<pre><code>systemctl get-default
+</code></pre>
+<p>输出一般是 <code>graphical.target</code>（桌面） 或 <code>multi-user.target</code>（命令行多用户）。</p>
+<p>可以用下面命令<strong>查看这个target会启动哪些服务</strong>：</p>
+<pre><code>systemctl list-dependencies default.target
+</code></pre>
+<p>或者</p>
+<pre><code>systemctl list-dependencies multi-user.target
+</code></pre>
+<hr />
+<ol>
+<li>
+<p><strong>systemd配置文件在哪？</strong></p>
+</li>
+<li>
+<p>系统自带服务配置：<code>/lib/systemd/system/</code></p>
+</li>
+<li>用户或自定义服务配置：<code>/etc/systemd/system/</code></li>
+<li>你可以用 <code>cat</code> 或 <code>less</code> 查看这些目录下的 <code>.service</code> 文件内容，了解每个服务如何启动的。</li>
+</ol>
+<hr />
+<ol>
+<li>
+<p><strong>验证init进程之后启动了什么？</strong></p>
+</li>
+<li>
+<p>你可以查看系统的启动日志：</p>
+</li>
+</ol>
+<pre><code>journalctl -b
+</code></pre>
+<ul>
+<li>这个命令会显示自上次启动以来systemd管理的所有服务启动过程。</li>
+</ul>
+<hr />
+<p><strong>总结</strong></p>
+<ul>
+<li>Ubuntu下，第一个进程（PID 1）几乎总是 <code>systemd</code>。</li>
+<li>systemd读取配置（unit文件），自动启动各种服务和目标（target），这些决定了系统启动后有哪些进程和服务。</li>
+<li>你可以用 <code>ps -p 1</code>、<code>systemctl</code>、<code>journalctl -b</code> 等命令观察和分析系统启动流程。</li>
+</ul>
+<h2 id="init">如何查看自己开发板的 init 系统</h2>
+<p>，<strong>嵌入式开发板的“初始化系统”和启动配置方式有多种</strong>，并不是所有的嵌入式Linux都还用 <code>/etc/inittab</code>。能不能用、用不用，<strong>取决于用的是什么 init 系统</strong>。下面详细分情况解释：</p>
+<ol>
+<li><strong>嵌入式开发板常见的 init 系统</strong></li>
+</ol>
+<p><strong>A. busybox init（常用在极简嵌入式系统）</strong></p>
+<ul>
+<li><strong>busybox</strong> 提供了极简的 <code>init</code> 实现，<strong>依然支持 <code>/etc/inittab</code> 配置文件</strong>。</li>
+<li>在很多基于 busybox 的系统（如 OpenWRT、buildroot 默认配置、老的Yocto镜像）上，你会看到 <code>/etc/inittab</code> 决定了系统启动流程和后台进程。</li>
+<li>适合资源有限、功能简单的嵌入式产品和开发板。</li>
+</ul>
+<p><strong>B. sysvinit（早期Linux常用）</strong></p>
+<ul>
+<li>比较重型的嵌入式Linux，也可能用传统 SysV init，这时也会用 <code>/etc/inittab</code>，但这种已经在主流桌面/服务器被淘汰。</li>
+</ul>
+<p><strong>C. systemd/upstart（现代复杂系统、性能充裕的开发板）</strong></p>
+<ul>
+<li>许多较新的开发板（比如基于 Ubuntu/Debian/Yocto 的 ARM 开发板，或树莓派等）<strong>已经用上了 systemd</strong>，此时 <code>/etc/inittab</code> 不再起作用。</li>
+<li>系统启动流程和服务自启都通过 systemd 的 unit 文件控制。</li>
+</ul>
+<hr />
+<ol>
+<li>
+<p><strong>怎么判断你的开发板/固件用的是哪种 init？</strong></p>
+</li>
+<li>
+<p><strong>查看 <code>/sbin/init</code> 或 <code>/init</code> 是谁：</strong></p>
+</li>
+</ol>
+<p><code>ls -l /sbin/init
+  ps -p 1 -o comm,args</code></p>
+<ul>
+<li>如果显示 <code>init [busybox]</code> 或 <code>init [sysv]</code>，一般支持 <code>/etc/inittab</code></li>
+<li>
+<p>如果是 <code>systemd</code>，那一定没有 <code>/etc/inittab</code> 的用武之地。</p>
+</li>
+<li>
+<p><strong>查看文件是否存在：</strong></p>
+</li>
+</ul>
+<p><code>ls /etc/inittab</code></p>
+<ul>
+<li>有并且内容丰富，十有八九在用。</li>
+<li>
+<p>没有，基本就是 systemd 或别的init系统。</p>
+</li>
+<li>
+<p><strong>查看发行版文档/构建脚本/Yocto/Buildroot配置：</strong></p>
+</li>
+<li>
+<p>busybox 默认用 <code>/etc/inittab</code>，除非你配置了别的 init。</p>
+</li>
+</ul>
+<hr />
+<ol>
+<li><strong>实际举例：</strong></li>
+</ol>
+<p><strong>OpenWRT、Buildroot、极简Busybox根文件系统</strong></p>
+<ul>
+<li><strong>默认都用 busybox init + /etc/inittab</strong>。</li>
+<li>你可以通过修改 <code>/etc/inittab</code>，让系统自动运行你的程序、管理串口shell、守护进程等。</li>
+</ul>
+<p><strong>树莓派官方Debian/Ubuntu、NXP官方Yocto、全志/瑞芯微最新SDK</strong></p>
+<ul>
+<li><strong>大多已经默认 systemd</strong>，用 unit 文件启动服务，和桌面Linux一致。</li>
+<li><code>/etc/inittab</code> 可能根本不存在。</li>
+</ul>
+<hr />
+<ol>
+<li>
+<p><strong>结论：</strong></p>
+</li>
+<li>
+<p><strong>在“精简嵌入式系统”中，busybox init + <code>/etc/inittab</code> 仍然很常见，是配置启动流程和后台进程的核心方式。</strong></p>
+</li>
+<li><strong>但在越来越多的“高性能/新型嵌入式系统”里，已经用 systemd/upstart 等现代init替代了inittab。</strong></li>
+<li><strong>是否用 <code>/etc/inittab</code>，关键看用的是什么 init 系统。</strong></li>
+</ol>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#_1"></a></li>
+<li><a href="#ubuntu">在我自己的ubuntu上如何找到第一个进程，以及如何知道第一个进程之后启动默认会启动什么？</a></li>
+<li><a href="#init">如何查看自己开发板的 init 系统</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

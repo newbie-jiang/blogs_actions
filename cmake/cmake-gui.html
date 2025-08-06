@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>cmake-gui</title>
+<style>
+body { margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5; }
+#wrapper { max-width: 950px; margin: 0 auto; padding-right: 300px; }
+#content {
+    background: #fff;
+    padding: 40px;
+    min-height: 100vh;
+    box-shadow: 0 2px 14px #eee;
+}
+#content img {
+    display: block;
+    margin: 24px auto;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px #eee;
+    background: #fff;
+}
+#content pre {
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 16px;
+}
+#content pre:empty {
+    display: none;
+}
+#content div:empty {
+    min-height: 0 !important;
+    background: none !important;
+}
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f8f8;
+    border-left: 1px solid #e0e0e0;
+    padding: 32px 16px 32px 24px;
+    box-shadow: -3px 0 7px 0 #eee;
+    z-index: 100;
+}
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+#toc ul ul {
+    padding-left: 18px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 8px;
+}
+#toc li {
+    margin-bottom: 3px;
+}
+#toc a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+#toc a:hover {
+    color: #1a73e8;
+}
+@media (max-width: 1200px) {
+    #toc { display: none; }
+    #wrapper { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+        <h1 id="cmake-gui">cmake-gui 控制编译</h1>
+<p>code https://github.com/newbie-jiang/cmake-study/tree/master/cmake-gui</p>
+<h2 id="_1">功能展示</h2>
+<ul>
+<li>cmake gui来决定编译运行哪一个库</li>
+<li>主函数中的使能同步</li>
+</ul>
+<p><img alt="image-20250805201419738" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805201419738.png" /></p>
+<h3 id="_2">同时使能三个库</h3>
+<p><img alt="image-20250805201744434" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805201744434.png" /></p>
+<p><img alt="image-20250805201722349" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805201722349.png" /></p>
+<h3 id="_3">使能两个库</h3>
+<p><img alt="image-20250805201830115" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805201830115.png" /></p>
+<p><img alt="image-20250805201858358" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805201858358.png" /></p>
+<h2 id="_4">创建的文件以及目录</h2>
+<p>在项目中的单元测试，我希望一种简单的方式来决定编译哪些模块，上述的做了三个库 alib  blib clib  每一个库都有单独的CMakeLists.txt来管理库文件，与所有库文件同目录的CMakeLists.txt 用来管理所有的lib库 , 主CMakeLists.txt控制所有的编译过程</p>
+<ul>
+<li>此种方式需要再代码中加上cmake的语法规则来决定编译哪一些代码，可以看做是C语言的#ifdef 之类的，cmake gui配置相当于一个可视化的宏开关</li>
+</ul>
+<pre><code>$ tree -L 3
+.
+|-- CMakeLists.txt
+|-- main.c
+`-- test_lib
+    |-- CMakeLists.txt
+    |-- alib
+    |   |-- CMakeLists.txt
+    |   |-- alib.c
+    |   `-- alib.h
+    |-- blib
+    |   |-- CMakeLists.txt
+    |   |-- blib.c
+    |   `-- blib.h
+    |-- clib
+    |   |-- CMakeLists.txt
+    |   |-- clib.c
+    |   `-- clib.h
+
+
+4 directories, 12 files
+
+</code></pre>
+<h2 id="_5">代码展示</h2>
+<h2 id="mainc">main.c</h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#ifdef HAVE_ALIB
+#include &quot;alib.h&quot;
+#endif
+#ifdef HAVE_BLIB
+#include &quot;blib.h&quot;
+#endif
+#ifdef HAVE_CLIB
+#include &quot;clib.h&quot;
+#endif
+
+int main(void) {
+#ifdef HAVE_ALIB
+    alib_hello();
+#endif
+#ifdef HAVE_BLIB
+    blib_hello();
+#endif
+#ifdef HAVE_CLIB
+    clib_hello();
+#endif
+    return 0;
+}
+</code></pre>
+<h2 id="cmakeliststxt">主CMakeLists.txt</h2>
+<pre><code class="language-cmake">cmake_minimum_required(VERSION 3.14)
+project(demo_cmake_libs)
+
+add_executable(demo main.c)
+
+# 添加 test_lib 目录，集中管理
+add_subdirectory(test_lib)
+
+if (TARGET alib)
+    target_link_libraries(demo PRIVATE alib)
+    target_compile_definitions(demo PRIVATE HAVE_ALIB)
+endif()
+if (TARGET blib)
+    target_link_libraries(demo PRIVATE blib)
+    target_compile_definitions(demo PRIVATE HAVE_BLIB)
+endif()
+if (TARGET clib)
+    target_link_libraries(demo PRIVATE clib)
+    target_compile_definitions(demo PRIVATE HAVE_CLIB)
+endif()
+</code></pre>
+<h2 id="test_libcmakeliststxt">test_lib目录下的CMakeLists.txt</h2>
+<pre><code class="language-cmake">option(ENABLE_ALIB &quot;Build alib library&quot; ON)
+option(ENABLE_BLIB &quot;Build blib library&quot; ON)
+option(ENABLE_CLIB &quot;Build clib library&quot; ON)
+
+if (ENABLE_ALIB)
+    add_subdirectory(alib)
+endif()
+if (ENABLE_BLIB)
+    add_subdirectory(blib)
+endif()
+if (ENABLE_CLIB)
+    add_subdirectory(clib)
+endif()
+</code></pre>
+<h2 id="test_libalib">test_lib\alib下</h2>
+<ul>
+<li>alib.c</li>
+</ul>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void alib_hello(void) {
+    printf(&quot;Hello from alib!\n&quot;);
+}
+</code></pre>
+<ul>
+<li>alib.h</li>
+</ul>
+<pre><code class="language-c">#ifndef ALIB_H
+#define ALIB_H
+
+void alib_hello(void);
+
+#endif
+</code></pre>
+<ul>
+<li>CMakeLists.txt</li>
+</ul>
+<pre><code class="language-cmake">add_library(alib STATIC alib.c)
+target_include_directories(alib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+</code></pre>
+<h2 id="test_libblib">test_lib\blib下</h2>
+<ul>
+<li>blib.c</li>
+</ul>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void blib_hello(void) {
+    printf(&quot;Hello from blib!\n&quot;);
+}
+</code></pre>
+<ul>
+<li>blib.h</li>
+</ul>
+<pre><code class="language-c">#ifndef BLIB_H
+#define BLIB_H
+
+void blib_hello(void);
+
+#endif
+</code></pre>
+<ul>
+<li>CMakeLists.txt</li>
+</ul>
+<pre><code class="language-cmake">add_library(blib STATIC blib.c)
+target_include_directories(blib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+</code></pre>
+<h2 id="test_libclib">test_lib\clib下</h2>
+<ul>
+<li>clib.c</li>
+</ul>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void clib_hello(void) {
+    printf(&quot;Hello from clib!\n&quot;);
+}
+</code></pre>
+<ul>
+<li>clib.h</li>
+</ul>
+<pre><code class="language-c">#ifndef CLIB_H
+#define CLIB_H
+
+void clib_hello(void);
+
+#endif
+</code></pre>
+<ul>
+<li>CMakeLists.txt</li>
+</ul>
+<pre><code class="language-cmake">add_library(clib STATIC clib.c)
+target_include_directories(clib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+</code></pre>
+<h2 id="_6">编译命令</h2>
+<pre><code>mkdir build &amp;&amp; cd build
+cmake-gui ..      (可视化配置并生成makefile文件【看下面的图】)
+make
+.\demo.exe
+</code></pre>
+<p><img alt="image-20250805204348229" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805204348229.png" /></p>
+<p><img alt="image-20250805204446962" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805204446962.png" /></p>
+<p><img alt="image-20250805204600136" src="https://newbie-typora.oss-cn-shenzhen.aliyuncs.com/TyporaJPG/image-20250805204600136.png" /></p>
+    </div>
+</div>
+<div id="toc">
+    <div style="font-weight:bold;margin-bottom:12px;">目录</div>
+    <div class="toc">
+<ul>
+<li><a href="#cmake-gui">cmake-gui 控制编译</a><ul>
+<li><a href="#_1">功能展示</a><ul>
+<li><a href="#_2">同时使能三个库</a></li>
+<li><a href="#_3">使能两个库</a></li>
+</ul>
+</li>
+<li><a href="#_4">创建的文件以及目录</a></li>
+<li><a href="#_5">代码展示</a></li>
+<li><a href="#mainc">main.c</a></li>
+<li><a href="#cmakeliststxt">主CMakeLists.txt</a></li>
+<li><a href="#test_libcmakeliststxt">test_lib目录下的CMakeLists.txt</a></li>
+<li><a href="#test_libalib">test_lib\alib下</a></li>
+<li><a href="#test_libblib">test_lib\blib下</a></li>
+<li><a href="#test_libclib">test_lib\clib下</a></li>
+<li><a href="#_6">编译命令</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
